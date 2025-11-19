@@ -24,7 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { EyeOff } from 'lucide-react';
+import { EyeOff, Eye } from 'lucide-react';
 import { useState } from 'react';
 
 const formSchema = z.object({
@@ -54,9 +54,9 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md shadow-2xl">
+    <Card className="w-full max-w-md border-gray-800 bg-gray-950 text-white shadow-2xl">
       <CardHeader>
-        <CardTitle className="text-3xl font-bold tracking-tight text-foreground">
+        <CardTitle className="text-3xl font-bold tracking-tight text-white">
           Sign In
         </CardTitle>
         <CardDescription>
@@ -74,7 +74,7 @@ export function LoginForm() {
                   <FormLabel>Username:</FormLabel>
                   <FormControl>
                     <Input
-                      className="h-12 bg-input text-base"
+                      className="h-12 bg-gray-900 text-base"
                       placeholder="Enter Username"
                       {...field}
                     />
@@ -93,7 +93,7 @@ export function LoginForm() {
                     <FormControl>
                       <Input
                         type={showPassword ? 'text' : 'password'}
-                        className="h-12 bg-input pr-10 text-base"
+                        className="h-12 bg-gray-900 pr-10 text-base"
                         placeholder="Enter Password"
                         {...field}
                       />
@@ -103,7 +103,11 @@ export function LoginForm() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute inset-y-0 right-0 flex items-center pr-3"
                     >
-                      <EyeOff className="h-5 w-5 text-muted-foreground" />
+                      {showPassword ? (
+                        <Eye className="h-5 w-5 text-muted-foreground" />
+                      ) : (
+                        <EyeOff className="h-5 w-5 text-muted-foreground" />
+                      )}
                     </button>
                   </div>
                   <FormMessage />
@@ -112,7 +116,7 @@ export function LoginForm() {
             />
             <Button
               type="submit"
-              className="w-full bg-slate-600 py-6 text-base font-semibold text-white hover:bg-slate-700"
+              className="w-full bg-blue-600 py-6 text-base font-semibold text-white hover:bg-blue-700"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Signing In...' : 'Sign In'}
@@ -123,13 +127,13 @@ export function LoginForm() {
       <CardFooter className="flex-col items-start gap-4">
         <Link
           href="#"
-          className="text-sm font-medium text-primary hover:underline"
+          className="text-sm font-medium text-blue-400 hover:underline"
         >
           Forgot your credentials?
         </Link>
         <Link
           href="#"
-          className="text-sm font-medium text-foreground hover:underline"
+          className="text-sm font-medium text-gray-300 hover:underline"
         >
           Corporate Enroll
         </Link>
