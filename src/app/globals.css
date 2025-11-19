@@ -47,6 +47,19 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
+
+  #gradient-canvas {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    --gradient-color-1: #adc8ff;
+    --gradient-color-2: #cfc1ff;
+    --gradient-color-3: #e89dff;
+    --gradient-color-4: #b098f2;
+  }
 }
 
 @layer base {
@@ -54,6 +67,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-transparent text-foreground;
   }
 }

@@ -54,7 +54,7 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md border-gray-800 bg-gray-950 text-white shadow-2xl">
+    <Card className="w-full max-w-md border-gray-800 bg-gray-950/80 text-white shadow-2xl backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="text-3xl font-bold tracking-tight text-white">
           Sign In
