@@ -8,7 +8,7 @@ export default function LoginPage() {
       <GradientBackground />
       <div className="relative min-h-screen w-full lg:grid lg:grid-cols-2">
         <div className="relative hidden items-center justify-center lg:flex">
-          <div className="relative z-10 mx-auto max-w-md space-y-8 text-white">
+          <div className="relative z-10 mx-auto max-w-md space-y-8 text-black">
             <div className="flex items-center gap-4">
               <div className="flex items-center justify-center rounded-lg bg-white p-2 shadow-md">
                 <Image
@@ -27,7 +27,7 @@ export default function LoginPage() {
               <h1 className="text-5xl font-bold tracking-tight">
                 Welcome to UBL Digital Business Banking
               </h1>
-              <p className="text-lg text-gray-300">
+              <p className="text-lg text-gray-800">
                 UBL Digital Business Banking offers a comprehensive suite of
                 flexible online financial solutions to cater to all your business
                 banking needs.
