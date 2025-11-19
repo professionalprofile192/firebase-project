@@ -54,9 +54,9 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md border-gray-800 bg-gray-950/80 text-white shadow-2xl backdrop-blur-sm">
+    <Card className="w-full max-w-md border-border bg-card/80 text-card-foreground shadow-2xl backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="text-3xl font-bold tracking-tight text-white">
+        <CardTitle className="text-3xl font-bold tracking-tight">
           Sign In
         </CardTitle>
         <CardDescription>
@@ -74,7 +74,7 @@ export function LoginForm() {
                   <FormLabel>Username:</FormLabel>
                   <FormControl>
                     <Input
-                      className="h-12 bg-gray-900 text-base"
+                      className="h-12 text-base"
                       placeholder="Enter Username"
                       {...field}
                     />
@@ -93,7 +93,7 @@ export function LoginForm() {
                     <FormControl>
                       <Input
                         type={showPassword ? 'text' : 'password'}
-                        className="h-12 bg-gray-900 pr-10 text-base"
+                        className="h-12 pr-10 text-base"
                         placeholder="Enter Password"
                         {...field}
                       />
@@ -116,7 +116,7 @@ export function LoginForm() {
             />
             <Button
               type="submit"
-              className="w-full bg-blue-600 py-6 text-base font-semibold text-white hover:bg-blue-700"
+              className="w-full py-6 text-base font-semibold"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Signing In...' : 'Sign In'}
@@ -127,13 +127,13 @@ export function LoginForm() {
       <CardFooter className="flex-col items-start gap-4">
         <Link
           href="#"
-          className="text-sm font-medium text-blue-400 hover:underline"
+          className="text-sm font-medium text-blue-600 hover:underline"
         >
           Forgot your credentials?
         </Link>
         <Link
           href="#"
-          className="text-sm font-medium text-gray-300 hover:underline"
+          className="text-sm font-medium text-gray-500 hover:underline"
         >
           Corporate Enroll
         </Link>
