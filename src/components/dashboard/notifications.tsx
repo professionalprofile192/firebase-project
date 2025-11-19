@@ -14,6 +14,7 @@ import {
   } from '@/components/ui/select';
   import { Button } from '../ui/button';
   import { ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
   
   
   const notifications = [
@@ -59,7 +60,10 @@ import {
               <div key={index} className="flex items-start gap-4 border-b pb-4 last:border-b-0 last:pb-0">
                   <div className="flex-1">
                       <p className="text-xs text-muted-foreground">{item.date}</p>
-                      <p className={`font-semibold ${item.statusColor}`}>{item.status}</p>
+                      <p className={cn("font-semibold", {
+                          "text-green-500": item.status === "APPROVED",
+                          "text-yellow-500": item.status === "IN PROGRESS",
+                      })}>{item.status}</p>
                       <p className="text-sm">{item.message}</p>
                   </div>
                   <ChevronRight className="h-4 w-4 text-muted-foreground self-center" />

@@ -7,11 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
         <CardHeader>
           <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-primary"></div>
                   <span className="text-sm">Credit</span>
               </div>
                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-destructive"></div>
                   <span className="text-sm">Debit</span>
               </div>
           </div>

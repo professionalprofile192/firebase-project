@@ -63,7 +63,7 @@ import {
             <div key={index} className="flex items-center gap-4">
               <div className="flex flex-col items-center">
                 <div className="text-sm text-muted-foreground">{tx.month}</div>
-                <div className="text-lg font-bold text-red-500 border-l-2 border-red-500 pl-2 -ml-2">{tx.date}</div>
+                <div className="text-lg font-bold text-destructive border-l-2 border-destructive pl-2 -ml-2">{tx.date}</div>
               </div>
               <div className="flex-1">
                 <p className="font-semibold">{tx.description}</p>
