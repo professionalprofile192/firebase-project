@@ -24,7 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Lock, User } from 'lucide-react';
+import { EyeOff } from 'lucide-react';
 import { useState } from 'react';
 
 const formSchema = z.object({
@@ -34,6 +34,8 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,13 +54,13 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md border-0 bg-transparent shadow-none">
-      <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-bold tracking-tight text-card-foreground">
-          Welcome Back
+    <Card className="w-full max-w-md shadow-2xl">
+      <CardHeader>
+        <CardTitle className="text-3xl font-bold tracking-tight text-foreground">
+          Sign In
         </CardTitle>
         <CardDescription>
-          Enter your credentials to access your account
+          Enter your credentials to sign in to UBL Digital.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -69,17 +71,14 @@ export function LoginForm() {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                    <FormControl>
-                      <Input
-                        className="h-12 pl-10 text-base"
-                        placeholder="Your username"
-                        {...field}
-                      />
-                    </FormControl>
-                  </div>
+                  <FormLabel>Username:</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-12 bg-input text-base"
+                      placeholder="Enter Username"
+                      {...field}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -89,25 +88,23 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Password</FormLabel>
-                    <Link
-                      href="#"
-                      className="text-sm font-medium text-primary hover:underline"
-                    >
-                      Forgot Password?
-                    </Link>
-                  </div>
+                  <FormLabel>Password:</FormLabel>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                     <FormControl>
                       <Input
-                        type="password"
-                        className="h-12 pl-10 text-base"
-                        placeholder="Your password"
+                        type={showPassword ? 'text' : 'password'}
+                        className="h-12 bg-input pr-10 text-base"
+                        placeholder="Enter Password"
                         {...field}
                       />
                     </FormControl>
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 flex items-center pr-3"
+                    >
+                      <EyeOff className="h-5 w-5 text-muted-foreground" />
+                    </button>
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -115,24 +112,27 @@ export function LoginForm() {
             />
             <Button
               type="submit"
-              className="w-full py-6 text-base font-semibold"
+              className="w-full bg-slate-600 py-6 text-base font-semibold text-white hover:bg-slate-700"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Logging in...' : 'Login'}
+              {isSubmitting ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex justify-center">
-        <p className="text-sm text-muted-foreground">
-          New corporate user?{' '}
-          <Link
-            href="#"
-            className="font-semibold text-primary hover:underline"
-          >
-            Enroll now
-          </Link>
-        </p>
+      <CardFooter className="flex-col items-start gap-4">
+        <Link
+          href="#"
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          Forgot your credentials?
+        </Link>
+        <Link
+          href="#"
+          className="text-sm font-medium text-foreground hover:underline"
+        >
+          Corporate Enroll
+        </Link>
       </CardFooter>
     </Card>
   );
