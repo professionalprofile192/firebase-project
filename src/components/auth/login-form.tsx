@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -26,15 +27,29 @@ import {
 } from '@/components/ui/card';
 import { EyeOff, Eye } from 'lucide-react';
 import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   username: z.string().min(1, { message: 'Username is required' }),
   password: z.string().min(1, { message: 'Password is required' }),
 });
 
+async function login(values: z.infer<typeof formSchema>) {
+  // This is a placeholder for the actual API call.
+  // In a real application, this would make a request to your backend,
+  // which would then securely call the UBL Digital API.
+  if (values.username === 'raaststp' && values.password === 'Kony@123456') {
+    return { success: true, message: 'Login successful' };
+  } else {
+    return { success: false, message: 'Invalid username or password' };
+  }
+}
+
 export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,13 +59,33 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await login(values);
+
+      if (response.success) {
+        toast({
+          title: 'Login Successful',
+          description: 'Redirecting to your dashboard...',
+        });
+        router.push('/dashboard');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Login Failed',
+          description: response.message,
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'An error occurred',
+        description: 'Please try again later.',
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 2000);
+    }
   }
 
   return (
