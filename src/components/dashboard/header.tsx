@@ -1,22 +1,39 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Menu, User, LogOut, ChevronDown } from 'lucide-react';
+import { Menu, User, LogOut, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { LogoutDialog } from '../auth/logout-dialog';
+import { Avatar, AvatarFallback } from '../ui/avatar';
+
+type UserProfile = {
+    firstname: string;
+    lastname: string;
+    email: string;
+}
 
 export function Header() {
   const router = useRouter();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    const profile = sessionStorage.getItem('userProfile');
+    if (profile) {
+      setUserProfile(JSON.parse(profile));
+    }
+  }, []);
 
   const handleLogout = () => {
     setShowLogoutDialog(true);
@@ -24,6 +41,7 @@ export function Header() {
 
   const confirmLogout = () => {
     setShowLogoutDialog(false);
+    sessionStorage.clear();
     router.push('/');
   };
 
@@ -68,9 +86,38 @@ export function Header() {
         <div className="flex-1" />
 
         <div className="hidden items-center gap-4 md:flex">
-          <Button variant="ghost" size="icon" className="text-muted-foreground">
-            <User className="h-5 w-5" />
-          </Button>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-muted-foreground">
+                    <User className="h-5 w-5" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-64" align="end">
+                 <DropdownMenuGroup>
+                    <div className="flex items-center gap-3 p-2">
+                        <Avatar>
+                            <AvatarFallback>
+                                <User className="h-6 w-6" />
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                            <span className="font-semibold capitalize">{userProfile?.firstname} {userProfile?.lastname}</span>
+                            <span className="text-xs text-muted-foreground">{userProfile?.email}</span>
+                        </div>
+                    </div>
+                 </DropdownMenuGroup>
+                 <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Profile Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Alerts Settings</span>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+
           <Button
             variant="ghost"
             size="icon"
@@ -124,6 +171,39 @@ export function Header() {
               >
                 Transfer
               </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="justify-start text-muted-foreground">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-64" align="end">
+                    <DropdownMenuGroup>
+                        <div className="flex items-center gap-3 p-2">
+                            <Avatar>
+                                <AvatarFallback>
+                                    <User className="h-6 w-6" />
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col">
+                                <span className="font-semibold capitalize">{userProfile?.firstname} {userProfile?.lastname}</span>
+                                <span className="text-xs text-muted-foreground">{userProfile?.email}</span>
+                            </div>
+                        </div>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Profile Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Alerts Settings</span>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <Button
                 variant="ghost"
                 onClick={handleLogout}
@@ -135,24 +215,6 @@ export function Header() {
             </nav>
           </SheetContent>
         </Sheet>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="hidden md:flex">
-              Nawaz AL... <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Logout</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </header>
       <LogoutDialog
         open={showLogoutDialog}
