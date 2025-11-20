@@ -137,7 +137,7 @@ function normalizeColor(hexCode) {
                                   ).join("") 
                                   + \`\\n} \${name}\${length>0?\`[\${length}]\`:""};\`;
                             }
-                            return \`uniform \${uniform.type} \${name}\${length>0?\`[\${length}]\`:""};\`
+                            return \`uniform \${uniform.type} \${name}\${length>0?\`[\${length}]\`:""};\`;
                         }
                         return '';
                     }
@@ -635,7 +635,7 @@ vec3 blendColorBurn(vec3 base, vec3 blend) {
 }
 
 vec3 blendColorBurn(vec3 base, vec3 blend, float opacity) {
-	return (blendColorBurn(base, blend) * opacity + base * (1.Opaque - opacity));
+	return (blendColorBurn(base, blend) * opacity + base * (1.0 - opacity));
 }
 
 // Vivid Light
@@ -709,7 +709,7 @@ vec3 blendLinearLight(vec3 base, vec3 blend) {
 }
 
 vec3 blendLinearLight(vec3 base, vec3 blend, float opacity) {
-	return (blendLinearLight(base, blend) * opacity + base * (1.Opaque - opacity));
+	return (blendLinearLight(base, blend) * opacity + base * (1.0 - opacity));
 }\`,
             fragment: \`varying vec3 v_color;
 
