@@ -58,6 +58,8 @@ export function LoginForm() {
           title: 'Login Successful',
           description: 'Redirecting to your dashboard...',
         });
+        
+        sessionStorage.setItem('userProfile', JSON.stringify(response.profile));
 
         // Call the second service to get the last login time
         const loginTimeResponse = await getLastLoginTime(response.profile.userid);
