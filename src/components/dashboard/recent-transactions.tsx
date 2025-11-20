@@ -14,6 +14,7 @@ import {
   } from '@/components/ui/select';
   import { Button } from '../ui/button';
   import { ChevronRight } from 'lucide-react';
+import { ScrollArea } from '../ui/scroll-area';
   
   const transactions = [
     {
@@ -40,11 +41,19 @@ import {
       type: 'Debit',
       amount: 'Rs. 3,000.00',
     },
+    {
+        date: '16',
+        month: 'Nov',
+        description: 'CASH WITHDRAWAL - AT...',
+        id: '5911804813',
+        type: 'Debit',
+        amount: 'Rs. 10,000.00',
+    },
   ];
   
   export function RecentTransactions() {
     return (
-      <Card className="h-full">
+      <Card className="h-full flex flex-col">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Recent Transactions</CardTitle>
@@ -58,29 +67,31 @@ import {
             </Select>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {transactions.map((tx, index) => (
-            <div key={index} className="flex items-center gap-4">
-              <div className="flex flex-col items-center">
-                <div className="text-sm text-muted-foreground">{tx.month}</div>
-                <div className="text-lg font-bold">{tx.date}</div>
-              </div>
-              <div className="flex-1 border-l-2 border-destructive pl-4">
-                <p className="font-semibold">{tx.description}</p>
-                <p className="text-sm text-muted-foreground">
-                  {tx.id}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {tx.type}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <p className="font-semibold text-primary">{tx.amount}</p>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </div>
-          ))}
-        </CardContent>
+        <ScrollArea className="flex-1">
+            <CardContent className="space-y-4">
+            {transactions.map((tx, index) => (
+                <div key={index} className="flex items-center gap-4">
+                <div className="flex flex-col items-center">
+                    <div className="text-sm text-muted-foreground">{tx.month}</div>
+                    <div className="text-lg font-bold">{tx.date}</div>
+                </div>
+                <div className="flex-1 border-l-2 border-destructive pl-4">
+                    <p className="font-semibold">{tx.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                    {tx.id}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                    {tx.type}
+                    </p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <p className="font-semibold text-primary">{tx.amount}</p>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </div>
+                </div>
+            ))}
+            </CardContent>
+        </ScrollArea>
         <CardFooter className="justify-center">
           <Button variant="link">See all</Button>
         </CardFooter>

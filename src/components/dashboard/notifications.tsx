@@ -15,6 +15,7 @@ import {
   import { Button } from '../ui/button';
   import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ScrollArea } from '../ui/scroll-area';
   
   
   const notifications = [
@@ -40,7 +41,7 @@ import { cn } from '@/lib/utils';
   
   export function Notifications() {
     return (
-      <Card className="h-full">
+      <Card className="h-full flex flex-col">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Notifications</CardTitle>
@@ -55,21 +56,23 @@ import { cn } from '@/lib/utils';
             </Select>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {notifications.map((item, index) => (
-              <div key={index} className="flex items-start gap-4 border-b pb-4 last:border-b-0 last:pb-0">
-                  <div className="flex-1">
-                      <p className="text-xs text-muted-foreground">{item.date}</p>
-                      <p className={cn("font-semibold", {
-                          "text-green-500": item.status === "APPROVED",
-                          "text-yellow-500": item.status === "IN PROGRESS",
-                      })}>{item.status}</p>
-                      <p className="text-sm">{item.message}</p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground self-center" />
-              </div>
-          ))}
-        </CardContent>
+        <ScrollArea className="flex-1">
+            <CardContent className="space-y-4">
+            {notifications.map((item, index) => (
+                <div key={index} className="flex items-start gap-4 border-b pb-4 last:border-b-0 last:pb-0">
+                    <div className="flex-1">
+                        <p className="text-xs text-muted-foreground">{item.date}</p>
+                        <p className={cn("font-semibold", {
+                            "text-green-500": item.status === "APPROVED",
+                            "text-yellow-500": item.status === "IN PROGRESS",
+                        })}>{item.status}</p>
+                        <p className="text-sm">{item.message}</p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground self-center" />
+                </div>
+            ))}
+            </CardContent>
+        </ScrollArea>
          <CardFooter className="justify-center">
           <Button variant="link">See all</Button>
         </CardFooter>
