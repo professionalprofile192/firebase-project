@@ -40,10 +40,10 @@ const SidebarNav = () => {
 
     const navItems = [
         { id: 'accounts', label: 'Accounts', icon: Landmark, subItems: ['My Accounts', 'Account Statements'] },
-        { id: 'approvals', label: 'Approvals & Requests', icon: CheckSquare },
-        { id: 'payments', label: 'Payments', icon: CreditCard },
-        { id: 'transfers', label: 'Transfers', icon: ArrowRightLeft },
-        { id: 'rtgs', label: 'RTGS', icon: Clock },
+        { id: 'approvals', label: 'Approvals & Requests', icon: CheckSquare, subItems: ['Pending Approvals', 'Approvals History', 'Pending Requests', 'Requests History'] },
+        { id: 'payments', label: 'Payments', icon: CreditCard, subItems: ['Bill Payment', 'Bulk Bill Payments', 'Bill Payment History'] },
+        { id: 'transfers', label: 'Transfers', icon: ArrowRightLeft, subItems: ['Bulk Transfers', 'Transfer History'] },
+        { id: 'rtgs', label: 'RTGS', icon: Clock, subItems: ['RTGS Transfers'] },
         { id: 'trade', label: 'Trade Request', icon: Briefcase },
         { id: 'reports', label: 'Report - MIS', icon: BarChart },
         { id: 'bulk', label: 'Bulk Import', icon: Upload },
@@ -51,7 +51,7 @@ const SidebarNav = () => {
 
     return (
         <nav className="flex flex-col h-full text-sm font-medium">
-             <div className="p-4 border-b">
+             <div className="p-4 border-b flex items-center justify-between">
                 <div className="flex items-center gap-2 text-lg font-semibold">
                     <Image
                         src={ublLogo}
@@ -64,20 +64,23 @@ const SidebarNav = () => {
                     />
                     <span>Business Banking</span>
                 </div>
+                <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                        <X className="h-5 w-5" />
+                    </Button>
+                </SheetTrigger>
             </div>
             <div className='flex-1 overflow-y-auto'>
                 {navItems.map(item => (
-                    <Collapsible key={item.id} open={openSections.includes(item.id)} onOpenChange={() => toggleSection(item.id)} className="border-b">
-                        <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-muted/50">
+                    <Collapsible key={item.id} open={openSections.includes(item.id)} onOpenChange={() => item.subItems && toggleSection(item.id)} className="border-b">
+                        <CollapsibleTrigger disabled={!item.subItems} className="flex items-center justify-between w-full p-4 hover:bg-muted/50 disabled:opacity-50 disabled:hover:bg-transparent">
                             <div className="flex items-center gap-3">
                                 <item.icon className="h-5 w-5" />
                                 <span>{item.label}</span>
                             </div>
                             {item.subItems ? (
                                 openSections.includes(item.id) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-                            ) : (
-                                <ChevronDown className="h-4 w-4" />
-                            )}
+                            ) : null }
                         </CollapsibleTrigger>
                         {item.subItems && (
                             <CollapsibleContent className={cn("bg-muted/20", {
@@ -136,7 +139,6 @@ export function Header() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-80">
-            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
             <SidebarNav />
           </SheetContent>
         </Sheet>
