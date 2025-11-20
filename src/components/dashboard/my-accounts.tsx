@@ -35,6 +35,7 @@ export function MyAccounts({ accounts }: MyAccountsProps) {
             return account.DEPOSIT_TYPE === 'S';
         }
         if (accountType === 'current') {
+            // As there is no current account in the provided data, this will be empty
             return account.DEPOSIT_TYPE !== 'S';
         }
         return true;
@@ -44,12 +45,12 @@ export function MyAccounts({ accounts }: MyAccountsProps) {
     const formattedTotalBalance = new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalBalance);
 
     return (
-      <Card className="h-full flex flex-col">
+      <Card className="h-full flex flex-col bg-primary/90 text-primary-foreground">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>My Accounts</CardTitle>
+            <CardTitle className="text-white">My Accounts</CardTitle>
             <Select value={accountType} onValueChange={setAccountType}>
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-[150px] bg-primary/80 text-white border-white/50">
                 <SelectValue placeholder="Select Account" />
               </SelectTrigger>
               <SelectContent>
@@ -63,25 +64,25 @@ export function MyAccounts({ accounts }: MyAccountsProps) {
           <CardContent>
             {filteredAccounts.length > 0 ? (
                 filteredAccounts.map((account) => (
-                    <div key={account.ACCT_NO} className="flex justify-between items-center py-3 border-b">
+                    <div key={account.ACCT_NO} className="flex justify-between items-center py-3 border-b border-white/20">
                         <div>
                             <p className="font-semibold">{account.ACCT_NO}</p>
-                            <p className="text-sm text-muted-foreground">{account.ACCT_TITLE}</p>
+                            <p className="text-sm text-white/80">{account.ACCT_TITLE}</p>
                         </div>
-                        <p className="font-semibold text-primary">
+                        <p className="font-semibold text-white">
                             Rs. {new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(account.AVAIL_BAL))}
                         </p>
                     </div>
                 ))
             ) : (
-                <p className='text-center text-muted-foreground'>No accounts of this type found.</p>
+                <p className='text-center text-white/80'>No accounts of this type found.</p>
             )}
           </CardContent>
         </ScrollArea>
-        <CardFooter>
+        <CardFooter className="bg-primary text-white">
             <div className="flex justify-between items-center w-full">
                 <p className="font-semibold">Total</p>
-                <p className="font-semibold text-primary">Rs. {formattedTotalBalance}</p>
+                <p className="font-semibold">Rs. {formattedTotalBalance}</p>
             </div>
         </CardFooter>
       </Card>

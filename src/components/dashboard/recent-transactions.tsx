@@ -35,14 +35,14 @@ export function RecentTransactions({ transactions, accounts, onAccountChange }: 
 
     return (
       <Card className="h-full flex flex-col">
-        <CardHeader>
+        <CardHeader className="bg-primary/90 text-primary-foreground rounded-t-lg">
           <div className="flex items-center justify-between">
-            <CardTitle>Recent Transactions</CardTitle>
+            <CardTitle className="text-white">Recent Transactions</CardTitle>
             <Select 
                 defaultValue={accounts.length > 0 ? accounts[0].ACCT_NO : undefined}
                 onValueChange={onAccountChange}
             >
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-[150px] bg-primary/80 text-white border-white/50">
                 <SelectValue placeholder="Select Account" />
               </SelectTrigger>
               <SelectContent>
@@ -54,7 +54,7 @@ export function RecentTransactions({ transactions, accounts, onAccountChange }: 
           </div>
         </CardHeader>
         <ScrollArea className="flex-1">
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 pt-4">
             {transactions.length > 0 ? (
                 transactions.map((tx) => {
                     const date = new Date(tx.tranDate);
@@ -65,16 +65,16 @@ export function RecentTransactions({ transactions, accounts, onAccountChange }: 
                                 <div className="text-lg font-bold">{format(date, 'dd')}</div>
                             </div>
                             <div className={`flex-1 border-l-2 ${tx.CRDR === 'D' ? 'border-destructive' : 'border-primary'} pl-4`}>
-                                <p className="font-semibold">{tx.particulars}</p>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="font-semibold text-sm">{tx.particulars}</p>
+                                <p className="text-xs text-muted-foreground">
                                     {tx.seqno}
                                 </p>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-xs text-muted-foreground">
                                     {tx.CRDR === 'D' ? 'Debit' : 'Credit'}
                                 </p>
                             </div>
                             <div className="flex items-center gap-2">
-                                <p className={`font-semibold ${tx.CRDR === 'D' ? 'text-destructive' : 'text-primary'}`}>
+                                <p className={`font-semibold text-sm ${tx.CRDR === 'D' ? 'text-destructive' : 'text-primary'}`}>
                                     Rs. {new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(tx.tranAmt))}
                                 </p>
                                 <ChevronRight className="h-4 w-4 text-muted-foreground" />

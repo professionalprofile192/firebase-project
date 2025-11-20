@@ -164,7 +164,7 @@ export default function DashboardPage() {
           <main className="flex-1 flex flex-col p-4 sm:px-6 sm:py-4 gap-4 overflow-auto">
             <div className="grid gap-4 lg:grid-cols-4">
               <div className="lg:col-span-1 flex flex-col gap-4">
-                <NetWorth accounts={accounts} userProfile={userProfile} />
+                 <NetWorth accounts={accounts} userProfile={userProfile} />
                 <Notifications />
               </div>
               <div className="lg:col-span-3 flex flex-col gap-4">
