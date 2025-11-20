@@ -57,17 +57,6 @@ export async function getAccounts(customerId: string, cif: string) {
                     "ACCT_TYPE": "100",
                     "LEDGER_BAL": "1512642.5",
                     "AVAIL_BAL": "1512642.5"
-                },
-                {
-                    "responseCode": "00",
-                    "ACCT_STATUS": "A",
-                    "ACCT_TITLE": "ALI ENTERPRISES",
-                    "ACCT_NO": "060510224212",
-                    "IBAN_CODE": "PK87UNIL0112060510224212",
-                    "DEPOSIT_TYPE": "C",
-                    "ACCT_TYPE": "101",
-                    "LEDGER_BAL": "500000.0",
-                    "AVAIL_BAL": "500000.0"
                 }
             ],
             "opstatus": 0,
