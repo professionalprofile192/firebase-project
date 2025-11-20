@@ -919,3 +919,5 @@ gradient.initGradient('#gradient-canvas')
 
   return <canvas id="gradient-canvas" data-js-darken-top />;
 }
+
+    
