@@ -6,25 +6,12 @@ import { Button } from '../ui/button';
 import { useEffect, useState } from 'react';
 
 export function NetWorth() {
-  const [lastLoginTime, setLastLoginTime] = useState('');
-
-  useEffect(() => {
-    const storedTime = sessionStorage.getItem('lastLoginTime');
-    if (storedTime) {
-      // Format the date as needed, for now just displaying it.
-      setLastLoginTime(`Last login: ${new Date(storedTime).toLocaleString()}`);
-    }
-  }, []);
-
   return (
     <Card className="h-full bg-gradient-to-br from-teal-400 to-green-500 text-white shadow-lg">
       <CardHeader className="flex flex-row items-start justify-between pb-2">
         <div>
           <p className="text-sm font-medium">Good afternoon!</p>
           <p className="text-sm">raast stp</p>
-          {lastLoginTime && (
-            <p className="text-xs text-white/80 mt-1">{lastLoginTime}</p>
-          )}
         </div>
         <Button
           variant="ghost"
