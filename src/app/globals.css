@@ -48,6 +48,14 @@
     --ring: 212.7 26.8% 83.9%;
   }
 
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
   #gradient-canvas {
     width: 100vw;
     height: 100vh;
