@@ -13,7 +13,7 @@ import {
   DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { LogoutDialog } from '../auth/logout-dialog';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
@@ -72,16 +72,16 @@ const SidebarNav = () => {
             </div>
             <div className='flex-1 overflow-y-auto'>
                 {navItems.map(item => (
-                    <Collapsible key={item.id} open={openSections.includes(item.id)} onOpenChange={() => item.subItems && toggleSection(item.id)} className="border-b">
+                    <Collapsible key={item.id} open={openSections.includes(item.id)} onOpenChange={() => toggleSection(item.id)} className="border-b">
                         <CollapsibleTrigger asChild>
-                            <div className={cn("flex items-center justify-between w-full p-4 hover:bg-muted/50", !item.subItems && "opacity-50 hover:bg-transparent")}>
+                            <div className={cn("flex items-center justify-between w-full p-4 hover:bg-muted/50", !item.subItems && item.id !== 'reports' && "opacity-50 hover:bg-transparent")}>
                                 <div className="flex items-center gap-3">
                                     <item.icon className="h-5 w-5" />
                                     <span>{item.label}</span>
                                 </div>
-                                {item.subItems || item.id === 'reports' ? (
-                                    openSections.includes(item.id) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-                                ) : null }
+                                {item.id !== 'reports' ? (
+                                    item.subItems && (openSections.includes(item.id) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />)
+                                ) : <ChevronDown className="h-4 w-4" /> }
                             </div>
                         </CollapsibleTrigger>
                         {item.subItems && (
