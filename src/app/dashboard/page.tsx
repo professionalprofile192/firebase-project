@@ -67,6 +67,20 @@ export default function DashboardPage() {
     resetTimeout();
   };
 
+  const fetchTransactionsForAccount = async (acctNo: string) => {
+    try {
+        const recentTransactionsData = await getRecentTransactions(acctNo);
+        if (recentTransactionsData.opstatus === 0) {
+            setTransactions(recentTransactionsData.payments);
+        } else {
+            setTransactions([]);
+        }
+    } catch (error) {
+        console.error("Failed to fetch transactions for account", error);
+        setTransactions([]);
+    }
+  }
+
   useEffect(() => {
     const profile = sessionStorage.getItem('userProfile');
     if (profile) {
@@ -76,14 +90,9 @@ export default function DashboardPage() {
       const fetchData = async () => {
         try {
             const accountsData = await getAccounts(parsedProfile.userid, parsedProfile.CIF_NO);
-            if (accountsData.opstatus === 0) {
+            if (accountsData.opstatus === 0 && accountsData.payments.length > 0) {
                 setAccounts(accountsData.payments);
-                if (accountsData.payments.length > 0) {
-                    const recentTransactionsData = await getRecentTransactions(accountsData.payments[0].ACCT_NO);
-                    if (recentTransactionsData.opstatus === 0) {
-                        setTransactions(recentTransactionsData.payments);
-                    }
-                }
+                await fetchTransactionsForAccount(accountsData.payments[0].ACCT_NO);
             }
         } catch (error) {
             console.error("Failed to fetch dashboard data", error);
@@ -117,20 +126,6 @@ export default function DashboardPage() {
     };
 
   }, [router, resetTimeout]);
-
-  const fetchTransactionsForAccount = async (acctNo: string) => {
-    try {
-        const recentTransactionsData = await getRecentTransactions(acctNo);
-        if (recentTransactionsData.opstatus === 0) {
-            setTransactions(recentTransactionsData.payments);
-        } else {
-            setTransactions([]);
-        }
-    } catch (error) {
-        console.error("Failed to fetch transactions for account", error);
-        setTransactions([]);
-    }
-  }
 
   if (loading || !userProfile) {
     return (
