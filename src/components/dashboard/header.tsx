@@ -68,7 +68,9 @@ export function Header() {
         <div className="flex-1" />
 
         <div className="hidden items-center gap-4 md:flex">
-          <User className="h-5 w-5 text-muted-foreground" />
+          <Button variant="ghost" size="icon" className="text-muted-foreground">
+            <User className="h-5 w-5" />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -122,10 +124,14 @@ export function Header() {
               >
                 Transfer
               </Link>
-              <DropdownMenuItem onSelect={handleLogout}>
+              <Button
+                variant="ghost"
+                onClick={handleLogout}
+                className="justify-start text-muted-foreground"
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Logout</span>
-              </DropdownMenuItem>
+              </Button>
             </nav>
           </SheetContent>
         </Sheet>

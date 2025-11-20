@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowDownCircle, ArrowUpCircle, RefreshCw } from 'lucide-react';
+import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
 
 export function NetWorth() {
@@ -19,14 +19,18 @@ export function NetWorth() {
         <p className="text-xs text-white/80">Total Net Worth</p>
         <div className="mt-6 space-y-4">
           <div className="flex items-center gap-2">
-            <ArrowDownCircle className="h-6 w-6" />
+            <div className="bg-white/20 rounded-full p-1">
+                <ArrowDown className="h-4 w-4" />
+            </div>
             <div>
               <p className="text-lg font-semibold">PKR. 1,512,627.50</p>
               <p className="text-sm text-white/80">Assets</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <ArrowUpCircle className="h-6 w-6" />
+            <div className="bg-white/20 rounded-full p-1">
+                <ArrowUp className="h-4 w-4" />
+            </div>
             <div>
               <p className="text-lg font-semibold">PKR. 0.00</p>
               <p className="text-sm text-white/80">Liabilities</p>
