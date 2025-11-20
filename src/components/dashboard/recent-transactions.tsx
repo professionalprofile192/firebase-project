@@ -1,3 +1,4 @@
+'use client';
 import {
     Card,
     CardContent,
@@ -15,81 +16,78 @@ import {
   import { Button } from '../ui/button';
   import { ChevronRight } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
+import { Transaction } from '@/app/dashboard/page';
+import { format } from 'date-fns';
+import { FileQuestion } from 'lucide-react';
   
-  const transactions = [
-    {
-      date: '19',
-      month: 'Nov',
-      description: 'CASH WITHDRAWAL - AT...',
-      id: '5917336308',
-      type: 'Debit',
-      amount: 'Rs. 5,000.00',
-    },
-    {
-      date: '18',
-      month: 'Nov',
-      description: 'CASH WITHDRAWAL - AT...',
-      id: '5914830496',
-      type: 'Debit',
-      amount: 'Rs. 5,000.00',
-    },
-    {
-      date: '17',
-      month: 'Nov',
-      description: 'CASH WITHDRAWAL - AT...',
-      id: '5911804812',
-      type: 'Debit',
-      amount: 'Rs. 3,000.00',
-    },
-    {
-        date: '16',
-        month: 'Nov',
-        description: 'CASH WITHDRAWAL - AT...',
-        id: '5911804813',
-        type: 'Debit',
-        amount: 'Rs. 10,000.00',
-    },
-  ];
+type Account = {
+    ACCT_NO: string;
+    ACCT_TITLE: string;
+};
+
+interface RecentTransactionsProps {
+    transactions: Transaction[];
+    accounts: Account[];
+    onAccountChange: (acctNo: string) => void;
+}
   
-  export function RecentTransactions() {
+export function RecentTransactions({ transactions, accounts, onAccountChange }: RecentTransactionsProps) {
+
     return (
       <Card className="h-full flex flex-col">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Recent Transactions</CardTitle>
-            <Select defaultValue="060510224211">
+            <Select 
+                defaultValue={accounts.length > 0 ? accounts[0].ACCT_NO : undefined}
+                onValueChange={onAccountChange}
+            >
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Select Account" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="060510224211">060510224211</SelectItem>
+                {accounts.map(account => (
+                    <SelectItem key={account.ACCT_NO} value={account.ACCT_NO}>{account.ACCT_NO}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
         </CardHeader>
         <ScrollArea className="flex-1">
             <CardContent className="space-y-4">
-            {transactions.map((tx, index) => (
-                <div key={index} className="flex items-center gap-4">
-                <div className="flex flex-col items-center">
-                    <div className="text-sm text-muted-foreground">{tx.month}</div>
-                    <div className="text-lg font-bold">{tx.date}</div>
+            {transactions.length > 0 ? (
+                transactions.map((tx) => {
+                    const date = new Date(tx.tranDate);
+                    return (
+                        <div key={tx.seqno} className="flex items-center gap-4">
+                            <div className="flex flex-col items-center">
+                                <div className="text-sm text-muted-foreground">{format(date, 'MMM')}</div>
+                                <div className="text-lg font-bold">{format(date, 'dd')}</div>
+                            </div>
+                            <div className={`flex-1 border-l-2 ${tx.CRDR === 'D' ? 'border-destructive' : 'border-primary'} pl-4`}>
+                                <p className="font-semibold">{tx.particulars}</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {tx.seqno}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    {tx.CRDR === 'D' ? 'Debit' : 'Credit'}
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <p className={`font-semibold ${tx.CRDR === 'D' ? 'text-destructive' : 'text-primary'}`}>
+                                    Rs. {new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(tx.tranAmt))}
+                                </p>
+                                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                        </div>
+                    )
+                })
+            ) : (
+                <div className="flex flex-col items-center justify-center pt-10 text-muted-foreground">
+                    <FileQuestion className="h-12 w-12" />
+                    <p className="mt-2 text-sm">No Recent Transactions</p>
                 </div>
-                <div className="flex-1 border-l-2 border-destructive pl-4">
-                    <p className="font-semibold">{tx.description}</p>
-                    <p className="text-sm text-muted-foreground">
-                    {tx.id}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                    {tx.type}
-                    </p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <p className="font-semibold text-primary">{tx.amount}</p>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                </div>
-                </div>
-            ))}
+            )}
             </CardContent>
         </ScrollArea>
         <CardFooter className="justify-center">

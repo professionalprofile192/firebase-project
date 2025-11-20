@@ -8,7 +8,7 @@ import { Notifications } from '@/components/dashboard/notifications';
 import { ChartCard } from '@/components/dashboard/chart-card';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { getAccounts } from '../actions';
+import { getAccounts, getRecentTransactions } from '../actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SessionTimeoutDialog } from '@/components/dashboard/session-timeout-dialog';
 
@@ -24,10 +24,21 @@ type Account = {
     AVAIL_BAL: string;
 }
 
+export type Transaction = {
+    CRDR: 'C' | 'D';
+    seqno: string;
+    instNo: string;
+    tranAmt: string;
+    tranDate: string;
+    particulars: string;
+    runBal: string;
+};
+
 const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
 export default function DashboardPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
@@ -62,19 +73,25 @@ export default function DashboardPage() {
       const parsedProfile = JSON.parse(profile);
       setUserProfile(parsedProfile);
 
-      const fetchAccounts = async () => {
+      const fetchData = async () => {
         try {
             const accountsData = await getAccounts(parsedProfile.userid, parsedProfile.CIF_NO);
             if (accountsData.opstatus === 0) {
                 setAccounts(accountsData.payments);
+                if (accountsData.payments.length > 0) {
+                    const recentTransactionsData = await getRecentTransactions(accountsData.payments[0].ACCT_NO);
+                    if (recentTransactionsData.opstatus === 0) {
+                        setTransactions(JSON.parse(recentTransactionsData.payments));
+                    }
+                }
             }
         } catch (error) {
-            console.error("Failed to fetch accounts", error);
+            console.error("Failed to fetch dashboard data", error);
         } finally {
             setLoading(false);
         }
       };
-      fetchAccounts();
+      fetchData();
     } else {
         router.push('/');
     }
@@ -100,6 +117,20 @@ export default function DashboardPage() {
     };
 
   }, [router, resetTimeout]);
+
+  const fetchTransactionsForAccount = async (acctNo: string) => {
+    try {
+        const recentTransactionsData = await getRecentTransactions(acctNo);
+        if (recentTransactionsData.opstatus === 0) {
+            setTransactions(JSON.parse(recentTransactionsData.payments));
+        } else {
+            setTransactions([]);
+        }
+    } catch (error) {
+        console.error("Failed to fetch transactions for account", error);
+        setTransactions([]);
+    }
+  }
 
   if (loading || !userProfile) {
     return (
@@ -139,7 +170,11 @@ export default function DashboardPage() {
               <div className="lg:col-span-3 flex flex-col gap-4">
                 <div className="grid md:grid-cols-2 gap-4">
                     <MyAccounts accounts={accounts} />
-                    <RecentTransactions />
+                    <RecentTransactions 
+                        transactions={transactions} 
+                        accounts={accounts}
+                        onAccountChange={fetchTransactionsForAccount}
+                    />
                 </div>
                  <div className="grid grid-cols-1">
                     <ChartCard />
