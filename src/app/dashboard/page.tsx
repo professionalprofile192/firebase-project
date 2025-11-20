@@ -103,20 +103,20 @@ export default function DashboardPage() {
 
   if (loading || !userProfile) {
     return (
-        <div className="flex h-screen w-full flex-col bg-muted/40 overflow-hidden">
+        <div className="flex h-screen w-full flex-col bg-muted/40">
             <Header />
-            <main className="flex-1 flex flex-col p-4 sm:px-6 sm:py-4 gap-4">
-                <div className="flex-1 grid gap-4 lg:grid-cols-4">
+            <main className="flex-1 flex flex-col p-4 sm:px-6 sm:py-4 gap-4 overflow-auto">
+                <div className="grid gap-4 lg:grid-cols-4">
                     <div className="lg:col-span-1 flex flex-col gap-4">
                         <Skeleton className="h-[350px]" />
                         <Skeleton className="flex-1" />
                     </div>
                     <div className="lg:col-span-3 flex flex-col gap-4">
-                        <div className="flex-1 grid md:grid-cols-2 gap-4">
+                        <div className="grid md:grid-cols-2 gap-4">
                             <Skeleton className="h-[300px]" />
                             <Skeleton className="h-[300px]" />
                         </div>
-                        <div className="flex-1 grid grid-cols-1">
+                        <div className="grid grid-cols-1">
                             <Skeleton className="flex-1" />
                         </div>
                     </div>
@@ -128,20 +128,20 @@ export default function DashboardPage() {
 
   return (
     <>
-        <div className="flex h-screen w-full flex-col bg-muted/40 overflow-hidden">
+        <div className="flex h-screen w-full flex-col bg-muted/40">
           <Header />
-          <main className="flex-1 flex flex-col p-4 sm:px-6 sm:py-4 gap-4">
-            <div className="flex-1 grid gap-4 lg:grid-cols-4">
+          <main className="flex-1 flex flex-col p-4 sm:px-6 sm:py-4 gap-4 overflow-auto">
+            <div className="grid gap-4 lg:grid-cols-4">
               <div className="lg:col-span-1 flex flex-col gap-4">
                 <NetWorth accounts={accounts} userProfile={userProfile} />
                 <Notifications />
               </div>
               <div className="lg:col-span-3 flex flex-col gap-4">
-                <div className="flex-1 grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-2 gap-4">
                     <MyAccounts accounts={accounts} />
                     <RecentTransactions />
                 </div>
-                 <div className="flex-1 grid grid-cols-1">
+                 <div className="grid grid-cols-1">
                     <ChartCard />
                 </div>
               </div>
