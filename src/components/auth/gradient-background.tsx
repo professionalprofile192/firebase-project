@@ -51,7 +51,7 @@ function normalizeColor(hexCode) {
                             }), shader
                         }
                         function getUniformVariableDeclarations(uniforms, type) {
-                            return Object.entries(uniforms).map(([uniform, value]) => value.getDeclaration(uniform, type)).join("\\\\n")
+                            return Object.entries(uniforms).map(([uniform, value]) => value.getDeclaration(uniform, type)).join("\\n")
                         }
                         material.uniforms = uniforms, material.uniformInstances = [];
   
@@ -123,19 +123,19 @@ function normalizeColor(hexCode) {
                     getDeclaration(name, type, length) {
                         const uniform = this;
                         if (uniform.excludeFrom !== type) {
-                            if ("array" === uniform.type) return uniform.value[0].getDeclaration(name, type, uniform.value.length) + \`\\\\nconst int \${name}_length = \${uniform.value.length};\`;
+                            if ("array" === uniform.type) return uniform.value[0].getDeclaration(name, type, uniform.value.length) + \`\\nconst int \${name}_length = \${uniform.value.length};\`;
                             if ("struct" === uniform.type) {
                                 let name_no_prefix = name.replace("u_", "");
                                 name_no_prefix = 
                                   name_no_prefix.charAt(0).toUpperCase() + 
                                   name_no_prefix.slice(1);
                                   return \`uniform struct \${name_no_prefix} 
-                                  {\\\\n\` + 
+                                  {\\n\` + 
                                   Object.entries(uniform.value).map(([name, uniform]) => 
                                   uniform.getDeclaration(name, type)
                                   .replace(/^uniform/, "")
                                   ).join("") 
-                                  + \`\\\\n} \${name}\${length>0?\`[\${length}]\`:""};\`;
+                                  + \`\\n} \${name}\${length>0?\`[\${length}]\`:""};\`;
                             }
                             return \`uniform \${uniform.type} \${name}\${length>0?\`[\${length}]\`:""};\`
                         }
@@ -839,7 +839,7 @@ void main() {
             },
             type: "struct"
         }));
-        this.vertexShader = [this.shaderFiles.noise, this.shaderFiles.blend, this.shaderFiles.vertex].join("\\\\n\\\\n");
+        this.vertexShader = [this.shaderFiles.noise, this.shaderFiles.blend, this.shaderFiles.vertex].join("\\n\\n");
         return new this.minigl.Material(this.vertexShader, this.shaderFiles.fragment, this.uniforms)
     }
     initMesh() {
