@@ -44,9 +44,9 @@ const SidebarNav = () => {
         { id: 'payments', label: 'Payments', icon: CreditCard, subItems: ['Bill Payment', 'Bulk Bill Payments', 'Bill Payment History'] },
         { id: 'transfers', label: 'Transfers', icon: ArrowRightLeft, subItems: ['Bulk Transfers', 'Transfer History'] },
         { id: 'rtgs', label: 'RTGS', icon: Clock, subItems: ['RTGS Transfers'] },
-        { id: 'trade', label: 'Trade Request', icon: Briefcase },
+        { id: 'trade', label: 'Trade Request', icon: Briefcase, subItems: ['Trade Request', 'Trade Request History'] },
         { id: 'reports', label: 'Report - MIS', icon: BarChart },
-        { id: 'bulk', label: 'Bulk Import', icon: Upload },
+        { id: 'bulk', label: 'Bulk Import', icon: Upload, subItems: ['Single Bulk Import', 'Bulk Import History'] },
     ];
 
     return (
@@ -73,14 +73,16 @@ const SidebarNav = () => {
             <div className='flex-1 overflow-y-auto'>
                 {navItems.map(item => (
                     <Collapsible key={item.id} open={openSections.includes(item.id)} onOpenChange={() => item.subItems && toggleSection(item.id)} className="border-b">
-                        <CollapsibleTrigger disabled={!item.subItems} className="flex items-center justify-between w-full p-4 hover:bg-muted/50 disabled:opacity-50 disabled:hover:bg-transparent">
-                            <div className="flex items-center gap-3">
-                                <item.icon className="h-5 w-5" />
-                                <span>{item.label}</span>
+                        <CollapsibleTrigger asChild>
+                            <div className={cn("flex items-center justify-between w-full p-4 hover:bg-muted/50", !item.subItems && "opacity-50 hover:bg-transparent")}>
+                                <div className="flex items-center gap-3">
+                                    <item.icon className="h-5 w-5" />
+                                    <span>{item.label}</span>
+                                </div>
+                                {item.subItems || item.id === 'reports' ? (
+                                    openSections.includes(item.id) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                                ) : null }
                             </div>
-                            {item.subItems ? (
-                                openSections.includes(item.id) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-                            ) : null }
                         </CollapsibleTrigger>
                         {item.subItems && (
                             <CollapsibleContent className={cn("bg-muted/20", {
