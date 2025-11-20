@@ -10,8 +10,8 @@ export async function login(values: any) {
       message: 'Login successful',
       profile: {
         userid: '7884057484',
-        firstname: 'raast',
-        lastname: 'stp',
+        firstname: 'Nawaz',
+        lastname: 'Ali',
         email: 'humna.sadia@ubl.com.pk',
         CIF_NO: '20269367', // Adding CIF_NO for the next service call
       },
