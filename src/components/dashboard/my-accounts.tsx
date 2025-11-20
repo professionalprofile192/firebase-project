@@ -14,11 +14,13 @@ import {
     SelectValue,
   } from '@/components/ui/select';
 import { ScrollArea } from '../ui/scroll-area';
+import { useState } from 'react';
   
 type Account = {
     ACCT_NO: string;
     ACCT_TITLE: string;
     AVAIL_BAL: string;
+    DEPOSIT_TYPE: string;
 };
 
 interface MyAccountsProps {
@@ -26,7 +28,19 @@ interface MyAccountsProps {
 }
 
 export function MyAccounts({ accounts }: MyAccountsProps) {
-    const totalBalance = accounts.reduce((sum, account) => sum + parseFloat(account.AVAIL_BAL), 0);
+    const [accountType, setAccountType] = useState('saving');
+
+    const filteredAccounts = accounts.filter(account => {
+        if (accountType === 'saving') {
+            return account.DEPOSIT_TYPE === 'S';
+        }
+        if (accountType === 'current') {
+            return account.DEPOSIT_TYPE !== 'S';
+        }
+        return true;
+    });
+
+    const totalBalance = filteredAccounts.reduce((sum, account) => sum + parseFloat(account.AVAIL_BAL), 0);
     const formattedTotalBalance = new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalBalance);
 
     return (
@@ -34,7 +48,7 @@ export function MyAccounts({ accounts }: MyAccountsProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>My Accounts</CardTitle>
-            <Select defaultValue="saving">
+            <Select value={accountType} onValueChange={setAccountType}>
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Select Account" />
               </SelectTrigger>
@@ -47,8 +61,8 @@ export function MyAccounts({ accounts }: MyAccountsProps) {
         </CardHeader>
         <ScrollArea className="flex-1">
           <CardContent>
-            {accounts.length > 0 ? (
-                accounts.map((account) => (
+            {filteredAccounts.length > 0 ? (
+                filteredAccounts.map((account) => (
                     <div key={account.ACCT_NO} className="flex justify-between items-center py-3 border-b">
                         <div>
                             <p className="font-semibold">{account.ACCT_NO}</p>
@@ -60,7 +74,7 @@ export function MyAccounts({ accounts }: MyAccountsProps) {
                     </div>
                 ))
             ) : (
-                <p className='text-center text-muted-foreground'>No accounts found.</p>
+                <p className='text-center text-muted-foreground'>No accounts of this type found.</p>
             )}
           </CardContent>
         </ScrollArea>
@@ -73,4 +87,3 @@ export function MyAccounts({ accounts }: MyAccountsProps) {
       </Card>
     );
   }
-  
