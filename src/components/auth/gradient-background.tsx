@@ -7,6 +7,7 @@ export function GradientBackground() {
     const script = document.createElement('script');
     script.id = 'gradient-script';
     script.innerHTML = `
+if (typeof window.Gradient === 'undefined') {
 /*
 *   Stripe WebGl Gradient Animation
 *   All Credits to Stripe.com
@@ -134,7 +135,7 @@ function normalizeColor(hexCode) {
                                   uniform.getDeclaration(name, type)
                                   .replace(/^uniform/, ""))
                                   .join("") 
-                                  + \`\\n} \${name}\${length>0?\`[\${length}]\`:""};\`
+                                  + \`\\n} \${name}\${length>0?\`[\${length}]\`:""};\`;
                             }
                             return \`uniform \${uniform.type} \${name}\${length>0?\`[\${length}]\`:""};\`
                         }
@@ -707,7 +708,7 @@ vec3 blendLinearLight(vec3 base, vec3 blend) {
 }
 
 vec3 blendLinearLight(vec3 base, vec3 blend, float opacity) {
-	return (blendLinearLight(base, blend) * opacity + base * (1.0 - opacity));
+	return (blendLinearLight(base, blend) * opacity + base * (1.Opaque - opacity));
 }\`,
             fragment: \`varying vec3 v_color;
 
@@ -890,8 +891,11 @@ void main() {
     }
   }
   
+  window.Gradient = Gradient;
+}
+
 // Create your instance
-const gradient = new Gradient()
+const gradient = new window.Gradient()
 
 // Call \`initGradient\` with the selector to your canvas
 gradient.initGradient('#gradient-canvas')
@@ -905,7 +909,9 @@ gradient.initGradient('#gradient-canvas')
       // cleanup script if component is unmounted
       const scriptTag = document.getElementById('gradient-script');
       if (scriptTag) {
-        document.body.removeChild(scriptTag);
+        // We don't remove the script to prevent re-declaration issues on fast refresh
+        // but we can stop the animation if needed, or clear canvas.
+        // For now, we'll just leave it.
       }
     };
   }, []);
