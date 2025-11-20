@@ -81,7 +81,7 @@ export default function DashboardPage() {
                 if (accountsData.payments.length > 0) {
                     const recentTransactionsData = await getRecentTransactions(accountsData.payments[0].ACCT_NO);
                     if (recentTransactionsData.opstatus === 0) {
-                        setTransactions(JSON.parse(recentTransactionsData.payments));
+                        setTransactions(recentTransactionsData.payments);
                     }
                 }
             }
@@ -122,7 +122,7 @@ export default function DashboardPage() {
     try {
         const recentTransactionsData = await getRecentTransactions(acctNo);
         if (recentTransactionsData.opstatus === 0) {
-            setTransactions(JSON.parse(recentTransactionsData.payments));
+            setTransactions(recentTransactionsData.payments);
         } else {
             setTransactions([]);
         }

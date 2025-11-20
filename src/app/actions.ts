@@ -77,13 +77,41 @@ export async function getAccounts(customerId: string, cif: string) {
 export async function getRecentTransactions(acctNo: string) {
     if (acctNo === '060510224211') {
         return {
-            "payments": "[{\"CRDR\":\"C\",\"seqno\":\"5919360425\",\"instNo\":\"\",\"tranAmt\":\"5\",\"tranDate\":\"2025-11-20 00:00:00\",\"particulars\":\"EB985298862 UBL DIGITAL:FUNDS TRANSFER  FR-1779039510235468 TO-605060510224211TXNTYPE-0010\",\"runBal\":\"1512642.5\"},{\"CRDR\":\"C\",\"seqno\":\"5919342907\",\"instNo\":\"\",\"tranAmt\":\"10\",\"tranDate\":\"2025-11-20 00:00:00\",\"particulars\":\"RAAST P2P FT FROM SYED BASHIR UL HASAN MEBL ACCT: PK17MEZN*********997 MSGID: AMEZNPKKA003001102889972511203035\",\"runBal\":\"1512637.5\"},{\"CRDR\":\"D\",\"seqno\":\"5917336308\",\"instNo\":\"\",\"tranAmt\":\"5000\",\"tranDate\":\"2025-11-19 00:00:00\",\"particulars\":\"CASH WITHDRAWAL - ATM\",\"runBal\":\"1512627.5\"}]",
+            "payments": [
+                {
+                    "CRDR": "C",
+                    "seqno": "5919360425",
+                    "instNo": "",
+                    "tranAmt": "5",
+                    "tranDate": "2025-11-20 00:00:00",
+                    "particulars": "EB985298862 UBL DIGITAL:FUNDS TRANSFER  FR-1779039510235468 TO-605060510224211TXNTYPE-0010",
+                    "runBal": "1512642.5"
+                },
+                {
+                    "CRDR": "C",
+                    "seqno": "5919342907",
+                    "instNo": "",
+                    "tranAmt": "10",
+                    "tranDate": "2025-11-20 00:00:00",
+                    "particulars": "RAAST P2P FT FROM SYED BASHIR UL HASAN MEBL ACCT: PK17MEZN*********997 MSGID: AMEZNPKKA003001102889972511203035",
+                    "runBal": "1512637.5"
+                },
+                {
+                    "CRDR": "D",
+                    "seqno": "5917336308",
+                    "instNo": "",
+                    "tranAmt": "5000",
+                    "tranDate": "2025-11-19 00:00:00",
+                    "particulars": "CASH WITHDRAWAL - ATM",
+                    "runBal": "1512627.5"
+                }
+            ],
             "opstatus": 0,
             "httpStatusCode": 0
           }
     } else {
         return {
-            payments: "[]",
+            payments: [],
             opstatus: 1,
             httpStatusCode: 404,
             message: 'Transactions not found for this account'
