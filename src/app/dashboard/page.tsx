@@ -7,6 +7,7 @@ import { RecentTransactions } from '@/components/dashboard/recent-transactions';
 import { Notifications } from '@/components/dashboard/notifications';
 import { ChartCard } from '@/components/dashboard/chart-card';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { getAccounts } from '../actions';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -26,6 +27,7 @@ export default function DashboardPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const profile = sessionStorage.getItem('userProfile');
@@ -47,11 +49,22 @@ export default function DashboardPage() {
       };
       fetchAccounts();
     } else {
-        setLoading(false);
+        router.push('/');
     }
-  }, []);
 
-  if (loading) {
+    const handleBeforeUnload = () => {
+        sessionStorage.clear();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+
+  }, [router]);
+
+  if (loading || !userProfile) {
     return (
         <div className="flex h-screen w-full flex-col bg-muted/40 overflow-hidden">
             <Header />
