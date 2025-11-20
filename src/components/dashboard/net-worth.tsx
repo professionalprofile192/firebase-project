@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
+import { cn } from '@/lib/utils';
 
 type Account = {
     AVAIL_BAL: string;
@@ -27,7 +28,7 @@ export function NetWorth({ accounts, userProfile }: NetWorthProps) {
   const liabilities = new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR' }).format(0);
 
   return (
-    <Card className="h-full bg-gradient-to-br from-teal-400 to-green-500 text-white shadow-lg">
+    <Card className={cn("h-full text-white shadow-lg", "WelcomeBg")}>
       <CardHeader className="flex flex-row items-start justify-between pb-2">
         <div>
           <p className="text-sm font-medium">Good afternoon!</p>
@@ -42,7 +43,7 @@ export function NetWorth({ accounts, userProfile }: NetWorthProps) {
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="text-4xl font-bold">{formattedNetWorth.replace('PKR', 'PKR.')}</div>
+        <div className="text-4xl font-bold">{formattedNetWorth.replace('PKR', 'Rs')}</div>
         <p className="text-xs text-white/80">Total Net Worth</p>
         <div className="mt-6 space-y-4">
           <div className="flex items-center gap-2">
@@ -50,7 +51,7 @@ export function NetWorth({ accounts, userProfile }: NetWorthProps) {
               <ArrowDown className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-lg font-semibold">{assets.replace('PKR', 'PKR.')}</p>
+              <p className="text-lg font-semibold">{assets.replace('PKR', 'Rs')}</p>
               <p className="text-sm text-white/80">Assets</p>
             </div>
           </div>
@@ -59,7 +60,7 @@ export function NetWorth({ accounts, userProfile }: NetWorthProps) {
               <ArrowUp className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-lg font-semibold">{liabilities.replace('PKR', 'PKR.')}</p>
+              <p className="text-lg font-semibold">{liabilities.replace('PKR', 'Rs')}</p>
               <p className="text-sm text-white/80">Liabilities</p>
             </div>
           </div>
