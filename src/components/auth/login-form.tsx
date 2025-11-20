@@ -1,4 +1,3 @@
-
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,22 +27,12 @@ import {
 import { EyeOff, Eye } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { getLastLoginTime, login } from '@/app/actions';
 
 const formSchema = z.object({
   username: z.string().min(1, { message: 'Username is required' }),
   password: z.string().min(1, { message: 'Password is required' }),
 });
-
-async function login(values: z.infer<typeof formSchema>) {
-  // This is a placeholder for the actual API call.
-  // In a real application, this would make a request to your backend,
-  // which would then securely call the UBL Digital API.
-  if (values.username === 'raaststp' && values.password === 'Kony@123456') {
-    return { success: true, message: 'Login successful' };
-  } else {
-    return { success: false, message: 'Invalid username or password' };
-  }
-}
 
 export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,6 +58,15 @@ export function LoginForm() {
           title: 'Login Successful',
           description: 'Redirecting to your dashboard...',
         });
+
+        // Call the second service to get the last login time
+        const loginTimeResponse = await getLastLoginTime(response.profile.userid);
+        if (loginTimeResponse.opstatus === 0) {
+          const lastLogin = loginTimeResponse.LoginServices[0].Lastlogintime;
+          // Store it in session storage to access it on the dashboard page
+          sessionStorage.setItem('lastLoginTime', lastLogin);
+        }
+
         router.push('/dashboard');
       } else {
         toast({
