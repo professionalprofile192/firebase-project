@@ -1,3 +1,4 @@
+'use client';
 import {
     Card,
     CardContent,
@@ -13,33 +14,58 @@ import {
     SelectValue,
   } from '@/components/ui/select';
   import { Button } from '../ui/button';
-  import { ChevronRight } from 'lucide-react';
+  import { ChevronRight, FileQuestion } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '../ui/scroll-area';
+import { useEffect, useState } from 'react';
+import { getNotifications } from '@/app/actions';
+import { Skeleton } from '../ui/skeleton';
+import { format } from 'date-fns';
   
+type Notification = {
+    lastModifiedAt: string;
+    status: string;
+    featureActionId: string;
+    referenceNo: string;
+}
   
-  const notifications = [
-      {
-          date: "18/10/2025 3:49 AM",
-          status: "APPROVED",
-          message: "You request for INTER BANK ACCOUNT FUND TRANSFER CREATE has been approved.",
-          statusColor: "text-green-500"
-      },
-      {
-          date: "18/10/2025 1:19 AM",
-          status: "IN PROGRESS",
-          message: "You have created new INTER BANK ACCOUNT FUND TRANSFER CREATE approval request",
-          statusColor: "text-yellow-500"
-      },
-      {
-          date: "13/9/2025 4:45 AM",
-          status: "APPROVED",
-          message: "You request for INTER BANK ACCOUNT FUND TRANSFER CREATE has been approved.",
-          statusColor: "text-green-500"
-      }
-  ]
-  
-  export function Notifications() {
+const featureActionToMessage: Record<string, string> = {
+    "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE": "Inter-bank fund transfer request"
+}
+
+export function Notifications() {
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const profile = sessionStorage.getItem('userProfile');
+        if (profile) {
+            const parsedProfile = JSON.parse(profile);
+            const fetchNotifications = async () => {
+                try {
+                    setLoading(true);
+                    const notificationData = await getNotifications(parsedProfile.userid);
+                    if (notificationData.opstatus === 0) {
+                        setNotifications(notificationData.ApprovalMatrix);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch notifications", error);
+                } finally {
+                    setLoading(false);
+                }
+            }
+            fetchNotifications();
+        }
+    }, []);
+
+    const getNotificationMessage = (notification: Notification) => {
+        const baseMessage = featureActionToMessage[notification.featureActionId] || "A new request";
+        if (notification.status === 'IN PROGRESS') {
+            return `You have created a new ${baseMessage} approval request.`;
+        }
+        return `Your request for ${baseMessage} has been ${notification.status.toLowerCase()}.`;
+    }
+
     return (
       <Card className="h-[280px] flex flex-col">
         <CardHeader>
@@ -58,19 +84,32 @@ import { ScrollArea } from '../ui/scroll-area';
         </CardHeader>
         <ScrollArea className="flex-1">
             <CardContent className="space-y-4">
-            {notifications.map((item, index) => (
-                <div key={index} className="flex items-start gap-4 border-b pb-4 last:border-b-0 last:pb-0">
-                    <div className="flex-1">
-                        <p className="text-xs text-muted-foreground">{item.date}</p>
-                        <p className={cn("font-semibold", {
-                            "text-green-500": item.status === "APPROVED",
-                            "text-yellow-500": item.status === "IN PROGRESS",
-                        })}>{item.status}</p>
-                        <p className="text-sm">{item.message}</p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground self-center" />
+            {loading ? (
+                <div className="space-y-4">
+                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-16 w-full" />
                 </div>
-            ))}
+            ) : notifications.length > 0 ? (
+                notifications.map((item) => (
+                    <div key={item.referenceNo} className="flex items-start gap-4 border-b pb-4 last:border-b-0 last:pb-0">
+                        <div className="flex-1">
+                            <p className="text-xs text-muted-foreground">{format(new Date(item.lastModifiedAt), "dd/MM/yyyy h:mm a")}</p>
+                            <p className={cn("font-semibold", {
+                                "text-green-500": item.status === "APPROVED",
+                                "text-yellow-500": item.status === "IN PROGRESS",
+                            })}>{item.status}</p>
+                            <p className="text-sm">{getNotificationMessage(item)}</p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground self-center" />
+                    </div>
+                ))
+            ) : (
+                <div className="flex flex-col items-center justify-center pt-10 text-muted-foreground">
+                    <FileQuestion className="h-12 w-12" />
+                    <p className="mt-2 text-sm">No Notifications Found</p>
+                </div>
+            )}
             </CardContent>
         </ScrollArea>
          <CardFooter className="justify-center">

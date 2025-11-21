@@ -118,3 +118,97 @@ export async function getRecentTransactions(acctNo: string) {
         }
     }
 }
+
+export async function getNotifications(userId: string) {
+    if (userId === '7884057484') {
+        return {
+            "ApprovalMatrix": [
+                {
+                    "contractId": "1960646668",
+                    "httpStatusCode": 200,
+                    "opstatus": 0,
+                    "referenceNo": "33994",
+                    "requesterId": "raast stp",
+                    "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE",
+                    "amount": "1.00",
+                    "sentBy": "7884057484",
+                    "status": "APPROVED",
+                    "transactionType": "ExternalTransfer",
+                    "fromAccountNumber": "060510224211",
+                    "toAccountNumber": "01050105856769",
+                    "lastModifiedAt": "2025-10-18 03:49:32.0",
+                    "transactionReferenceId": "2756675839940669",
+                    "transactionData": "{\"stan\":\"838297\"}",
+                    "transactionType2": "Interbank Account to Account Fund Transfer",
+                    "typeId": "MONETARY"
+                },
+                {
+                    "contractId": "1960646668",
+                    "httpStatusCode": 200,
+                    "opstatus": 0,
+                    "referenceNo": "33970",
+                    "requesterId": "raast stp",
+                    "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE",
+                    "amount": "1.00",
+                    "sentBy": "7884057484",
+                    "status": "IN PROGRESS",
+                    "transactionType": "ExternalTransfer",
+                    "fromAccountNumber": "060510224211",
+                    "toAccountNumber": "01050105856769",
+                    "lastModifiedAt": "2025-10-18 01:19:23.0",
+                    "transactionReferenceId": "2612348479607740",
+                    "transactionData": "{\"stan\":\"721069\"}",
+                    "transactionType2": "Interbank Account to Account Fund Transfer",
+                    "typeId": "MONETARY"
+                },
+                {
+                    "contractId": "1960646668",
+                    "httpStatusCode": 200,
+                    "opstatus": 0,
+                    "referenceNo": "26588",
+                    "requesterId": "raast stp",
+                    "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE",
+                    "amount": "1.00",
+                    "sentBy": "7884057484",
+                    "status": "APPROVED",
+                    "transactionType": "InternalTransfer",
+                    "fromAccountNumber": "060510224211",
+                    "toAccountNumber": "238921162",
+                    "lastModifiedAt": "2025-09-13 04:45:54.0",
+                    "transactionReferenceId": "1525665127989248",
+                    "transactionData": "{\"stan\":\"007087\"}",
+                    "transactionType2": "Interbank Account to Account Fund Transfer",
+                    "typeId": "MONETARY"
+                },
+                {
+                    "contractId": "1960646668",
+                    "httpStatusCode": 200,
+                    "opstatus": 0,
+                    "referenceNo": "26587",
+                    "requesterId": "raast stp",
+                    "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE",
+                    "amount": "1.00",
+                    "sentBy": "7884057484",
+                    "status": "APPROVED",
+                    "transactionType": "InternalTransfer",
+                    "fromAccountNumber": "060510224211",
+                    "toAccountNumber": "331997792",
+                    "lastModifiedAt": "2025-09-13 04:45:49.0",
+                    "transactionReferenceId": "4261818738409472",
+                    "transactionData": "{\"stan\":\"566616\"}",
+                    "transactionType2": "Interbank Account to Account Fund Transfer",
+                    "typeId": "MONETARY"
+                }
+            ],
+            "opstatus": 0,
+            "httpStatusCode": 200
+        }
+    } else {
+        return {
+            ApprovalMatrix: [],
+            opstatus: 1,
+            httpStatusCode: 404,
+            message: 'Notifications not found'
+        }
+    }
+}
