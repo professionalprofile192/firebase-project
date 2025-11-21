@@ -1,5 +1,6 @@
 'use client';
+import { GradientCanvas } from './gradient-canvas';
 
 export function GradientBackground() {
-  return <div className="fixed inset-0 -z-10 WelcomeBg" />;
+  return <GradientCanvas />;
 }
