@@ -71,7 +71,8 @@ export default function DashboardPage() {
     try {
         const recentTransactionsData = await getRecentTransactions(acctNo);
         if (recentTransactionsData.opstatus === 0) {
-            setTransactions(recentTransactionsData.payments);
+            // Take only the 3 most recent transactions for the dashboard
+            setTransactions(recentTransactionsData.payments.slice(0, 3));
         } else {
             setTransactions([]);
         }
@@ -135,15 +136,15 @@ export default function DashboardPage() {
                 <div className="grid gap-4 lg:grid-cols-4">
                     <div className="lg:col-span-1 flex flex-col gap-4">
                         <Skeleton className="h-[350px]" />
-                        <Skeleton className="flex-1" />
+                        <Skeleton className="h-[280px]" />
                     </div>
                     <div className="lg:col-span-3 flex flex-col gap-4">
-                        <div className="grid md:grid-cols-2 gap-4">
-                            <Skeleton className="h-[350px]" />
-                            <Skeleton className="h-[350px]" />
+                        <div className="grid md:grid-cols-2 gap-4 h-[350px]">
+                            <Skeleton className="h-full" />
+                            <Skeleton className="h-full" />
                         </div>
                         <div className="grid grid-cols-1">
-                            <Skeleton className="flex-1" />
+                            <Skeleton className="h-[250px]" />
                         </div>
                     </div>
                 </div>
@@ -160,10 +161,10 @@ export default function DashboardPage() {
             <div className="grid gap-4 lg:grid-cols-4">
               <div className="lg:col-span-1 flex flex-col gap-4">
                  <NetWorth accounts={accounts} userProfile={userProfile} />
-                <Notifications />
+                 <Notifications />
               </div>
               <div className="lg:col-span-3 flex flex-col gap-4">
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-2 gap-4 h-[350px]">
                     <MyAccounts accounts={accounts} />
                     <RecentTransactions 
                         transactions={transactions} 

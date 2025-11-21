@@ -20,6 +20,7 @@ import { Transaction } from '@/app/dashboard/page';
 import { format } from 'date-fns';
 import { FileQuestion } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
   
 type Account = {
     ACCT_NO: string;
@@ -92,7 +93,9 @@ export function RecentTransactions({ transactions, accounts, onAccountChange }: 
             </CardContent>
         </ScrollArea>
         <CardFooter className="justify-center">
-          <Button variant="link">See all</Button>
+          <Link href="/account-statement">
+            <Button variant="link">See all</Button>
+          </Link>
         </CardFooter>
       </Card>
     );
