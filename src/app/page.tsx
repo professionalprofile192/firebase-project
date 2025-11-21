@@ -7,7 +7,7 @@ export default function LoginPage() {
   return (
     <>
       <GradientBackground />
-      <div className="relative min-h-screen w-full lg:grid lg:grid-cols-2">
+      <div className="relative min-h-screen w-full lg:grid lg:grid-cols-2 bg-transparent">
         <div className="relative hidden items-center justify-center lg:flex">
           <div className="relative z-10 mx-auto max-w-md space-y-8 text-black">
             <div className="flex items-center gap-4">

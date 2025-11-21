@@ -503,7 +503,6 @@ export default function GradientCanvas() {
     <canvas
       ref={canvasRef}
       id="gradient-canvas"
-      className="w-screen h-screen fixed top-0 left-0"
     />
   );
 }
