@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Transaction } from "@/app/account-statement/page";
 import { format } from "date-fns";
+import Link from "next/link";
 
 interface TransactionsListProps {
     transactions: Transaction[];
@@ -55,6 +56,11 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
                     <TableBody>
                         {transactions.map((tx) => {
                             const date = new Date(tx.tranDate);
+                            const transactionData = {
+                                ...tx,
+                                accountTitle: 'NAWAZ ALI',
+                                fromAccount: '060510224211',
+                            }
                             return (
                                 <TableRow key={tx.seqno}>
                                     <TableCell>{format(date, 'dd/MM/yyyy')}</TableCell>
@@ -67,7 +73,12 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
                                     </TableCell>
                                     <TableCell className="text-right">{formatAmount(tx.runBal)}</TableCell>
                                     <TableCell className="text-center">
-                                        <Button variant="outline" size="sm">View</Button>
+                                        <Link href={{
+                                            pathname: `/account-statement/${tx.seqno}`,
+                                            query: { tx: JSON.stringify(transactionData) }
+                                        }}>
+                                            <Button variant="outline" size="sm">View</Button>
+                                        </Link>
                                     </TableCell>
                                 </TableRow>
                             )
