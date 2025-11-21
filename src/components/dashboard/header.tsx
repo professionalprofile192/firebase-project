@@ -253,7 +253,7 @@ export function Header() {
                     <Button
                     variant="outline"
                     size="icon"
-                    className="shrink-0 md:hidden"
+                    className="shrink-0 md:hidden mr-4"
                     >
                     <Menu className="h-5 w-5" />
                     <span className="sr-only">Toggle navigation menu</span>
@@ -264,7 +264,7 @@ export function Header() {
                 </SheetContent>
             </Sheet>
 
-            <nav className="flex items-center gap-6 text-sm font-medium">
+            <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
                 <Link
                     href="/dashboard"
                     className="text-foreground transition-colors hover:text-foreground/80"
