@@ -185,103 +185,105 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className="shrink-0"
-            >
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle navigation menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-80">
-            <SidebarNav />
-          </SheetContent>
-        </Sheet>
-        
-        <div className="hidden items-center gap-4 md:flex">
-          <div className="flex items-center gap-2">
-            <Image
-              src={ublLogo}
-              alt="UBL Digital Logo"
-              width={32}
-              height={32}
-              data-ai-hint="logo banking"
-              className="rounded-md"
-              priority
-            />
-            <span className="font-semibold">Business Banking</span>
-          </div>
+      <header className="sticky top-0 z-30 flex flex-col border-b bg-background">
+        {/* Top Row */}
+        <div className="flex h-16 items-center justify-between px-4 sm:px-6">
+            <div className="flex items-center gap-2">
+                <Image
+                src={ublLogo}
+                alt="UBL Digital Logo"
+                width={32}
+                height={32}
+                data-ai-hint="logo banking"
+                className="rounded-md"
+                priority
+                />
+                <span className="font-semibold">Business Banking</span>
+            </div>
+
+            <div className="flex items-center gap-4">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="text-muted-foreground">
+                            <User className="h-5 w-5" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-64" align="end">
+                        <DropdownMenuGroup>
+                            <div className="flex items-center gap-3 p-2">
+                                <Avatar>
+                                    <AvatarFallback>
+                                        {userProfile?.firstname?.[0]?.toUpperCase()}{userProfile?.lastname?.[0]?.toUpperCase()}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col">
+                                    <span className="font-semibold capitalize">{userProfile?.firstname} {userProfile?.lastname}</span>
+                                    <span className="text-xs text-muted-foreground">{userProfile?.email}</span>
+                                </div>
+                            </div>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                            <Settings className="mr-2 h-4 w-4" />
+                            <span>Profile Settings</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <Settings className="mr-2 h-4 w-4" />
+                            <span>Alerts Settings</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleLogout}
+                    className="text-muted-foreground"
+                    aria-label="Logout"
+                >
+                    <LogOut className="h-5 w-5" />
+                </Button>
+            </div>
         </div>
 
-        <nav className="hidden items-center gap-6 text-sm font-medium md:flex ml-6">
-          <Link
-            href="#"
-            className="text-foreground transition-colors hover:text-foreground/80"
-          >
-            Home
-          </Link>
-          <Link
-            href="#"
-            className="text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Payments
-          </Link>
-          <Link
-            href="#"
-            className="text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Transfer
-          </Link>
-        </nav>
-
-        <div className="flex-1" />
-
-        <div className="flex items-center gap-4">
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-muted-foreground">
-                        <User className="h-5 w-5" />
+        {/* Bottom Row */}
+        <div className="flex h-16 items-center border-t px-4 sm:px-6">
+            <Sheet>
+                <SheetTrigger asChild>
+                    <Button
+                    variant="outline"
+                    size="icon"
+                    className="shrink-0 md:hidden"
+                    >
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle navigation menu</span>
                     </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-64" align="end">
-                     <DropdownMenuGroup>
-                        <div className="flex items-center gap-3 p-2">
-                            <Avatar>
-                                <AvatarFallback>
-                                    {userProfile?.firstname?.[0]?.toUpperCase()}{userProfile?.lastname?.[0]?.toUpperCase()}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div className="flex flex-col">
-                                <span className="font-semibold capitalize">{userProfile?.firstname} {userProfile?.lastname}</span>
-                                <span className="text-xs text-muted-foreground">{userProfile?.email}</span>
-                            </div>
-                        </div>
-                     </DropdownMenuGroup>
-                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Profile Settings</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Alerts Settings</span>
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0 w-80">
+                    <SidebarNav />
+                </SheetContent>
+            </Sheet>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleLogout}
-            className="text-muted-foreground"
-            aria-label="Logout"
-          >
-            <LogOut className="h-5 w-5" />
-          </Button>
+            <nav className="flex items-center gap-6 text-sm font-medium">
+                <Link
+                    href="/dashboard"
+                    className="text-foreground transition-colors hover:text-foreground/80"
+                >
+                    Home
+                </Link>
+                <Link
+                    href="#"
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                    Payments
+                </Link>
+                <Link
+                    href="#"
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                    Transfer
+                </Link>
+            </nav>
         </div>
       </header>
       <LogoutDialog
