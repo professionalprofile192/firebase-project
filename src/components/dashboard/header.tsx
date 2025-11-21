@@ -99,6 +99,7 @@ const SidebarNav = () => {
             id: 'reports', 
             label: 'Report - MIS', 
             icon: BarChart,
+            href: '#'
         },
         { 
             id: 'bulk', 
@@ -113,7 +114,7 @@ const SidebarNav = () => {
 
     return (
         <nav className="flex flex-col h-full text-sm font-medium">
-             <div className="p-4 border-b flex items-center justify-between">
+            <div className="p-4 border-b flex items-center justify-between">
                 <div className="flex items-center gap-2 text-lg font-semibold">
                     <Image
                         src={ublLogo}
@@ -131,20 +132,18 @@ const SidebarNav = () => {
                 {navItems.map(item => (
                     <Collapsible key={item.id} open={openSections.includes(item.id)} onOpenChange={() => item.subItems && toggleSection(item.id)} className="border-b">
                         <CollapsibleTrigger asChild>
-                            <div className={cn("flex items-center justify-between w-full p-4", {
-                                'hover:bg-muted/50': item.subItems,
-                                'cursor-pointer': item.subItems,
-                            })}>
+                            <Link href={item.href || '#'} className={cn("flex items-center justify-between w-full p-4", {
+                                'hover:bg-muted/50': item.subItems || item.href,
+                                'cursor-pointer': item.subItems || item.href,
+                            }, !item.subItems && !item.href ? "opacity-50 cursor-not-allowed hover:bg-transparent" : "")}>
                                 <div className="flex items-center gap-3">
                                     <item.icon className="h-5 w-5" />
                                     <span>{item.label}</span>
                                 </div>
-                                {item.id === 'reports' ? (
-                                     <ChevronDown className="h-4 w-4" />
-                                ) : item.subItems ? (
+                                {item.subItems ? (
                                     openSections.includes(item.id) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
                                 ) : <div className="w-4 h-4" /> }
-                            </div>
+                            </Link>
                         </CollapsibleTrigger>
                         {item.subItems && (
                             <CollapsibleContent>
