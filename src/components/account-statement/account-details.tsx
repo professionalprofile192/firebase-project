@@ -53,11 +53,11 @@ export function AccountDetails({ account }: AccountDetailsProps) {
                          <div className="flex justify-end space-x-8">
                             <div className="text-right">
                                 <p className="text-sm text-muted-foreground">Current Balance:</p>
-                                <p className="font-semibold text-blue-600">{formatCurrency(account.LEDGER_BAL)}</p>
+                                <p className="font-semibold text-primary">{formatCurrency(account.LEDGER_BAL)}</p>
                             </div>
                             <div className="text-right">
                                 <p className="text-sm text-muted-foreground">Available Balance:</p>
-                                <p className="font-semibold text-blue-600">{formatCurrency(account.AVAIL_BAL)}</p>
+                                <p className="font-semibold text-primary">{formatCurrency(account.AVAIL_BAL)}</p>
                             </div>
                         </div>
                     </div>

@@ -162,7 +162,7 @@ export function LoginForm() {
       <CardFooter className="flex-col items-start gap-4">
         <Link
           href="#"
-          className="text-sm font-medium text-blue-600 hover:underline"
+          className="text-sm font-medium text-primary hover:underline"
         >
           Forgot your credentials?
         </Link>
