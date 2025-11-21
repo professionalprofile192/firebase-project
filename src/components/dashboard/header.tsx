@@ -39,14 +39,53 @@ const SidebarNav = () => {
     }
 
     const navItems = [
-        { id: 'accounts', label: 'Accounts', icon: Landmark, subItems: ['My Accounts', 'Account Statements'] },
-        { id: 'approvals', label: 'Approvals & Requests', icon: CheckSquare, subItems: ['Pending Approvals', 'Approvals History', 'Pending Requests', 'Requests History'] },
-        { id: 'payments', label: 'Payments', icon: CreditCard, subItems: ['Bill Payment', 'Bulk Bill Payments', 'Bill Payment History'] },
-        { id: 'transfers', label: 'Transfers', icon: ArrowRightLeft, subItems: ['Bulk Transfers', 'Transfer History'] },
-        { id: 'rtgs', label: 'RTGS', icon: Clock, subItems: ['RTGS Transfers'] },
-        { id: 'trade', label: 'Trade Request', icon: Briefcase, subItems: ['Trade Request', 'Trade Request History'] },
-        { id: 'reports', label: 'Report - MIS', icon: BarChart },
-        { id: 'bulk', label: 'Bulk Import', icon: Upload, subItems: ['Single Bulk Import', 'Bulk Import History'] },
+        { 
+            id: 'accounts', 
+            label: 'Accounts', 
+            icon: Landmark, 
+            subItems: ['My Accounts', 'Account Statements'] 
+        },
+        { 
+            id: 'approvals', 
+            label: 'Approvals & Requests', 
+            icon: CheckSquare, 
+            subItems: ['Pending Approvals', 'Approvals History', 'Pending Requests', 'Requests History'] 
+        },
+        { 
+            id: 'payments', 
+            label: 'Payments', 
+            icon: CreditCard, 
+            subItems: ['Bill Payment', 'Bulk Bill Payments', 'Bill Payment History'] 
+        },
+        { 
+            id: 'transfers', 
+            label: 'Transfers', 
+            icon: ArrowRightLeft, 
+            subItems: ['Bulk Transfers', 'Transfer History'] 
+        },
+        { 
+            id: 'rtgs', 
+            label: 'RTGS', 
+            icon: Clock, 
+            subItems: ['RTGS Transfers'] 
+        },
+        { 
+            id: 'trade', 
+            label: 'Trade Request', 
+            icon: Briefcase, 
+            subItems: ['Trade Request', 'Trade Request History'] 
+        },
+        { 
+            id: 'reports', 
+            label: 'Report - MIS', 
+            icon: BarChart 
+        },
+        { 
+            id: 'bulk', 
+            label: 'Bulk Import', 
+            icon: Upload, 
+            subItems: ['Single Bulk Import', 'Bulk Import History'] 
+        },
     ];
 
     return (
@@ -64,34 +103,29 @@ const SidebarNav = () => {
                     />
                     <span>Business Banking</span>
                 </div>
-                <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                        <X className="h-5 w-5" />
-                    </Button>
-                </SheetTrigger>
             </div>
             <div className='flex-1 overflow-y-auto'>
                 {navItems.map(item => (
-                    <Collapsible key={item.id} open={openSections.includes(item.id)} onOpenChange={() => toggleSection(item.id)} className="border-b">
+                    <Collapsible key={item.id} open={openSections.includes(item.id)} onOpenChange={() => item.subItems && toggleSection(item.id)} className="border-b">
                         <CollapsibleTrigger asChild>
-                            <div className={cn("flex items-center justify-between w-full p-4 hover:bg-muted/50")}>
+                            <div className={cn("flex items-center justify-between w-full p-4", {
+                                'hover:bg-muted/50': item.subItems,
+                                'cursor-pointer': item.subItems,
+                                'cursor-default': !item.subItems
+                            })}>
                                 <div className="flex items-center gap-3">
                                     <item.icon className="h-5 w-5" />
                                     <span>{item.label}</span>
                                 </div>
                                 {item.subItems ? (
                                     openSections.includes(item.id) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-                                ) : null }
+                                ) : <div className="w-4 h-4" /> }
                             </div>
                         </CollapsibleTrigger>
                         {item.subItems && (
-                            <CollapsibleContent className={cn("bg-muted/20", {
-                                "bg-primary/10": item.id === 'accounts' && openSections.includes('accounts')
-                            })}>
+                            <CollapsibleContent>
                                 {item.subItems.map(subItem => (
-                                    <Link href="#" key={subItem} className={cn("block py-3 px-12", {
-                                        "bg-primary/20 text-primary font-semibold": subItem === "My Accounts"
-                                    })}>
+                                    <Link href="#" key={subItem} className="block py-3 px-12 bg-muted/20 hover:bg-muted/50">
                                         {subItem}
                                     </Link>
                                 ))}
