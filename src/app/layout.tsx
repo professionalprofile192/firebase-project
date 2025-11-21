@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
+import { GradientBackground } from '@/components/auth/gradient-background';
 
 export const metadata: Metadata = {
   title: 'UBL Digital Banking Login',
@@ -23,9 +24,8 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={cn("font-body antialiased h-full", {
-        'login-page-bg': true
-      })}>
+      <body className={cn("font-body antialiased h-full")}>
+        <GradientBackground />
         {children}
         <Toaster />
       </body>
