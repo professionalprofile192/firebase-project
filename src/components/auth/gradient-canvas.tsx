@@ -297,11 +297,6 @@ export default function GradientCanvas() {
       }
     }
 
-    if (canvasRef.current) {
-      const gradient = new Gradient(canvasRef.current);
-      gradient.init();
-    }
-
     // Gradient Class
     class Gradient {
         constructor(el) {
@@ -498,6 +493,10 @@ export default function GradientCanvas() {
     }
 
 
+    if (canvasRef.current) {
+      const gradient = new Gradient(canvasRef.current);
+      gradient.init();
+    }
   }, [canvasRef]);
 
   return (
