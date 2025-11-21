@@ -1,6 +1,5 @@
 'use client';
 
-import { Header } from '@/components/dashboard/header';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAccounts, getRecentTransactions } from '../actions';
@@ -9,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card } from '@/components/ui/card';
 import { AccountDetails } from '@/components/account-statement/account-details';
 import { TransactionsList } from '@/components/account-statement/transactions-list';
+import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 
 type Account = {
     responseCode: string;
@@ -92,8 +92,7 @@ export default function AccountStatementPage() {
 
   if (loading || !userProfile) {
     return (
-        <div className="flex h-screen w-full flex-col bg-muted/40">
-            <Header />
+        <DashboardLayout>
             <main className="flex-1 p-4 sm:px-6 sm:py-4">
                 <div className="space-y-4">
                     <Skeleton className="h-12 w-1/4" />
@@ -101,13 +100,12 @@ export default function AccountStatementPage() {
                     <Skeleton className="h-96 w-full" />
                 </div>
             </main>
-        </div>
+        </DashboardLayout>
     )
   }
 
   return (
-    <div className="flex h-screen w-full flex-col bg-muted/40">
-      <Header />
+    <DashboardLayout>
       <main className="flex-1 p-4 sm:px-6 sm:py-4 gap-4 overflow-auto">
         <div className="grid grid-cols-12 gap-6">
             <div className="col-span-12 lg:col-span-3">
@@ -136,6 +134,6 @@ export default function AccountStatementPage() {
             </div>
         </div>
       </main>
-    </div>
+    </DashboardLayout>
   );
 }
