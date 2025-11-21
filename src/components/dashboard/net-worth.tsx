@@ -28,7 +28,7 @@ export function NetWorth({ accounts, userProfile }: NetWorthProps) {
   const liabilities = new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR' }).format(0);
 
   return (
-    <Card className={cn("h-[350px] text-white shadow-lg flex flex-col", "WelcomeBg")}>
+    <Card className={cn("h-[350px] bg-primary text-primary-foreground shadow-lg flex flex-col")}>
       <CardHeader className="flex flex-row items-start justify-between pb-2">
         <div>
           <p className="text-sm font-medium">Good afternoon!</p>
