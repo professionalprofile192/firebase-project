@@ -43,48 +43,71 @@ const SidebarNav = () => {
             id: 'accounts', 
             label: 'Accounts', 
             icon: Landmark, 
-            subItems: ['My Accounts', 'Account Statements'] 
+            subItems: [
+                { label: 'My Accounts', href: '/dashboard' },
+                { label: 'Account Statements', href: '/account-statement' }
+            ] 
         },
         { 
             id: 'approvals', 
             label: 'Approvals & Requests', 
             icon: CheckSquare, 
-            subItems: ['Pending Approvals', 'Approvals History', 'Pending Requests', 'Requests History'] 
+            subItems: [
+                { label: 'Pending Approvals', href: '#' },
+                { label: 'Approvals History', href: '#' },
+                { label: 'Pending Requests', href: '#' },
+                { label: 'Requests History', href: '#' }
+            ] 
         },
         { 
             id: 'payments', 
             label: 'Payments', 
             icon: CreditCard, 
-            subItems: ['Bill Payment', 'Bulk Bill Payments', 'Bill Payment History'] 
+            subItems: [
+                { label: 'Bill Payment', href: '#' },
+                { label: 'Bulk Bill Payments', href: '#' },
+                { label: 'Bill Payment History', href: '#' }
+            ] 
         },
         { 
             id: 'transfers', 
             label: 'Transfers', 
             icon: ArrowRightLeft, 
-            subItems: ['Bulk Transfers', 'Transfer History'] 
+            subItems: [
+                { label: 'Bulk Transfers', href: '#' },
+                { label: 'Transfer History', href: '#' }
+            ] 
         },
         { 
             id: 'rtgs', 
             label: 'RTGS', 
             icon: Clock, 
-            subItems: ['RTGS Transfers'] 
+            subItems: [
+                { label: 'RTGS Transfers', href: '#' }
+            ] 
         },
         { 
             id: 'trade', 
             label: 'Trade Request', 
             icon: Briefcase, 
-            subItems: ['Trade Request', 'Trade Request History'] 
+            subItems: [
+                { label: 'Trade Request', href: '#' },
+                { label: 'Trade Request History', href: '#' }
+            ] 
         },
         { 
             id: 'reports', 
             label: 'Report - MIS', 
-            icon: BarChart 
+            icon: BarChart,
         },
         { 
             id: 'bulk', 
             label: 'Bulk Import', 
             icon: Upload, 
-            subItems: ['Single Bulk Import', 'Bulk Import History'] 
+            subItems: [
+                { label: 'Single Bulk Import', href: '#' },
+                { label: 'Bulk Import History', href: '#' }
+            ] 
         },
     ];
 
@@ -111,13 +134,14 @@ const SidebarNav = () => {
                             <div className={cn("flex items-center justify-between w-full p-4", {
                                 'hover:bg-muted/50': item.subItems,
                                 'cursor-pointer': item.subItems,
-                                'cursor-default': !item.subItems
                             })}>
                                 <div className="flex items-center gap-3">
                                     <item.icon className="h-5 w-5" />
                                     <span>{item.label}</span>
                                 </div>
-                                {item.subItems ? (
+                                {item.id === 'reports' ? (
+                                     <ChevronDown className="h-4 w-4" />
+                                ) : item.subItems ? (
                                     openSections.includes(item.id) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
                                 ) : <div className="w-4 h-4" /> }
                             </div>
@@ -125,8 +149,8 @@ const SidebarNav = () => {
                         {item.subItems && (
                             <CollapsibleContent>
                                 {item.subItems.map(subItem => (
-                                    <Link href="#" key={subItem} className="block py-3 px-12 bg-muted/20 hover:bg-muted/50">
-                                        {subItem}
+                                    <Link href={subItem.href} key={subItem.label} className="block py-3 px-12 bg-muted/20 hover:bg-muted/50">
+                                        {subItem.label}
                                     </Link>
                                 ))}
                             </CollapsibleContent>
