@@ -253,7 +253,7 @@ export function Header() {
                     <Button
                     variant="outline"
                     size="icon"
-                    className="shrink-0 md:hidden mr-4"
+                    className="shrink-0 mr-4"
                     >
                     <Menu className="h-5 w-5" />
                     <span className="sr-only">Toggle navigation menu</span>
