@@ -55,19 +55,6 @@
     height: 100vh;
     width: 100vw;
   }
-
-  #gradient-canvas {
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    --gradient-color-1: #adc8ff;
-    --gradient-color-2: #cfc1ff;
-    --gradient-color-3: #e89dff;
-    --gradient-color-4: #b098f2;
-  }
 }
 
 @layer base {
@@ -77,4 +64,10 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.login-page-bg {
+    background: radial-gradient(circle at 10% 20%, rgb(226, 236, 255) 0%, rgb(215, 226, 255) 28.5%, rgb(203, 218, 254) 55.4%, rgb(180, 199, 250) 84.4%, rgb(160, 182, 246) 100.2%);
+    background: radial-gradient(ellipse at top, #d5d8ff, transparent), radial-gradient(ellipse at bottom, #a7c5ff, transparent);
+    background-color: #e5e9ff;
 }

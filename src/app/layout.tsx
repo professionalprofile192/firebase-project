@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'UBL Digital Banking Login',
@@ -22,7 +23,9 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="font-body antialiased h-full">
+      <body className={cn("font-body antialiased h-full", {
+        'login-page-bg': true
+      })}>
         {children}
         <Toaster />
       </body>
