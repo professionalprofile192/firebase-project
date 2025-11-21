@@ -115,7 +115,7 @@ const SidebarNav = () => {
     return (
         <nav className="flex flex-col h-full text-sm font-medium">
             <div className="p-4 border-b flex items-center justify-between">
-                <div className="flex items-center gap-2 text-lg font-semibold">
+                <div className="flex items-center gap-2 text-lg font-semibold text-primary">
                     <Image
                         src={ublLogo}
                         alt="UBL Digital Logo"
@@ -132,7 +132,7 @@ const SidebarNav = () => {
                 {navItems.map(item => (
                     <Collapsible key={item.id} open={openSections.includes(item.id)} onOpenChange={() => item.subItems && toggleSection(item.id)} className="border-b">
                         <CollapsibleTrigger asChild>
-                            <Link href={item.href || '#'} className={cn("flex items-center justify-between w-full p-4", {
+                            <Link href={item.href || '#'} className={cn("flex items-center justify-between w-full p-4 text-primary", {
                                 'hover:bg-muted/50': item.subItems || item.href,
                                 'cursor-pointer': item.subItems || item.href,
                             }, !item.subItems && !item.href ? "opacity-50 cursor-not-allowed hover:bg-transparent" : "")}>
@@ -148,7 +148,7 @@ const SidebarNav = () => {
                         {item.subItems && (
                             <CollapsibleContent>
                                 {item.subItems.map(subItem => (
-                                    <Link href={subItem.href} key={subItem.label} className="block py-3 px-12 bg-muted/20 hover:bg-muted/50">
+                                    <Link href={subItem.href} key={subItem.label} className="block py-3 px-12 bg-muted/20 hover:bg-muted/50 text-primary">
                                         {subItem.label}
                                     </Link>
                                 ))}
@@ -185,7 +185,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex flex-col border-b bg-background">
+      <header className="sticky top-0 z-30 flex flex-col border-b bg-white text-primary">
         {/* Top Row */}
         <div className="flex h-16 items-center justify-between px-4 sm:px-6">
             <div className="flex items-center gap-2">
@@ -199,6 +199,49 @@ export function Header() {
                 priority
                 />
                 <span className="font-semibold">Business Banking</span>
+            </div>
+
+            <div className="flex items-center gap-4">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                            <User className="h-5 w-5" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-64" align="end">
+                        <DropdownMenuGroup>
+                            <div className="flex items-center gap-3 p-2">
+                                <Avatar>
+                                    <AvatarFallback>
+                                        {userProfile?.firstname?.[0]?.toUpperCase()}{userProfile?.lastname?.[0]?.toUpperCase()}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col">
+                                    <span className="font-semibold capitalize text-foreground">{userProfile?.firstname} {userProfile?.lastname}</span>
+                                    <span className="text-xs text-muted-foreground">{userProfile?.email}</span>
+                                </div>
+                            </div>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-foreground">
+                            <Settings className="mr-2 h-4 w-4" />
+                            <span>Profile Settings</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-foreground">
+                            <Settings className="mr-2 h-4 w-4" />
+                            <span>Alerts Settings</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleLogout}
+                    aria-label="Logout"
+                >
+                    <LogOut className="h-5 w-5" />
+                </Button>
             </div>
         </div>
 
@@ -223,67 +266,23 @@ export function Header() {
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
                 <Link
                     href="/dashboard"
-                    className="text-foreground transition-colors hover:text-foreground/80"
+                    className="transition-colors hover:text-primary/80"
                 >
                     Home
                 </Link>
                 <Link
                     href="#"
-                    className="text-muted-foreground transition-colors hover:text-foreground"
+                    className="transition-colors hover:text-primary/80"
                 >
                     Payments
                 </Link>
                 <Link
                     href="#"
-                    className="text-muted-foreground transition-colors hover:text-foreground"
+                    className="transition-colors hover:text-primary/80"
                 >
                     Transfer
                 </Link>
             </nav>
-
-            <div className="flex items-center gap-4 ml-auto">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-muted-foreground">
-                            <User className="h-5 w-5" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-64" align="end">
-                        <DropdownMenuGroup>
-                            <div className="flex items-center gap-3 p-2">
-                                <Avatar>
-                                    <AvatarFallback>
-                                        {userProfile?.firstname?.[0]?.toUpperCase()}{userProfile?.lastname?.[0]?.toUpperCase()}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="flex flex-col">
-                                    <span className="font-semibold capitalize">{userProfile?.firstname} {userProfile?.lastname}</span>
-                                    <span className="text-xs text-muted-foreground">{userProfile?.email}</span>
-                                </div>
-                            </div>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <Settings className="mr-2 h-4 w-4" />
-                            <span>Profile Settings</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <Settings className="mr-2 h-4 w-4" />
-                            <span>Alerts Settings</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleLogout}
-                    className="text-muted-foreground"
-                    aria-label="Logout"
-                >
-                    <LogOut className="h-5 w-5" />
-                </Button>
-            </div>
         </div>
       </header>
       <LogoutDialog
