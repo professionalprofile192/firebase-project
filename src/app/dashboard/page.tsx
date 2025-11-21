@@ -163,7 +163,7 @@ export default function DashboardPage() {
                 <Notifications />
               </div>
               <div className="lg:col-span-3 flex flex-col gap-4">
-                <div className="grid md:grid-cols-2 gap-4 h-[350px]">
+                <div className="grid md:grid-cols-2 gap-4">
                     <MyAccounts accounts={accounts} />
                     <RecentTransactions 
                         transactions={transactions} 

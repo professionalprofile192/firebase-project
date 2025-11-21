@@ -19,6 +19,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Transaction } from '@/app/dashboard/page';
 import { format } from 'date-fns';
 import { FileQuestion } from 'lucide-react';
+import { cn } from '@/lib/utils';
   
 type Account = {
     ACCT_NO: string;
@@ -34,7 +35,7 @@ interface RecentTransactionsProps {
 export function RecentTransactions({ transactions, accounts, onAccountChange }: RecentTransactionsProps) {
 
     return (
-      <Card className="h-full flex flex-col">
+      <Card className={cn("h-[350px] flex flex-col")}>
         <CardHeader className="bg-primary/90 text-primary-foreground rounded-t-lg">
           <div className="flex items-center justify-between">
             <CardTitle className="text-white">Recent Transactions</CardTitle>

@@ -15,6 +15,7 @@ import {
   } from '@/components/ui/select';
 import { ScrollArea } from '../ui/scroll-area';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
   
 type Account = {
     ACCT_NO: string;
@@ -45,7 +46,7 @@ export function MyAccounts({ accounts }: MyAccountsProps) {
     const formattedTotalBalance = new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalBalance);
 
     return (
-      <Card className="h-full flex flex-col bg-primary/90 text-primary-foreground">
+      <Card className={cn("h-[350px] flex flex-col bg-primary/90 text-primary-foreground")}>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-white">My Accounts</CardTitle>
