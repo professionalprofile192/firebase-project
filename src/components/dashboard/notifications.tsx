@@ -41,7 +41,7 @@ import { ScrollArea } from '../ui/scroll-area';
   
   export function Notifications() {
     return (
-      <Card className="h-[250px] flex flex-col">
+      <Card className="h-[280px] flex flex-col">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Notifications</CardTitle>
