@@ -5,7 +5,7 @@ import { ChevronDown, FileQuestion } from 'lucide-react';
   
   export function ChartCard() {
     return (
-      <Card className="h-full">
+      <Card className="h-[250px]">
         <CardHeader>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
