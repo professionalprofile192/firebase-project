@@ -139,8 +139,8 @@ export default function DashboardPage() {
                     </div>
                     <div className="lg:col-span-3 flex flex-col gap-4">
                         <div className="grid md:grid-cols-2 gap-4">
-                            <Skeleton className="h-[300px]" />
-                            <Skeleton className="h-[300px]" />
+                            <Skeleton className="h-[350px]" />
+                            <Skeleton className="h-[350px]" />
                         </div>
                         <div className="grid grid-cols-1">
                             <Skeleton className="flex-1" />
