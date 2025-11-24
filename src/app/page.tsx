@@ -10,7 +10,7 @@ export default function LoginPage() {
   return (
     <div className="h-full w-full lg:grid lg:grid-cols-2 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
       {/* Left side - visible on desktop */}
-      <div className="hidden lg:flex flex-col items-start justify-center p-12">
+      <div className="hidden lg:flex flex-col items-start justify-center p-12 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
         <Image
           src={ublLogo}
           alt="UBL Digital Logo"
@@ -20,7 +20,7 @@ export default function LoginPage() {
           className="rounded-lg shadow-md mb-8"
           priority
         />
-        <h1 className="text-5xl font-bold mb-4">
+        <h1 className="text-5xl font-bold mb-4 pt-24">
           Welcome to UBL Digital Business Banking
         </h1>
         <p className="text-lg max-w-lg">
@@ -31,7 +31,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right side - Login form container */}
-      <div className="relative flex items-center justify-center h-full p-4 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300 lg:bg-none lg:bg-transparent">
+      <div className="relative flex flex-col items-center justify-start h-full p-4 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300 lg:bg-none lg:bg-transparent lg:justify-center lg:items-center">
          {/* Mobile header */}
         <header className="w-full flex justify-start lg:hidden absolute top-4 px-4">
           <Image
@@ -45,7 +45,7 @@ export default function LoginPage() {
           />
         </header>
 
-        <main className="flex items-center justify-center w-full">
+        <main className="flex items-center justify-center w-full mt-[15%] lg:mt-0">
           <LoginForm />
         </main>
         
