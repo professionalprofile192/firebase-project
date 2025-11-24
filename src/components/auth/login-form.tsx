@@ -333,7 +333,7 @@ export function LoginForm() {
 
   return (
     <div className={cn('w-full max-w-sm flip-card', { 'flipped': view !== 'signIn' })}>
-        <div className='flip-card-inner' style={{ minHeight: '500px' }}>
+        <div className='flip-card-inner' style={{ minHeight: '620px' }}>
             <div className='flip-card-front'>
                 <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm flex flex-col">
                     <CardHeader>
