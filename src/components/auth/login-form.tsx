@@ -364,8 +364,7 @@ export function LoginForm() {
     }
   }
 
-  const isFlippedToForgot = currentView === 'forgotOptions' || currentView === 'recoverUsername' || currentView === 'recoverPassword';
-
+  const isFlippedToForgot = currentView !== 'login';
   const isFlippedToRecover = currentView === 'recoverUsername' || currentView === 'recoverPassword';
 
   return (
