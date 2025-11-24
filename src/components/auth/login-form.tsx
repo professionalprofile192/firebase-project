@@ -41,7 +41,7 @@ const recoverUsernameFormSchema = z.object({
     captcha: z.string().min(1, { message: 'Captcha is required.' }),
 });
 
-type View = 'signIn' | 'forgotOptions' | 'recoverUsername';
+type View = 'signIn' | 'forgotOptions' | 'recoverUsername' | 'recoverPassword';
 
 
 function ForgotCredentialsOptions({ setView }: { setView: (view: View) => void }) {
@@ -63,7 +63,7 @@ function ForgotCredentialsOptions({ setView }: { setView: (view: View) => void }
                         </div>
                     </div>
                 </button>
-                    <button className="w-full text-left p-4 rounded-lg bg-white/80 hover:bg-white transition-all shadow-md">
+                    <button onClick={() => setView('recoverPassword')} className="w-full text-left p-4 rounded-lg bg-white/80 hover:bg-white transition-all shadow-md">
                     <div className='flex items-start gap-4'>
                         <Lock className="h-6 w-6 text-primary" />
                         <div>
@@ -173,6 +173,104 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
     );
 }
 
+const recoverPasswordFormSchema = z.object({
+    loginId: z.string().min(1, { message: 'Login ID is required' }),
+    email: z.string().email({ message: 'Please enter a valid email address.' }),
+    captcha: z.string().min(1, { message: 'Captcha is required.' }),
+});
+
+function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
+    const form = useForm<z.infer<typeof recoverPasswordFormSchema>>({
+        resolver: zodResolver(recoverPasswordFormSchema),
+        defaultValues: {
+            loginId: '',
+            email: '',
+            captcha: '',
+        },
+    });
+
+    function onSubmit(values: z.infer<typeof recoverPasswordFormSchema>) {
+        console.log(values);
+        // Handle form submission
+    }
+
+    return (
+        <>
+            <CardHeader>
+                <CardTitle className="text-3xl font-bold tracking-tight">Reset Password</CardTitle>
+                <CardDescription>Let's verify it's you</CardDescription>
+            </CardHeader>
+            <CardContent className='flex-1 flex flex-col'>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 flex flex-col flex-1">
+                        <div className="flex-1 space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="loginId"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Login ID</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Enter Login ID" {...field} className="h-12 text-base bg-white/50" />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Enter Email Address" {...field} className="h-12 text-base bg-white/50" />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="captcha"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <div className="flex items-end gap-2">
+                                        <div className="flex-1">
+                                            <FormLabel>Captcha</FormLabel>
+                                            <div className='flex items-center gap-2'>
+                                                <div className="bg-gray-200 p-2 rounded-md flex-grow">
+                                                    <Image src="https://placehold.co/150x50/e2e8f0/000000?text=aBCdE&font=source-sans-pro" alt="Captcha" width={150} height={50} className='w-full' />
+                                                </div>
+                                                <Button variant="ghost" size="icon">
+                                                    <RefreshCw className="h-5 w-5" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <FormControl>
+                                        <Input placeholder="Enter the above captcha here" {...field} className="mt-2 h-12 text-base bg-white/50" />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <Button
+                            type="submit"
+                            className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80"
+                        >
+                            Next
+                        </Button>
+                    </form>
+                </Form>
+            </CardContent>
+            <CardFooter>
+                 <Button variant="link" onClick={() => setView('forgotOptions')}>Go Back</Button>
+            </CardFooter>
+        </>
+    );
+}
 
 export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -328,6 +426,7 @@ export function LoginForm() {
                 <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm flex flex-col">
                     {view === 'forgotOptions' && <ForgotCredentialsOptions setView={handleSetView} />}
                     {view === 'recoverUsername' && <RecoverUsernameForm setView={handleSetView} />}
+                    {view === 'recoverPassword' && <RecoverPasswordForm setView={handleSetView} />}
                 </Card>
             </div>
         </div>
