@@ -23,7 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { EyeOff, Eye } from 'lucide-react';
+import { EyeOff, Eye, User, Lock } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { getLastLoginTime, login } from '@/app/actions';
@@ -181,14 +181,30 @@ export function LoginForm() {
                 </Card>
             </div>
             <div className='flip-card-back'>
-                {/* Content for the back of the card will go here */}
-                {/* For now, it's just an empty card to show the flip */}
-                <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm flex flex-col justify-center items-center">
-                     <CardHeader>
-                        <CardTitle>Forgot Credentials</CardTitle>
+                <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm flex flex-col">
+                    <CardHeader>
+                        <CardTitle className="text-3xl font-bold tracking-tight">Forgot Credentials</CardTitle>
+                        <CardDescription>Select an option to recover your account.</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <p>Recovery options will be here.</p>
+                    <CardContent className="flex-1 flex flex-col justify-center gap-4">
+                        <button className="w-full text-left p-4 rounded-lg bg-white/80 hover:bg-white transition-all shadow-md">
+                            <div className='flex items-start gap-4'>
+                                <User className="h-6 w-6 text-primary" />
+                                <div>
+                                    <h3 className="font-semibold text-lg">Recover Username</h3>
+                                    <p className="text-sm text-muted-foreground">To view your username and unlock your mobile account, confirm your account details.</p>
+                                </div>
+                            </div>
+                        </button>
+                         <button className="w-full text-left p-4 rounded-lg bg-white/80 hover:bg-white transition-all shadow-md">
+                            <div className='flex items-start gap-4'>
+                                <Lock className="h-6 w-6 text-primary" />
+                                <div>
+                                    <h3 className="font-semibold text-lg">Reset Password</h3>
+                                    <p className="text-sm text-muted-foreground">To view your username and unlock your mobile account, confirm your personal and account details.</p>
+                                </div>
+                            </div>
+                        </button>
                     </CardContent>
                     <CardFooter>
                         <Button variant="link" onClick={() => setIsFlipped(false)}>Go Back</Button>
