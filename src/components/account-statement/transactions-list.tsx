@@ -1,20 +1,18 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "../ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Transaction } from "@/app/account-statement/page";
-import { format } from "date-fns";
-import Link from "next/link";
-import { ScrollArea } from "../ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { TransactionTable } from "./transaction-table";
+import { TransactionCards } from "./transaction-cards";
 
 interface TransactionsListProps {
     transactions: Transaction[];
 }
 
 export function TransactionsList({ transactions }: TransactionsListProps) {
-    const formatAmount = (amount: string) => new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(amount));
+    const isMobile = useIsMobile();
     
     return (
         <Card className="h-full flex flex-col">
@@ -43,51 +41,11 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
                 </div>
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden">
-                <ScrollArea className="h-full w-full">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Transaction Date</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead className="text-right">Debit Amount</TableHead>
-                            <TableHead className="text-right">Credit Amount</TableHead>
-                            <TableHead className="text-right">Running Balance</TableHead>
-                            <TableHead className="text-center">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {transactions.map((tx) => {
-                            const date = new Date(tx.tranDate);
-                            const transactionData = {
-                                ...tx,
-                                accountTitle: 'NAWAZ ALI',
-                                fromAccount: '060510224211',
-                            }
-                            return (
-                                <TableRow key={tx.seqno}>
-                                    <TableCell className="whitespace-nowrap">{format(date, 'dd/MM/yyyy')}</TableCell>
-                                    <TableCell className="min-w-[250px]">{tx.particulars}</TableCell>
-                                    <TableCell className="text-right whitespace-nowrap">
-                                        {tx.CRDR === 'D' ? formatAmount(tx.tranAmt) : '-'}
-                                    </TableCell>
-                                    <TableCell className="text-right whitespace-nowrap">
-                                        {tx.CRDR === 'C' ? formatAmount(tx.tranAmt) : '-'}
-                                    </TableCell>
-                                    <TableCell className="text-right whitespace-nowrap">{formatAmount(tx.runBal)}</TableCell>
-                                    <TableCell className="text-center">
-                                        <Link href={{
-                                            pathname: `/account-statement/${tx.seqno}`,
-                                            query: { tx: JSON.stringify(transactionData) }
-                                        }}>
-                                            <Button variant="outline" size="sm">View</Button>
-                                        </Link>
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })}
-                    </TableBody>
-                </Table>
-                </ScrollArea>
+                {isMobile ? (
+                    <TransactionCards transactions={transactions} />
+                ) : (
+                    <TransactionTable transactions={transactions} />
+                )}
             </CardContent>
         </Card>
     )
