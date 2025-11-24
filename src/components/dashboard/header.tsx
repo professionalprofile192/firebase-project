@@ -13,7 +13,7 @@ import {
   DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { LogoutDialog } from '../auth/logout-dialog';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
@@ -259,6 +259,7 @@ export function Header() {
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="p-0 w-80">
+                    <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                     <SidebarNav />
                 </SheetContent>
             </Sheet>
