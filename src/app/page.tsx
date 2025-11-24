@@ -10,7 +10,7 @@ export default function LoginPage() {
           <div className="flex items-center gap-4">
             <div className="flex items-center justify-center rounded-lg bg-white p-2 shadow-md">
               <Image
-                src={ublLogo}
+                src="/ubl-digital-logo.png"
                 alt="UBL Digital Logo"
                 width={40}
                 height={40}

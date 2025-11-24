@@ -25,7 +25,7 @@ type UserProfile = {
     email: string;
 }
 
-const ublLogo = '/ubl_logo.png';
+const ublLogo = '/ubl-digital-logo.png';
 
 const SidebarNav = () => {
     const [openSections, setOpenSections] = useState<string[]>([]);
