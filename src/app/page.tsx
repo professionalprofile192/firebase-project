@@ -14,8 +14,8 @@ export default function LoginPage() {
               <Image
                 src={ublLogo}
                 alt="UBL Digital Logo"
-                width={50}
-                height={50}
+                width={60}
+                height={60}
                 data-ai-hint="logo banking"
                 className="rounded-md"
                 priority
