@@ -51,7 +51,7 @@ function ForgotCredentialsOptions({ setView }: { setView: (view: View) => void }
                 <CardTitle className="text-3xl font-bold tracking-tight">Forgot Credentials</CardTitle>
                 <CardDescription>Select an option to recover your account.</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col justify-center gap-4">
+            <CardContent className="space-y-4">
                 <button 
                     onClick={() => setView('recoverUsername')}
                     className="w-full text-left p-4 rounded-lg bg-white/80 hover:bg-white transition-all shadow-md">
@@ -101,62 +101,60 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
                 <CardTitle className="text-3xl font-bold tracking-tight">Recover Username</CardTitle>
                 <CardDescription>Let's verify it's you</CardDescription>
             </CardHeader>
-            <CardContent className='flex-1 flex flex-col'>
+            <CardContent>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 flex flex-col flex-1">
-                        <div className="flex-1 space-y-4">
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter Email Address" {...field} className="h-12 text-base bg-white/50" />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="mobileNumber"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Mobile Number</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter Registered Mobile Number" {...field} className="h-12 text-base bg-white/50" />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="captcha"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <div className="flex items-end gap-2">
-                                        <div className="flex-1">
-                                            <FormLabel>Captcha</FormLabel>
-                                            <div className='flex items-center gap-2'>
-                                                <div className="bg-gray-200 p-2 rounded-md flex-grow">
-                                                    <Image src="https://placehold.co/150x50/e2e8f0/000000?text=gZAa5&font=source-sans-pro" alt="Captcha" width={150} height={50} className='w-full' />
-                                                </div>
-                                                <Button variant="ghost" size="icon">
-                                                    <RefreshCw className="h-5 w-5" />
-                                                </Button>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Enter Email Address" {...field} className="h-12 text-base bg-white/50" />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="mobileNumber"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Mobile Number</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Enter Registered Mobile Number" {...field} className="h-12 text-base bg-white/50" />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="captcha"
+                            render={({ field }) => (
+                                <FormItem>
+                                <div className="flex items-end gap-2">
+                                    <div className="flex-1">
+                                        <FormLabel>Captcha</FormLabel>
+                                        <div className='flex items-center gap-2'>
+                                            <div className="bg-gray-200 p-2 rounded-md flex-grow">
+                                                <Image src="https://placehold.co/150x50/e2e8f0/000000?text=gZAa5&font=source-sans-pro" alt="Captcha" width={150} height={50} className='w-full' />
                                             </div>
+                                            <Button variant="ghost" size="icon">
+                                                <RefreshCw className="h-5 w-5" />
+                                            </Button>
                                         </div>
                                     </div>
-                                    <FormControl>
-                                        <Input placeholder="Enter the above captcha here" {...field} className="mt-2 h-12 text-base bg-white/50" />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+                                </div>
+                                <FormControl>
+                                    <Input placeholder="Enter the above captcha here" {...field} className="mt-2 h-12 text-base bg-white/50" />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <Button
                             type="submit"
                             className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80"
@@ -200,62 +198,60 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
                 <CardTitle className="text-3xl font-bold tracking-tight">Reset Password</CardTitle>
                 <CardDescription>Let's verify it's you</CardDescription>
             </CardHeader>
-            <CardContent className='flex-1 flex flex-col'>
+            <CardContent>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 flex flex-col flex-1">
-                        <div className="flex-1 space-y-4">
-                            <FormField
-                                control={form.control}
-                                name="loginId"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Login ID</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter Login ID" {...field} className="h-12 text-base bg-white/50" />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter Email Address" {...field} className="h-12 text-base bg-white/50" />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="captcha"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <div className="flex items-end gap-2">
-                                        <div className="flex-1">
-                                            <FormLabel>Captcha</FormLabel>
-                                            <div className='flex items-center gap-2'>
-                                                <div className="bg-gray-200 p-2 rounded-md flex-grow">
-                                                    <Image src="https://placehold.co/150x50/e2e8f0/000000?text=aBCdE&font=source-sans-pro" alt="Captcha" width={150} height={50} className='w-full' />
-                                                </div>
-                                                <Button variant="ghost" size="icon">
-                                                    <RefreshCw className="h-5 w-5" />
-                                                </Button>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="loginId"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Login ID</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Enter Login ID" {...field} className="h-12 text-base bg-white/50" />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Enter Email Address" {...field} className="h-12 text-base bg-white/50" />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="captcha"
+                            render={({ field }) => (
+                                <FormItem>
+                                <div className="flex items-end gap-2">
+                                    <div className="flex-1">
+                                        <FormLabel>Captcha</FormLabel>
+                                        <div className='flex items-center gap-2'>
+                                            <div className="bg-gray-200 p-2 rounded-md flex-grow">
+                                                <Image src="https://placehold.co/150x50/e2e8f0/000000?text=aBCdE&font=source-sans-pro" alt="Captcha" width={150} height={50} className='w-full' />
                                             </div>
+                                            <Button variant="ghost" size="icon">
+                                                <RefreshCw className="h-5 w-5" />
+                                            </Button>
                                         </div>
                                     </div>
-                                    <FormControl>
-                                        <Input placeholder="Enter the above captcha here" {...field} className="mt-2 h-12 text-base bg-white/50" />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+                                </div>
+                                <FormControl>
+                                    <Input placeholder="Enter the above captcha here" {...field} className="mt-2 h-12 text-base bg-white/50" />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <Button
                             type="submit"
                             className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80"
@@ -333,9 +329,9 @@ export function LoginForm() {
 
   return (
     <div className={cn('w-full max-w-sm flip-card', { 'flipped': view !== 'signIn' })}>
-        <div className='flip-card-inner' style={{ minHeight: '620px' }}>
+        <div className='flip-card-inner'>
             <div className='flip-card-front'>
-                <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm flex flex-col">
+                <Card className="w-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm">
                     <CardHeader>
                         <CardTitle className="text-3xl font-bold tracking-tight">
                         Sign In
@@ -344,7 +340,7 @@ export function LoginForm() {
                         Enter your credentials to sign in to UBL Digital.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className='flex-1'>
+                    <CardContent>
                         <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <FormField
@@ -423,7 +419,7 @@ export function LoginForm() {
                 </Card>
             </div>
             <div className='flip-card-back'>
-                <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm flex flex-col">
+                <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm">
                     {view === 'forgotOptions' && <ForgotCredentialsOptions setView={handleSetView} />}
                     {view === 'recoverUsername' && <RecoverUsernameForm setView={handleSetView} />}
                     {view === 'recoverPassword' && <RecoverPasswordForm setView={handleSetView} />}
