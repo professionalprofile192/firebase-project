@@ -50,6 +50,7 @@
 
   body {
     background-color: hsl(var(--background));
+    overflow: hidden;
   }
 }
 
