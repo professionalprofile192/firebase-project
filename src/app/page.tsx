@@ -31,7 +31,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right side - Login form container */}
-      <div className="flex flex-col items-center justify-between p-4 bg-white min-h-screen lg:justify-center lg:min-h-0 lg:bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
+      <div className="flex flex-col items-center justify-between p-4 bg-white min-h-screen lg:justify-between lg:bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
          {/* Mobile header */}
         <header className="w-full flex justify-start lg:hidden">
           <Image
