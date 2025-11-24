@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { LoginForm } from '@/components/auth/login-form';
 
 export default function LoginPage() {
-  const ublLogo = '/ubl-digital-logo.png';
+  const ublLogo = '/ubl_logo.png';
   return (
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
       <div className="relative hidden items-center justify-center bg-gray-100 lg:flex">
@@ -14,8 +14,8 @@ export default function LoginPage() {
               <Image
                 src={ublLogo}
                 alt="UBL Digital Logo"
-                width={40}
-                height={40}
+                width={50}
+                height={50}
                 data-ai-hint="logo banking"
                 className="rounded-md"
                 priority
