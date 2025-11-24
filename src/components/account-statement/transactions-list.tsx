@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Transaction } from "@/app/account-statement/page";
 import { format } from "date-fns";
 import Link from "next/link";
+import { ScrollArea } from "../ui/scroll-area";
 
 interface TransactionsListProps {
     transactions: Transaction[];
@@ -16,12 +17,12 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
     const formatAmount = (amount: string) => new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(amount));
     
     return (
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+        <Card className="h-full flex flex-col">
+            <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <CardTitle className="text-base">Transactions</CardTitle>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                      <Select defaultValue="pdf">
-                        <SelectTrigger className="w-[150px]">
+                        <SelectTrigger className="w-full sm:w-[150px]">
                             <SelectValue placeholder="Download As" />
                         </SelectTrigger>
                         <SelectContent>
@@ -30,7 +31,7 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
                         </SelectContent>
                     </Select>
                      <Select defaultValue="all">
-                        <SelectTrigger className="w-[120px]">
+                        <SelectTrigger className="w-full sm:w-[120px]">
                             <SelectValue placeholder="View" />
                         </SelectTrigger>
                         <SelectContent>
@@ -41,7 +42,8 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
                     </Select>
                 </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1 overflow-hidden">
+                <ScrollArea className="h-full w-full">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -63,15 +65,15 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
                             }
                             return (
                                 <TableRow key={tx.seqno}>
-                                    <TableCell>{format(date, 'dd/MM/yyyy')}</TableCell>
-                                    <TableCell className="max-w-xs truncate">{tx.particulars}</TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="whitespace-nowrap">{format(date, 'dd/MM/yyyy')}</TableCell>
+                                    <TableCell className="min-w-[250px]">{tx.particulars}</TableCell>
+                                    <TableCell className="text-right whitespace-nowrap">
                                         {tx.CRDR === 'D' ? formatAmount(tx.tranAmt) : '-'}
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-right whitespace-nowrap">
                                         {tx.CRDR === 'C' ? formatAmount(tx.tranAmt) : '-'}
                                     </TableCell>
-                                    <TableCell className="text-right">{formatAmount(tx.runBal)}</TableCell>
+                                    <TableCell className="text-right whitespace-nowrap">{formatAmount(tx.runBal)}</TableCell>
                                     <TableCell className="text-center">
                                         <Link href={{
                                             pathname: `/account-statement/${tx.seqno}`,
@@ -85,6 +87,7 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
                         })}
                     </TableBody>
                 </Table>
+                </ScrollArea>
             </CardContent>
         </Card>
     )

@@ -106,10 +106,10 @@ export default function AccountStatementPage() {
 
   return (
     <DashboardLayout>
-      <main className="flex-1 p-4 sm:px-6 sm:py-4 gap-4 overflow-auto">
-        <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-12 lg:col-span-3">
-                <Card className="p-4">
+      <main className="flex-1 p-4 sm:px-6 sm:py-4 gap-6 flex flex-col">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="col-span-1 lg:col-span-3">
+                <Card className="p-4 h-full">
                     <h3 className="text-sm font-semibold text-muted-foreground mb-2">Today's Snapshot</h3>
                      <Select
                         value={selectedAccount?.ACCT_NO}
@@ -128,10 +128,12 @@ export default function AccountStatementPage() {
                     </Select>
                 </Card>
             </div>
-            <div className="col-span-12 lg:col-span-9 space-y-6">
+            <div className="col-span-1 lg:col-span-9">
                 {selectedAccount && <AccountDetails account={selectedAccount} />}
-                <TransactionsList transactions={transactions} />
             </div>
+        </div>
+        <div className="flex-1">
+            <TransactionsList transactions={transactions} />
         </div>
       </main>
     </DashboardLayout>
