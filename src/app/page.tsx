@@ -8,33 +8,59 @@ import { Landmark, Send } from 'lucide-react';
 export default function LoginPage() {
   const ublLogo = '/ubl-digital-logo.png';
   return (
-    <div className="relative min-h-screen w-full flex flex-col p-4 sm:p-6 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
-      <header className="w-full flex justify-start">
+    <div className="relative min-h-screen w-full flex flex-col lg:grid lg:grid-cols-2">
+      {/* Left side - visible on desktop */}
+      <div className="hidden lg:flex flex-col items-start justify-center p-12 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300 text-white">
         <Image
           src={ublLogo}
           alt="UBL Digital Logo"
-          width={80}
-          height={80}
+          width={100}
+          height={100}
           data-ai-hint="logo banking"
-          className="rounded-lg shadow-md"
+          className="rounded-lg shadow-md mb-8"
           priority
         />
-      </header>
+        <h1 className="text-5xl font-bold mb-4">
+          Welcome to UBL Digital Business Banking
+        </h1>
+        <p className="text-lg max-w-lg">
+          UBL Digital Business Banking offers a comprehensive suite of flexible
+          online financial solutions to cater to all your business banking
+          needs.
+        </p>
+      </div>
 
-      <main className="flex-1 flex items-center justify-center w-full">
-        <LoginForm />
-      </main>
-      
-      <footer className="w-full flex items-center justify-center gap-4">
-        <Button variant="outline" className="bg-white/90 text-foreground hover:bg-white flex-col h-auto py-2 px-6 gap-1 rounded-xl border-gray-200">
-          <Send className="h-5 w-5" />
-          <span>Locate Us</span>
-        </Button>
-        <Button variant="outline" className="bg-white/90 text-foreground hover:bg-white flex-col h-auto py-2 px-6 gap-1 rounded-xl border-gray-200">
-          <Landmark className="h-5 w-5" />
-          <span>Contact Us</span>
-        </Button>
-      </footer>
+      {/* Right side - Login form container */}
+      <div className="flex flex-col items-center justify-center p-4 bg-white lg:bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
+         {/* Mobile header */}
+        <header className="w-full flex justify-start lg:hidden">
+          <Image
+            src={ublLogo}
+            alt="UBL Digital Logo"
+            width={80}
+            height={80}
+            data-ai-hint="logo banking"
+            className="rounded-lg shadow-md"
+            priority
+          />
+        </header>
+
+        <main className="flex-1 flex items-center justify-center w-full">
+          <LoginForm />
+        </main>
+        
+        {/* Mobile footer */}
+        <footer className="w-full flex items-center justify-center gap-4 lg:hidden">
+          <Button variant="outline" className="bg-white/90 text-foreground hover:bg-white flex-col h-auto py-2 px-6 gap-1 rounded-xl border-gray-200">
+            <Send className="h-5 w-5" />
+            <span>Locate Us</span>
+          </Button>
+          <Button variant="outline" className="bg-white/90 text-foreground hover:bg-white flex-col h-auto py-2 px-6 gap-1 rounded-xl border-gray-200">
+            <Landmark className="h-5 w-5" />
+            <span>Contact Us</span>
+          </Button>
+        </footer>
+      </div>
     </div>
   );
 }
