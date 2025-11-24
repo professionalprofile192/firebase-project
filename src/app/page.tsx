@@ -45,7 +45,7 @@ export default function LoginPage() {
           />
         </header>
 
-        <main className="flex items-center justify-center w-full my-4">
+        <main className="flex items-center justify-center w-full">
           <LoginForm />
         </main>
         
