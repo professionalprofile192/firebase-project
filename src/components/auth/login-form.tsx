@@ -41,6 +41,12 @@ const recoverUsernameFormSchema = z.object({
     captcha: z.string().min(1, { message: 'Captcha is required.' }),
 });
 
+const recoverPasswordFormSchema = z.object({
+    loginId: z.string().min(1, { message: 'Login ID is required' }),
+    email: z.string().email({ message: 'Please enter a valid email address.' }),
+    captcha: z.string().min(1, { message: 'Captcha is required.' }),
+});
+
 type View = 'signIn' | 'forgotOptions' | 'recoverUsername' | 'recoverPassword';
 
 
@@ -96,12 +102,12 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
     }
 
     return (
-        <>
+        <div className='flex flex-col h-full'>
             <CardHeader>
                 <CardTitle className="text-3xl font-bold tracking-tight">Recover Username</CardTitle>
                 <CardDescription>Let's verify it's you</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className='flex-grow'>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <FormField
@@ -167,15 +173,9 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
             <CardFooter>
                  <Button variant="link" onClick={() => setView('forgotOptions')}>Go Back</Button>
             </CardFooter>
-        </>
+        </div>
     );
 }
-
-const recoverPasswordFormSchema = z.object({
-    loginId: z.string().min(1, { message: 'Login ID is required' }),
-    email: z.string().email({ message: 'Please enter a valid email address.' }),
-    captcha: z.string().min(1, { message: 'Captcha is required.' }),
-});
 
 function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
     const form = useForm<z.infer<typeof recoverPasswordFormSchema>>({
@@ -193,12 +193,12 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
     }
 
     return (
-        <>
+        <div className="flex flex-col h-full">
             <CardHeader>
                 <CardTitle className="text-3xl font-bold tracking-tight">Reset Password</CardTitle>
                 <CardDescription>Let's verify it's you</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-grow">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <FormField
@@ -264,7 +264,7 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
             <CardFooter>
                  <Button variant="link" onClick={() => setView('forgotOptions')}>Go Back</Button>
             </CardFooter>
-        </>
+        </div>
     );
 }
 
@@ -419,7 +419,7 @@ export function LoginForm() {
                 </Card>
             </div>
             <div className='flip-card-back'>
-                <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm">
+                <Card className="w-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm" style={{minHeight: '560px'}}>
                     {view === 'forgotOptions' && <ForgotCredentialsOptions setView={handleSetView} />}
                     {view === 'recoverUsername' && <RecoverUsernameForm setView={handleSetView} />}
                     {view === 'recoverPassword' && <RecoverPasswordForm setView={handleSetView} />}
@@ -429,3 +429,5 @@ export function LoginForm() {
     </div>
   );
 }
+
+    
