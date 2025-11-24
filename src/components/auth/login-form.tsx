@@ -89,7 +89,7 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md border-border bg-card/80 text-card-foreground shadow-2xl backdrop-blur-sm">
+    <Card className="w-full max-w-sm border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="text-3xl font-bold tracking-tight">
           Sign In
@@ -100,7 +100,7 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="username"
@@ -109,7 +109,7 @@ export function LoginForm() {
                   <FormLabel>Username:</FormLabel>
                   <FormControl>
                     <Input
-                      className="h-12 text-base"
+                      className="h-12 text-base bg-white/50"
                       placeholder="Enter Username"
                       {...field}
                     />
@@ -128,7 +128,7 @@ export function LoginForm() {
                     <FormControl>
                       <Input
                         type={showPassword ? 'text' : 'password'}
-                        className="h-12 pr-10 text-base"
+                        className="h-12 pr-10 text-base bg-white/50"
                         placeholder="Enter Password"
                         {...field}
                       />
@@ -159,7 +159,7 @@ export function LoginForm() {
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-4">
+      <CardFooter className="flex-col items-start gap-2">
         <Link
           href="#"
           className="text-sm font-medium text-primary hover:underline"
@@ -168,7 +168,7 @@ export function LoginForm() {
         </Link>
         <Link
           href="#"
-          className="text-sm font-medium text-gray-500 hover:underline"
+          className="text-sm font-medium text-gray-700 hover:underline"
         >
           Corporate Enroll
         </Link>

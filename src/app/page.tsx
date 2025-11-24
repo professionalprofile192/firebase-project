@@ -2,42 +2,38 @@
 
 import Image from 'next/image';
 import { LoginForm } from '@/components/auth/login-form';
+import { Button } from '@/components/ui/button';
+import { Landmark, Send } from 'lucide-react';
 
 export default function LoginPage() {
-  const ublLogo = '/ubl_logo.png';
+  const ublLogo = '/ubl-digital-logo.png';
   return (
-    <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
-      <div className="relative hidden items-center justify-center bg-gray-100 lg:flex">
-        <div className="relative z-10 mx-auto max-w-md space-y-8 text-black">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center rounded-lg bg-white shadow-md">
-              <Image
-                src={ublLogo}
-                alt="UBL Digital Logo"
-                width={60}
-                height={60}
-                data-ai-hint="logo banking"
-                className="rounded-md"
-                priority
-              />
-            </div>
-            <span className="text-2xl font-bold">UBL Digital</span>
-          </div>
-
-          <div className="space-y-4">
-            <h1 className="text-5xl font-bold tracking-tight">
-              Welcome to UBL Digital Business Banking
-            </h1>
-            <p className="text-lg text-gray-800">
-              UBL Digital Business Banking offers a comprehensive suite of
-              flexible online financial solutions to cater to all your business
-              banking needs.
-            </p>
-          </div>
-        </div>
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-between p-4 sm:p-6 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
+      <div className="w-full">
+        <Image
+          src={ublLogo}
+          alt="UBL Digital Logo"
+          width={80}
+          height={80}
+          data-ai-hint="logo banking"
+          className="rounded-lg shadow-md"
+          priority
+        />
       </div>
-      <div className="flex min-h-screen items-center justify-center bg-white p-6 sm:p-8 lg:min-h-0">
+
+      <div className="w-full flex-1 flex items-center justify-center">
         <LoginForm />
+      </div>
+      
+      <div className="flex items-center justify-center gap-4 w-full">
+        <Button variant="outline" className="bg-white/90 text-foreground hover:bg-white flex-col h-auto py-2 px-6 gap-1 rounded-xl border-gray-200">
+          <Send className="h-5 w-5" />
+          <span>Locate Us</span>
+        </Button>
+        <Button variant="outline" className="bg-white/90 text-foreground hover:bg-white flex-col h-auto py-2 px-6 gap-1 rounded-xl border-gray-200">
+          <Landmark className="h-5 w-5" />
+          <span>Contact Us</span>
+        </Button>
       </div>
     </div>
   );
