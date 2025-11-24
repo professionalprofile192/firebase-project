@@ -8,9 +8,9 @@ import { Landmark, Send } from 'lucide-react';
 export default function LoginPage() {
   const ublLogo = '/ubl_logo.png';
   return (
-    <div className="relative h-full w-full flex flex-col lg:grid lg:grid-cols-2">
+    <div className="h-full w-full lg:grid lg:grid-cols-2 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
       {/* Left side - visible on desktop */}
-      <div className="hidden lg:flex flex-col items-start justify-center p-12 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300 text-white">
+      <div className="hidden lg:flex flex-col items-start justify-center p-12 text-white">
         <Image
           src={ublLogo}
           alt="UBL Digital Logo"
@@ -31,7 +31,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right side - Login form container */}
-      <div className="flex flex-col items-center justify-center p-4 bg-white min-h-screen lg:min-h-0 lg:bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
+      <div className="relative flex flex-col items-center justify-center h-full p-4">
          {/* Mobile header */}
         <header className="w-full flex justify-start lg:hidden absolute top-4 px-4">
           <Image
