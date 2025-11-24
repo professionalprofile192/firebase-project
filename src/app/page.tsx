@@ -10,7 +10,7 @@ export default function LoginPage() {
       <div className="relative hidden items-center justify-center bg-gray-100 lg:flex">
         <div className="relative z-10 mx-auto max-w-md space-y-8 text-black">
           <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center rounded-lg bg-white p-2 shadow-md">
+            <div className="flex items-center justify-center rounded-lg bg-white shadow-md">
               <Image
                 src={ublLogo}
                 alt="UBL Digital Logo"
