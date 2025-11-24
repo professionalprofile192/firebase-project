@@ -336,10 +336,10 @@ export function LoginForm() {
   }
 
   return (
-    <div className={cn('w-full max-w-sm flip-card', { 'flipped': view !== 'signIn' })}>
+    <div className={cn('w-full max-w-sm lg:max-w-sm flip-card', { 'flipped': view !== 'signIn' })}>
         <div className='flip-card-inner'>
             <div className='flip-card-front'>
-                <Card className="w-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm">
+                <Card className="w-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm rounded-b-none lg:rounded-b-lg lg:rounded-t-lg">
                     <CardHeader>
                         <CardTitle className="text-3xl font-bold tracking-tight">
                         Sign In
@@ -427,7 +427,7 @@ export function LoginForm() {
                 </Card>
             </div>
             <div className='flip-card-back'>
-                <Card className="w-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm" style={{minHeight: '560px'}}>
+                <Card className="w-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm rounded-b-none lg:rounded-b-lg lg:rounded-t-lg" style={{minHeight: '560px'}}>
                     {view === 'forgotOptions' && <ForgotCredentialsOptions setView={handleSetView} />}
                     {view === 'recoverUsername' && <RecoverUsernameForm setView={handleSetView} />}
                     {view === 'recoverPassword' && <RecoverPasswordForm setView={handleSetView} />}

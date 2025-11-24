@@ -8,9 +8,9 @@ import { Landmark, Send } from 'lucide-react';
 export default function LoginPage() {
   const ublLogo = '/ubl_logo.png';
   return (
-    <div className="h-full w-full lg:grid lg:grid-cols-2 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
+    <div className="h-full w-full flex flex-col lg:grid lg:grid-cols-2 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
       {/* Left side - visible on desktop */}
-      <div className="hidden lg:flex flex-col items-start justify-center p-12 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
+      <div className="hidden lg:flex flex-col items-start justify-center p-12">
         <Image
           src={ublLogo}
           alt="UBL Digital Logo"
@@ -20,7 +20,7 @@ export default function LoginPage() {
           className="rounded-lg shadow-md mb-8"
           priority
         />
-        <h1 className="text-5xl font-bold mb-4 pt-24">
+        <h1 className="text-5xl font-bold mb-4 pt-12">
           Welcome to UBL Digital Business Banking
         </h1>
         <p className="text-lg max-w-lg">
@@ -31,9 +31,9 @@ export default function LoginPage() {
       </div>
 
       {/* Right side - Login form container */}
-      <div className="relative flex flex-col items-center justify-start h-full p-4 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300 lg:bg-none lg:bg-transparent lg:justify-center lg:items-center">
+      <div className="flex flex-col h-full lg:items-center lg:justify-center">
          {/* Mobile header */}
-        <header className="w-full flex justify-start lg:hidden absolute top-4 px-4">
+        <header className="w-full flex justify-start p-4 lg:hidden">
           <Image
             src={ublLogo}
             alt="UBL Digital Logo"
@@ -45,12 +45,12 @@ export default function LoginPage() {
           />
         </header>
 
-        <main className="flex items-center justify-center w-full mt-[15%] lg:mt-0">
+        <main className="flex-1 flex flex-col justify-end w-full lg:justify-center lg:items-center lg:flex-none">
           <LoginForm />
         </main>
         
-        {/* Footer with buttons */}
-        <footer className="w-full flex items-center justify-center gap-4 lg:hidden absolute bottom-4 px-4">
+        {/* Footer with buttons - Mobile Only */}
+        <footer className="w-full flex items-center justify-center gap-4 p-4 bg-white/80 backdrop-blur-sm lg:hidden">
           <Button variant="outline" className="bg-white/90 text-foreground hover:bg-white flex-col h-auto py-2 px-6 gap-1 rounded-xl border-gray-200 shadow-md">
             <Send className="h-5 w-5" />
             <span>Locate Us</span>
