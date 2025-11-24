@@ -41,6 +41,121 @@ const recoverUsernameSchema = z.object({
     captcha: z.string().min(1, { message: "Captcha is required." }),
 });
 
+const recoverPasswordSchema = z.object({
+    loginId: z.string().min(1, { message: "Login ID is required." }),
+    email: z.string().email({ message: "Please enter a valid email address." }),
+    captcha: z.string().min(1, { message: "Captcha is required." }),
+});
+
+
+function RecoverPasswordForm({ onBackClick }: { onBackClick: () => void }) {
+    const form = useForm<z.infer<typeof recoverPasswordSchema>>({
+        resolver: zodResolver(recoverPasswordSchema),
+        defaultValues: {
+            loginId: '',
+            email: '',
+            captcha: ''
+        },
+    });
+
+    function onSubmit(values: z.infer<typeof recoverPasswordSchema>) {
+        console.log(values);
+        // Handle form submission
+    }
+
+    return (
+        <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm flex flex-col">
+            <CardHeader>
+                <CardTitle className="text-3xl font-bold tracking-tight">
+                    Recover Password
+                </CardTitle>
+                <CardDescription>
+                    Let&apos;s verify it&apos;s you
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1 space-y-4">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="loginId"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Login ID</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            className="h-12 text-base bg-white/50"
+                                            placeholder="Enter Login ID"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            className="h-12 text-base bg-white/50"
+                                            placeholder="Enter Email Address"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                         <FormField
+                            control={form.control}
+                            name="captcha"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <div className='flex items-end gap-2'>
+                                        <div className='bg-gray-200 rounded-md p-2 flex-1'>
+                                            <Image src="/captcha.png" alt="captcha" width={150} height={40} className="w-full" />
+                                        </div>
+                                        <Button variant="ghost" size="icon">
+                                            <RefreshCw className="h-5 w-5 text-muted-foreground" />
+                                        </Button>
+                                    </div>
+                                    <FormControl className='mt-2'>
+                                        <Input
+                                            className="h-12 text-base bg-white/50"
+                                            placeholder="Enter the above captcha here"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <Button
+                            type="submit"
+                            className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80"
+                        >
+                           Next
+                        </Button>
+                    </form>
+                </Form>
+            </CardContent>
+            <CardFooter>
+                <button
+                    type="button"
+                    onClick={onBackClick}
+                    className="text-sm font-medium text-primary hover:underline"
+                >
+                    Go Back
+                </button>
+            </CardFooter>
+        </Card>
+    )
+}
+
 function RecoverUsernameForm({ onBackClick }: { onBackClick: () => void }) {
     const form = useForm<z.infer<typeof recoverUsernameSchema>>({
         resolver: zodResolver(recoverUsernameSchema),
@@ -149,7 +264,7 @@ function RecoverUsernameForm({ onBackClick }: { onBackClick: () => void }) {
     )
 }
 
-function ForgotPasswordOptions({ onBackClick, onRecoverUsernameClick }: { onBackClick: () => void, onRecoverUsernameClick: () => void }) {
+function ForgotPasswordOptions({ onBackClick, onRecoverUsernameClick, onRecoverPasswordClick }: { onBackClick: () => void, onRecoverUsernameClick: () => void, onRecoverPasswordClick: () => void }) {
   return (
     <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm">
       <CardHeader>
@@ -170,7 +285,7 @@ function ForgotPasswordOptions({ onBackClick, onRecoverUsernameClick }: { onBack
                 To view your username and unlock your mobile account, confirm your account details.
             </p>
         </div>
-        <div className="p-4 rounded-lg bg-white/50 border border-gray-200 cursor-pointer hover:bg-white/70">
+        <div onClick={onRecoverPasswordClick} className="p-4 rounded-lg bg-white/50 border border-gray-200 cursor-pointer hover:bg-white/70">
             <div className='flex items-center gap-3'>
                 <Lock className="w-5 h-5 text-primary" />
                 <h3 className="font-semibold">Reset Password</h3>
@@ -197,7 +312,7 @@ function ForgotPasswordOptions({ onBackClick, onRecoverUsernameClick }: { onBack
 export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [currentView, setCurrentView] = useState('login'); // 'login', 'forgotOptions', 'recoverUsername'
+  const [currentView, setCurrentView] = useState('login'); // 'login', 'forgotOptions', 'recoverUsername', 'recoverPassword'
   const router = useRouter();
   const { toast } = useToast();
 
@@ -249,8 +364,8 @@ export function LoginForm() {
     }
   }
 
-  const isFlippedToForgot = currentView === 'forgotOptions' || currentView === 'recoverUsername';
-  const isFlippedToRecover = currentView === 'recoverUsername';
+  const isFlippedToForgot = currentView === 'forgotOptions' || currentView === 'recoverUsername' || currentView === 'recoverPassword';
+  const isFlippedToRecover = currentView === 'recoverUsername' || currentView === 'recoverPassword';
 
   return (
     <div className={cn('w-full max-w-sm flip-card', { 'flipped': isFlippedToForgot })}>
@@ -347,10 +462,15 @@ export function LoginForm() {
                  <div className={cn('w-full h-full flip-card', { 'flipped': isFlippedToRecover })}>
                     <div className="flip-card-inner">
                         <div className="flip-card-front">
-                            <ForgotPasswordOptions onBackClick={() => setCurrentView('login')} onRecoverUsernameClick={() => setCurrentView('recoverUsername')} />
+                            <ForgotPasswordOptions 
+                                onBackClick={() => setCurrentView('login')} 
+                                onRecoverUsernameClick={() => setCurrentView('recoverUsername')}
+                                onRecoverPasswordClick={() => setCurrentView('recoverPassword')} 
+                            />
                         </div>
                         <div className="flip-card-back">
-                            <RecoverUsernameForm onBackClick={() => setCurrentView('forgotOptions')} />
+                           {currentView === 'recoverUsername' && <RecoverUsernameForm onBackClick={() => setCurrentView('forgotOptions')} />}
+                           {currentView === 'recoverPassword' && <RecoverPasswordForm onBackClick={() => setCurrentView('forgotOptions')} />}
                         </div>
                     </div>
                 </div>
