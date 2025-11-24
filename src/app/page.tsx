@@ -31,7 +31,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right side - Login form container */}
-      <div className="flex flex-col items-center justify-center p-4 bg-white min-h-screen lg:min-h-0 lg:justify-center lg:bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
+      <div className="flex flex-col items-center justify-between p-4 bg-white min-h-screen lg:min-h-0 lg:justify-center lg:bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
          {/* Mobile header */}
         <header className="w-full flex justify-start lg:hidden">
           <Image
@@ -50,7 +50,7 @@ export default function LoginPage() {
         </main>
         
         {/* Footer with buttons */}
-        <footer className="w-full flex items-center justify-center gap-4">
+        <footer className="w-full flex items-center justify-center gap-4 lg:hidden">
           <Button variant="outline" className="bg-white/90 text-foreground hover:bg-white flex-col h-auto py-2 px-6 gap-1 rounded-xl border-gray-200 shadow-md">
             <Send className="h-5 w-5" />
             <span>Locate Us</span>
