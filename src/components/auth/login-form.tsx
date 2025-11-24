@@ -325,7 +325,7 @@ export function LoginForm() {
                 </Card>
             </div>
             <div className='flip-card-back'>
-                <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm flex flex-col justify-between">
+                <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm flex flex-col">
                     {view === 'forgotOptions' && <ForgotCredentialsOptions setView={handleSetView} />}
                     {view === 'recoverUsername' && <RecoverUsernameForm setView={handleSetView} />}
                 </Card>
