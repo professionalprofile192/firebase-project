@@ -8,8 +8,8 @@ import { Landmark, Send } from 'lucide-react';
 export default function LoginPage() {
   const ublLogo = '/ubl-digital-logo.png';
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-between p-4 sm:p-6 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
-      <div className="w-full">
+    <div className="relative min-h-screen w-full flex flex-col p-4 sm:p-6 bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300">
+      <header className="w-full flex justify-start">
         <Image
           src={ublLogo}
           alt="UBL Digital Logo"
@@ -19,13 +19,13 @@ export default function LoginPage() {
           className="rounded-lg shadow-md"
           priority
         />
-      </div>
+      </header>
 
-      <div className="w-full flex-1 flex items-center justify-center">
+      <main className="flex-1 flex items-center justify-center w-full">
         <LoginForm />
-      </div>
+      </main>
       
-      <div className="flex items-center justify-center gap-4 w-full">
+      <footer className="w-full flex items-center justify-center gap-4">
         <Button variant="outline" className="bg-white/90 text-foreground hover:bg-white flex-col h-auto py-2 px-6 gap-1 rounded-xl border-gray-200">
           <Send className="h-5 w-5" />
           <span>Locate Us</span>
@@ -34,7 +34,7 @@ export default function LoginPage() {
           <Landmark className="h-5 w-5" />
           <span>Contact Us</span>
         </Button>
-      </div>
+      </footer>
     </div>
   );
 }
