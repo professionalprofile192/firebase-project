@@ -37,8 +37,8 @@ export default function LoginPage() {
           <Image
             src={ublLogo}
             alt="UBL Digital Logo"
-            width={80}
-            height={80}
+            width={60}
+            height={60}
             data-ai-hint="logo banking"
             className="rounded-lg shadow-md"
             priority
@@ -49,8 +49,8 @@ export default function LoginPage() {
           <LoginForm />
         </main>
         
-        {/* Mobile footer */}
-        <footer className="w-full flex items-center justify-center gap-4 lg:hidden">
+        {/* Footer with buttons */}
+        <footer className="w-full flex items-center justify-center gap-4">
           <Button variant="outline" className="bg-white/90 text-foreground hover:bg-white flex-col h-auto py-2 px-6 gap-1 rounded-xl border-gray-200 shadow-md">
             <Send className="h-5 w-5" />
             <span>Locate Us</span>
