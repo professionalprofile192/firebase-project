@@ -56,7 +56,7 @@ export function RecentTransactions({ transactions, accounts, onAccountChange }: 
           </div>
         </CardHeader>
         <ScrollArea className="flex-1">
-            <CardContent className="space-y-4 pt-4">
+            <CardContent className="space-y-4 pt-6">
             {transactions.length > 0 ? (
                 transactions.map((tx) => {
                     const date = new Date(tx.tranDate);

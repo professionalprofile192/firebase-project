@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Landmark, Send } from 'lucide-react';
 
 export default function LoginPage() {
-  const ublLogo = '/ubl-digital-logo.png';
+  const ublLogo = '/ubl_logo.png';
   return (
     <div className="relative min-h-screen w-full flex flex-col lg:grid lg:grid-cols-2">
       {/* Left side - visible on desktop */}

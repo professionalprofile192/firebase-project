@@ -62,10 +62,10 @@ export function MyAccounts({ accounts }: MyAccountsProps) {
           </div>
         </CardHeader>
         <ScrollArea className="flex-1">
-          <CardContent>
+          <CardContent className='pt-6'>
             {filteredAccounts.length > 0 ? (
                 filteredAccounts.map((account) => (
-                    <div key={account.ACCT_NO} className="flex justify-between items-center py-3 border-b border-white/20">
+                    <div key={account.ACCT_NO} className="flex justify-between items-center py-3 border-b border-white/20 last:border-b-0">
                         <div>
                             <p className="font-semibold">{account.ACCT_NO}</p>
                             <p className="text-sm text-white/80">{account.ACCT_TITLE}</p>
