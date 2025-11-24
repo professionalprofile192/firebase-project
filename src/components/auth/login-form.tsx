@@ -266,7 +266,7 @@ function RecoverUsernameForm({ onBackClick }: { onBackClick: () => void }) {
 
 function ForgotPasswordOptions({ onBackClick, onRecoverUsernameClick, onRecoverPasswordClick }: { onBackClick: () => void, onRecoverUsernameClick: () => void, onRecoverPasswordClick: () => void }) {
   return (
-    <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm">
+    <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm flex flex-col">
       <CardHeader>
         <CardTitle className="text-3xl font-bold tracking-tight">
           Forgot Credentials
@@ -275,7 +275,7 @@ function ForgotPasswordOptions({ onBackClick, onRecoverUsernameClick, onRecoverP
           Recover your username or reset your password.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="flex-1 space-y-4">
         <div onClick={onRecoverUsernameClick} className="p-4 rounded-lg bg-white/50 border border-gray-200 cursor-pointer hover:bg-white/70">
             <div className='flex items-center gap-3'>
                 <User className="w-5 h-5 text-primary" />
@@ -365,13 +365,14 @@ export function LoginForm() {
   }
 
   const isFlippedToForgot = currentView === 'forgotOptions' || currentView === 'recoverUsername' || currentView === 'recoverPassword';
+
   const isFlippedToRecover = currentView === 'recoverUsername' || currentView === 'recoverPassword';
 
   return (
     <div className={cn('w-full max-w-sm flip-card', { 'flipped': isFlippedToForgot })}>
-        <div className='flip-card-inner' style={{ minHeight: '520px' }}>
+        <div className='flip-card-inner' style={{ minHeight: '550px' }}>
             <div className='flip-card-front'>
-                <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm">
+                <Card className="w-full h-full border-none bg-white/80 text-card-foreground shadow-2xl backdrop-blur-sm flex flex-col">
                     <CardHeader>
                         <CardTitle className="text-3xl font-bold tracking-tight">
                         Sign In
@@ -380,7 +381,7 @@ export function LoginForm() {
                         Enter your credentials to sign in to UBL Digital.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className='flex-1'>
                         <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <FormField
