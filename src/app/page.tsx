@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import { LoginForm } from '@/components/auth/login-form';
 
@@ -10,7 +12,7 @@ export default function LoginPage() {
           <div className="flex items-center gap-4">
             <div className="flex items-center justify-center rounded-lg bg-white p-2 shadow-md">
               <Image
-                src="/ubl-digital-logo.png"
+                src={ublLogo}
                 alt="UBL Digital Logo"
                 width={40}
                 height={40}
