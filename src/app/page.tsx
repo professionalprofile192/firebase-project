@@ -36,8 +36,8 @@ export default function LoginPage() {
       <div className="flex flex-col h-full bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300 lg:items-center lg:justify-center">
         
         {/* Mobile View */}
-        <div className="lg:hidden h-full flex flex-col">
-            <div className="flex-shrink-0 p-4">
+        <div className="lg:hidden h-full flex flex-col justify-between p-4">
+            <div className="flex-shrink-0">
                  <Image
                     src={ublLogo}
                     alt="UBL Digital Logo"
@@ -48,17 +48,17 @@ export default function LoginPage() {
                     priority
                 />
             </div>
-            <main className="flex-1 flex flex-col justify-end">
-                <div className="bg-white rounded-t-2xl pt-8 px-4">
+            <main className="flex-1 flex flex-col justify-end pb-4">
+                <div className="bg-white rounded-2xl p-4">
                      <LoginForm />
                 </div>
             </main>
-            <footer className="bg-white p-4 border-t border-gray-200">
+            <footer className="bg-transparent">
                 <div className="flex gap-2">
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full bg-white text-primary">
                         <Landmark className="mr-2 h-4 w-4" /> Locate Us
                     </Button>
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full bg-white text-primary">
                         <Send className="mr-2 h-4 w-4" /> Contact Us
                     </Button>
                 </div>
