@@ -24,7 +24,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import { EyeOff, Eye, User, Lock, Link as LinkIcon } from 'lucide-react';
+import { EyeOff, Eye, User, Lock, RefreshCcw } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { getLastLoginTime, login } from '@/app/actions';
@@ -41,11 +41,13 @@ const loginFormSchema = z.object({
 const recoverUsernameFormSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
   mobileNumber: z.string().min(1, { message: 'Mobile number is required.' }),
+  captcha: z.string().min(1, { message: 'Captcha is required.' }),
 });
 
 const recoverPasswordFormSchema = z.object({
   loginId: z.string().min(1, { message: 'Login ID is required' }),
   email: z.string().email({ message: 'Please enter a valid email address.' }),
+  captcha: z.string().min(1, { message: 'Captcha is required.' }),
 });
 
 const corporateEnrollFormSchema = z.object({
@@ -199,6 +201,7 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
     defaultValues: {
       email: '',
       mobileNumber: '',
+      captcha: '',
     },
   });
 
@@ -245,6 +248,29 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
                 </FormItem>
               )}
             />
+
+            {/* captcha */}
+            <FormField
+              control={form.control}
+              name="captcha"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Captcha</FormLabel>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 p-2 rounded-md bg-gray-200 text-center line-through tracking-widest text-xl font-serif select-none">
+                      A5Bv7
+                    </div>
+                    <Button variant="ghost" size="icon">
+                      <RefreshCcw className="h-5 w-5" />
+                    </Button>
+                  </div>
+                  <FormControl>
+                    <Input placeholder="Enter Captcha" {...field} className="h-12 text-base bg-white/50" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             
               <Button type="submit" className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80">
                 Next
@@ -266,6 +292,7 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
     defaultValues: {
       loginId: '',
       email: '',
+      captcha: '',
     },
   });
 
@@ -307,6 +334,29 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter Email Address" {...field} className="h-12 text-base bg-white/50" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* captcha */}
+            <FormField
+              control={form.control}
+              name="captcha"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Captcha</FormLabel>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 p-2 rounded-md bg-gray-200 text-center line-through tracking-widest text-xl font-serif select-none">
+                      A5Bv7
+                    </div>
+                    <Button variant="ghost" size="icon">
+                      <RefreshCcw className="h-5 w-5" />
+                    </Button>
+                  </div>
+                  <FormControl>
+                    <Input placeholder="Enter Captcha" {...field} className="h-12 text-base bg-white/50" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -409,7 +459,7 @@ export function LoginForm() {
 
           {/* FRONT */}
           <div className="flip-card-front">
-            <Card className="w-full border-none   bg-white/80 shadow-none md:shadow-xl md:bg-white/80   relative md:rounded-lg" >
+            <Card className="w-full border-none bg-white md:bg-white/80 shadow-none md:shadow-xl relative md:rounded-lg" >
               <CardHeader>
                 <CardTitle className="text-3xl font-bold tracking-tight">
                   Sign In
