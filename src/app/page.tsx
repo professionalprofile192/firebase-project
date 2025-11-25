@@ -5,13 +5,10 @@ import { LoginForm } from '@/components/auth/login-form';
 import { Button } from '@/components/ui/button';
 import { Landmark, Send } from 'lucide-react';
 import { StripeGradient } from '@/components/auth/stripe-gradient';
-import { useState } from 'react';
-import { ContactUsDialog } from '@/components/auth/contact-us-dialog';
 import { cn } from '@/lib/utils';
 
 export default function LoginPage() {
   const ublLogo = '/ubl_logo.png';
-  const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   return (
     <>
       <div className="hidden lg:block">
@@ -89,7 +86,6 @@ export default function LoginPage() {
                 <Button
                   variant="outline"
                   className="w-full bg-white text-primary border-gray-300"
-                  onClick={() => setIsContactDialogOpen(true)}
                 >
                   <Send className="mr-2 h-4 w-4" /> Contact Us
                 </Button>
@@ -106,7 +102,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <ContactUsDialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen} />
     </>
   );
 }
