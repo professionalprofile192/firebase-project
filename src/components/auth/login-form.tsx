@@ -47,7 +47,7 @@ const recoverUsernameFormSchema = z.object({
 const recoverPasswordFormSchema = z.object({
   loginId: z.string().min(1, { message: 'Login ID is required' }),
   email: z.string().email({ message: 'Please enter a valid email address.' }),
-  captcha: z.string().min(1, { message: 'Captcha is required' }),
+  captcha: z.string().min(1, { message: 'Captcha is required.' }),
 });
 
 type View = 'signIn' | 'forgotOptions' | 'recoverUsername' | 'recoverPassword';
@@ -119,15 +119,15 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <>
       <CardHeader>
         <CardTitle className="text-3xl font-bold tracking-tight">Recover Username</CardTitle>
         <CardDescription>Let's verify it's you</CardDescription>
       </CardHeader>
 
-      <CardContent className="flex-grow">
+      <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 h-full flex flex-col">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* email */}
             <FormField
               control={form.control}
@@ -187,11 +187,10 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
               )}
             />
 
-            <div className="mt-auto">
+            
               <Button type="submit" className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80">
                 Next
               </Button>
-            </div>
           </form>
         </Form>
       </CardContent>
@@ -199,7 +198,7 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
       <CardFooter>
         <Button variant="link" onClick={() => setView('forgotOptions')}>Go Back</Button>
       </CardFooter>
-    </div>
+    </>
   );
 }
 
@@ -218,15 +217,15 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <>
       <CardHeader>
         <CardTitle className="text-3xl font-bold tracking-tight">Reset Password</CardTitle>
         <CardDescription>Let's verify it's you</CardDescription>
       </CardHeader>
 
-      <CardContent className="flex-grow">
+      <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 h-full flex flex-col">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* loginId */}
             <FormField
               control={form.control}
@@ -292,11 +291,10 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
               )}
             />
 
-            <div className="mt-auto">
+            
               <Button type="submit" className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80">
                 Next
               </Button>
-            </div>
           </form>
         </Form>
       </CardContent>
@@ -304,7 +302,7 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
       <CardFooter>
         <Button variant="link" onClick={() => setView('forgotOptions')}>Go Back</Button>
       </CardFooter>
-    </div>
+    </>
   );
 }
 
@@ -377,7 +375,7 @@ export function LoginForm() {
 
   // ⭐ FINAL LAYOUT (RIGHT SIDE ONLY — MATCHES YOUR NEED)
   return (
-    <div className="w-full h-full flex justify-center items-center">
+    <div className="w-full h-full flex justify-center items-center lg:items-start lg:pt-0">
 
       <div
         className={cn(
@@ -389,7 +387,7 @@ export function LoginForm() {
 
           {/* FRONT */}
           <div className="flip-card-front">
-            <Card className="w-full border-none bg-white lg:bg-white/80 shadow-lg lg:shadow-xl backdrop-blur-sm lg:rounded-lg">
+            <Card className="w-full border-none bg-transparent lg:bg-white/80 shadow-none lg:shadow-xl lg:rounded-lg">
               <CardHeader>
                 <CardTitle className="text-3xl font-bold tracking-tight">
                   Sign In
@@ -412,7 +410,7 @@ export function LoginForm() {
                           <FormLabel>Username:</FormLabel>
                           <FormControl>
                             <Input
-                              className="h-12 text-base bg-white/50"
+                              className="h-12 text-base bg-gray-100 lg:bg-white/50"
                               placeholder="Enter Username"
                               {...field}
                             />
@@ -434,7 +432,7 @@ export function LoginForm() {
                             <FormControl>
                               <Input
                                 type={showPassword ? 'text' : 'password'}
-                                className="h-12 pr-10 text-base bg-white/50"
+                                className="h-12 pr-10 text-base bg-gray-100 lg:bg-white/50"
                                 placeholder="Enter Password"
                                 {...field}
                               />
@@ -491,7 +489,6 @@ export function LoginForm() {
           <div className="flip-card-back">
             <Card
               className="w-full border-none bg-white lg:bg-white/80 shadow-lg lg:shadow-xl backdrop-blur-sm lg:rounded-lg"
-              style={{ minHeight: '560px' }}
             >
               {view === 'forgotOptions' && (
                 <ForgotCredentialsOptions setView={handleSetView} />
