@@ -41,13 +41,11 @@ const loginFormSchema = z.object({
 const recoverUsernameFormSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
   mobileNumber: z.string().min(1, { message: 'Mobile number is required.' }),
-  captcha: z.string().min(1, { message: 'Captcha is required.' }),
 });
 
 const recoverPasswordFormSchema = z.object({
   loginId: z.string().min(1, { message: 'Login ID is required' }),
   email: z.string().email({ message: 'Please enter a valid email address.' }),
-  captcha: z.string().min(1, { message: 'Captcha is required.' }),
 });
 
 type View = 'signIn' | 'forgotOptions' | 'recoverUsername' | 'recoverPassword';
@@ -110,7 +108,6 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
     defaultValues: {
       email: '',
       mobileNumber: '',
-      captcha: '',
     },
   });
 
@@ -157,36 +154,6 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
                 </FormItem>
               )}
             />
-
-            {/* captcha */}
-            <FormField
-              control={form.control}
-              name="captcha"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Captcha</FormLabel>
-                  <div className="flex items-center gap-2">
-                    <div className="bg-gray-200 p-2 rounded-md flex-grow">
-                      <Image src="https://placehold.co/150x50/e2e8f0/000000?text=gZAa5" alt="Captcha" width={150} height={50} className="w-full" />
-                    </div>
-                    <Button variant="ghost" size="icon">
-                      <RefreshCw className="h-5 w-5" />
-                    </Button>
-                  </div>
-
-                  <FormControl>
-                    <Input
-                      placeholder="Enter captcha"
-                      {...field}
-                      className="mt-2 h-12 text-base bg-white/50"
-                    />
-                  </FormControl>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             
               <Button type="submit" className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80">
                 Next
@@ -208,7 +175,6 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
     defaultValues: {
       loginId: '',
       email: '',
-      captcha: '',
     },
   });
 
@@ -251,41 +217,6 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
                   <FormControl>
                     <Input placeholder="Enter Email Address" {...field} className="h-12 text-base bg-white/50" />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* captcha */}
-            <FormField
-              control={form.control}
-              name="captcha"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Captcha</FormLabel>
-                  <div className="flex items-center gap-2">
-                    <div className="bg-gray-200 p-2 rounded-md flex-grow">
-                      <Image
-                        src="https://placehold.co/150x50/e2e8f0/000000?text=aBCdE"
-                        alt="Captcha"
-                        width={150}
-                        height={50}
-                        className="w-full"
-                      />
-                    </div>
-                    <Button variant="ghost" size="icon">
-                      <RefreshCw className="h-5 w-5" />
-                    </Button>
-                  </div>
-
-                  <FormControl>
-                    <Input
-                      placeholder="Enter captcha"
-                      {...field}
-                      className="mt-2 h-12 text-base bg-white/50"
-                    />
-                  </FormControl>
-
                   <FormMessage />
                 </FormItem>
               )}
@@ -375,7 +306,7 @@ export function LoginForm() {
 
   // ⭐ FINAL LAYOUT (RIGHT SIDE ONLY — MATCHES YOUR NEED)
   return (
-    <div className="w-full h-full flex lg:pt-0">
+    <div className="w-full h-full flex md:pt-0">
 
       <div
         className={cn(
@@ -387,7 +318,7 @@ export function LoginForm() {
 
           {/* FRONT */}
           <div className="flip-card-front">
-            <Card className="w-full border-none   bg-white/80 shadow-none    shadow-xl   relative rounded-lg" >
+            <Card className="w-full border-none   bg-white/80 shadow-none md:shadow-xl md:bg-white/80   relative md:rounded-lg" >
               <CardHeader>
                 <CardTitle className="text-3xl font-bold tracking-tight">
                   Sign In
@@ -410,7 +341,7 @@ export function LoginForm() {
                           <FormLabel>Username:</FormLabel>
                           <FormControl>
                             <Input
-                              className="h-12 text-base bg-gray-100 lg:bg-white/50"
+                              className="h-12 text-base bg-gray-100 md:bg-white/50"
                               placeholder="Enter Username"
                               {...field}
                             />
@@ -432,7 +363,7 @@ export function LoginForm() {
                             <FormControl>
                               <Input
                                 type={showPassword ? 'text' : 'password'}
-                                className="h-12 pr-10 text-base bg-gray-100 lg:bg-white/50"
+                                className="h-12 pr-10 text-base bg-gray-100 md:bg-white/50"
                                 placeholder="Enter Password"
                                 {...field}
                               />
@@ -488,7 +419,7 @@ export function LoginForm() {
           {/* BACK */}
           <div className="flip-card-back">
             <Card
-              className="w-full border-none bg-white  bg-white/80 shadow-lg lg:shadow-xl  lg:rounded-lg"
+              className="w-full border-none bg-white  bg-white/80 shadow-lg md:shadow-xl  md:rounded-lg"
             >
               {view === 'forgotOptions' && (
                 <ForgotCredentialsOptions setView={handleSetView} />
