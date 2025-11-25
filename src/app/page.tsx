@@ -5,15 +5,24 @@ import { LoginForm } from '@/components/auth/login-form';
 import { Button } from '@/components/ui/button';
 import { Landmark, Send } from 'lucide-react';
 import { StripeGradient } from '@/components/auth/stripe-gradient';
+import { useState } from 'react';
+import { ContactUsDialog } from '@/components/auth/contact-us-dialog';
+import { cn } from '@/lib/utils';
 
 export default function LoginPage() {
   const ublLogo = '/ubl_logo.png';
+  const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   return (
     <>
-      <StripeGradient />
-      <div className="h-full w-full md:grid lg:grid sm:grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-2 relative z-10">
+      <div className="hidden lg:block">
+        <StripeGradient />
+      </div>
+      <div className={cn(
+        "h-full w-full relative z-10",
+        "lg:grid lg:grid-cols-2"
+      )}>
         {/* Left side - visible on desktop */}
-        <div className="hidden lg:flex md:flex sm:flex flex-col items-start justify-between p-12 ">
+        <div className="hidden md:flex flex-col items-start justify-between p-12 ">
           <Image
             src={ublLogo}
             alt="UBL Digital Logo"
@@ -50,10 +59,10 @@ export default function LoginPage() {
         </div>
 
         {/* Right side - Login form container */}
-        <div className="flex flex-col h-full justify-between lg:items-start lg:p-20 lg:pt-25  md:items-start md:p-20 md:pt-25 sm:items-start sm:p-20 sm:pt-25">
+        <div className="flex flex-col h-full justify-between items-start md:p-20 lg:p-20 md:pt-25 lg:pt-25">
           {/* Mobile View */}
-          <div className="lg:hidden md:hidden sm:hidden flex flex-col h-full min-h-screen">
-            <div className="flex-shrink-0 p-4">
+          <div className="lg:hidden flex flex-col h-full min-h-screen w-full bg-white">
+            <header className="flex-shrink-0 p-4">
               <Image
                 src={ublLogo}
                 alt="UBL Digital Logo"
@@ -63,39 +72,41 @@ export default function LoginPage() {
                 className="rounded-lg shadow-md"
                 priority
               />
-            </div>
-            <main className="flex flex-col p-4">
-              <div className=" flex flex-col">
+            </header>
+            <main className="flex-1 flex flex-col p-4 justify-end pb-8">
+              <div className="w-full">
                 <LoginForm />
               </div>
             </main>
-            <footer className="w-full flex justify-center bg-transparent mt-auto pb-6">
-  <div className="flex gap-2 w-[50%] justify-center">
-    <Button
-      variant="outline"
-      className="w-full bg-white text-primary border-gray-300"
-    >
-      <Landmark className="mr-2 h-4 w-4" /> Locate Us
-    </Button>
-    <Button
-      variant="outline"
-      className="w-full bg-white text-primary border-gray-300"
-    >
-      <Send className="mr-2 h-4 w-4" /> Contact Us
-    </Button>
-  </div>
-</footer>
-
+            <footer className="w-full flex justify-center bg-transparent mt-auto pb-6 px-4">
+              <div className="flex gap-2 w-full max-w-sm justify-center">
+                <Button
+                  variant="outline"
+                  className="w-full bg-white text-primary border-gray-300"
+                >
+                  <Landmark className="mr-2 h-4 w-4" /> Locate Us
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full bg-white text-primary border-gray-300"
+                  onClick={() => setIsContactDialogOpen(true)}
+                >
+                  <Send className="mr-2 h-4 w-4" /> Contact Us
+                </Button>
+              </div>
+            </footer>
           </div>
 
+
           {/* Desktop: Centered form */}
-          <div className="hidden lg:flex md:flex sm:flex  flex-col items-center justify-center w-full">
+          <div className="hidden lg:flex flex-col items-center justify-center w-full">
             <div className="w-full max-w-sm">
               <LoginForm />
             </div>
           </div>
         </div>
       </div>
+      <ContactUsDialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen} />
     </>
   );
 }
