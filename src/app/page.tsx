@@ -33,7 +33,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right side - Login form container */}
-      <div className="flex flex-col h-full bg-gradient-to-br from-purple-300 via-purple-400 to-pink-300 lg:items-center lg:justify-center">
+      <div className="flex flex-col h-full bg-white lg:bg-gradient-to-br lg:from-purple-300 lg:via-purple-400 lg:to-pink-300 lg:items-center lg:justify-center">
         
         {/* Mobile View */}
         <div className="lg:hidden h-full flex flex-col justify-between p-4">
@@ -55,10 +55,10 @@ export default function LoginPage() {
             </main>
             <footer className="bg-transparent">
                 <div className="flex gap-2">
-                    <Button variant="outline" className="w-full bg-white text-primary">
+                    <Button variant="outline" className="w-full bg-white text-primary border-gray-300">
                         <Landmark className="mr-2 h-4 w-4" /> Locate Us
                     </Button>
-                    <Button variant="outline" className="w-full bg-white text-primary">
+                    <Button variant="outline" className="w-full bg-white text-primary border-gray-300">
                         <Send className="mr-2 h-4 w-4" /> Contact Us
                     </Button>
                 </div>
