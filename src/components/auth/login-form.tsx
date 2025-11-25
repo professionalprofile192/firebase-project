@@ -24,7 +24,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import { EyeOff, Eye, User, Lock, RefreshCw } from 'lucide-react';
+import { EyeOff, Eye, User, Lock, Link as LinkIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { getLastLoginTime, login } from '@/app/actions';
@@ -48,10 +48,101 @@ const recoverPasswordFormSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
 });
 
-type View = 'signIn' | 'forgotOptions' | 'recoverUsername' | 'recoverPassword';
+const corporateEnrollFormSchema = z.object({
+  tempLoginId: z.string().min(1, { message: 'Temporary Login ID is required' }),
+  tempPassword: z.string().min(1, { message: 'Temporary Password is required' }),
+});
+
+type View = 'signIn' | 'forgotOptions' | 'recoverUsername' | 'recoverPassword' | 'corporateEnroll';
 
 
 // ---------------- COMPONENTS ---------------------
+
+function CorporateEnrollForm({ setView }: { setView: (view: View) => void }) {
+    const [showPassword, setShowPassword] = useState(false);
+    const form = useForm<z.infer<typeof corporateEnrollFormSchema>>({
+      resolver: zodResolver(corporateEnrollFormSchema),
+      defaultValues: {
+        tempLoginId: '',
+        tempPassword: '',
+      },
+    });
+
+    function onSubmit(values: z.infer<typeof corporateEnrollFormSchema>) {
+      console.log(values);
+    }
+  
+    return (
+      <>
+        <CardHeader>
+          <CardTitle className="text-3xl font-bold tracking-tight">Activate your account</CardTitle>
+          <CardDescription>Enter Temporary ID & Password</CardDescription>
+        </CardHeader>
+  
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {/* tempLoginId */}
+              <FormField
+                control={form.control}
+                name="tempLoginId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Temporary Login ID</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter Temporary Login ID" {...field} className="h-12 text-base bg-white/50" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+  
+              {/* tempPassword */}
+              <FormField
+                control={form.control}
+                name="tempPassword"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Temporary Password</FormLabel>
+                    <div className="relative">
+                      <FormControl>
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          className="h-12 pr-10 text-base bg-white/50"
+                          placeholder="Enter Temporary Password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 flex items-center pr-3"
+                      >
+                        {showPassword ? (
+                          <Eye className="h-5 w-5" />
+                        ) : (
+                          <EyeOff className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+  
+              <Button type="submit" className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80">
+                Verify
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+  
+        <CardFooter>
+          <Button variant="link" onClick={() => setView('signIn')}>Go Back</Button>
+        </CardFooter>
+      </>
+    );
+  }
 
 function ForgotCredentialsOptions({ setView }: { setView: (view: View) => void }) {
   return (
@@ -409,7 +500,11 @@ export function LoginForm() {
                   Forgot your credentials?
                 </button>
 
-                <button className="text-sm font-medium text-gray-700 hover:underline">
+                <button
+                  type="button"
+                  onClick={() => handleSetView('corporateEnroll')}
+                  className="text-sm font-medium text-gray-700 hover:underline"
+                >
                   Corporate Enroll
                 </button>
               </CardFooter>
@@ -429,6 +524,9 @@ export function LoginForm() {
               )}
               {view === 'recoverPassword' && (
                 <RecoverPasswordForm setView={handleSetView} />
+              )}
+              {view === 'corporateEnroll' && (
+                <CorporateEnrollForm setView={handleSetView} />
               )}
             </Card>
           </div>
