@@ -33,10 +33,10 @@ export default function LoginPage() {
       </div>
 
       {/* Right side - Login form container */}
-      <div className="flex flex-col h-full bg-white lg:bg-gradient-to-br lg:from-purple-300 lg:via-purple-400 lg:to-pink-300 lg:items-center lg:justify-center">
+      <div className="flex flex-col h-full bg-gradient-to-br  from-purple-300  via-purple-400 lg:to-pink-300  justify-between lg:items-start lg:p-20 lg:pt-20">
         
         {/* Mobile View */}
-        <div className="lg:hidden h-full flex flex-col justify-between p-4">
+        <div className="lg:hidden flex flex-col gap-6 p-4">
             <div className="flex-shrink-0">
                  <Image
                     src={ublLogo}
@@ -48,21 +48,21 @@ export default function LoginPage() {
                     priority
                 />
             </div>
-            <main className="flex-1 flex flex-col justify-end pb-4">
-                <div className="bg-white rounded-2xl p-4">
+            <main className="flex flex-col">
+                <div className="rounded-2xl p-4">
                      <LoginForm />
                 </div>
             </main>
-            <footer className="bg-transparent">
-                <div className="flex gap-2">
-                    <Button variant="outline" className="w-full bg-white text-primary border-gray-300">
-                        <Landmark className="mr-2 h-4 w-4" /> Locate Us
-                    </Button>
-                    <Button variant="outline" className="w-full bg-white text-primary border-gray-300">
-                        <Send className="mr-2 h-4 w-4" /> Contact Us
-                    </Button>
-                </div>
-            </footer>
+          <footer className="bg-transparent mt-[130%]">
+    <div className="flex gap-2">
+      <Button variant="outline" className="w-full bg-white text-primary border-gray-300">
+        <Landmark className="mr-2 h-4 w-4" /> Locate Us
+      </Button>
+      <Button variant="outline" className="w-full bg-white text-primary border-gray-300">
+        <Send className="mr-2 h-4 w-4" /> Contact Us
+      </Button>
+    </div>
+  </footer>
         </div>
 
         {/* Desktop: Centered form */}

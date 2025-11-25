@@ -375,7 +375,7 @@ export function LoginForm() {
 
   // ⭐ FINAL LAYOUT (RIGHT SIDE ONLY — MATCHES YOUR NEED)
   return (
-    <div className="w-full h-full flex justify-center items-center lg:items-start lg:pt-0">
+    <div className="w-full h-full flex lg:pt-0">
 
       <div
         className={cn(
@@ -387,7 +387,7 @@ export function LoginForm() {
 
           {/* FRONT */}
           <div className="flip-card-front">
-            <Card className="w-full border-none bg-transparent lg:bg-white/80 shadow-none lg:shadow-xl lg:rounded-lg">
+            <Card className="w-full border-none   bg-white/80 shadow-none    shadow-xl   relative rounded-lg" >
               <CardHeader>
                 <CardTitle className="text-3xl font-bold tracking-tight">
                   Sign In
@@ -488,7 +488,7 @@ export function LoginForm() {
           {/* BACK */}
           <div className="flip-card-back">
             <Card
-              className="w-full border-none bg-white lg:bg-white/80 shadow-lg lg:shadow-xl backdrop-blur-sm lg:rounded-lg"
+              className="w-full border-none bg-white  bg-white/80 shadow-lg lg:shadow-xl  lg:rounded-lg"
             >
               {view === 'forgotOptions' && (
                 <ForgotCredentialsOptions setView={handleSetView} />
