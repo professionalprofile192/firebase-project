@@ -94,6 +94,9 @@ export default function LoginPage() {
           </div>
         </footer>
         </div>
+        {showContactInfo && (
+        <ContactInfoCard onClose={() => setShowContactInfo(false)} />
+      )}
         {/* RIGHT SIDE – Desktop & Tablet login form */}
         <div
           className="

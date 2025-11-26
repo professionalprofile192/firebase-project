@@ -10,7 +10,7 @@ interface ContactInfoCardProps {
 
 export function ContactInfoCard({ onClose }: ContactInfoCardProps) {
     return (
-        <div className="md:hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <Card className="w-full max-w-sm relative">
                 <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full" onClick={onClose}>
                     <X className="h-4 w-4" />
