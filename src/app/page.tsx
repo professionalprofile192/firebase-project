@@ -15,16 +15,18 @@ export default function LoginPage() {
 
   return (
     <>
-      <StripeGradient />
+    {/* Background har screen par show hoga */}
+    <StripeGradient />
 
-      <div
-        className={cn(
-          "h-full w-full relative z-10",
-          "hidden md:grid md:grid-cols-2"
-        )}
-      >
+    <div
+      className={cn(
+        "h-full w-full relative z-10",
+        // Desktop + Tablet layout
+        "hidden sm:grid sm:grid-cols-2"
+      )}
+    >
         {/* LEFT SIDE – visible on tablet + desktop */}
-        <div className="hidden md:flex flex-col items-start justify-between p-12">
+        <div className="hidden sm:flex flex-col items-start justify-between p-12">
           <Image
             src={ublLogo}
             alt="UBL Digital Logo"
@@ -72,23 +74,27 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* RIGHT SIDE – Desktop & Tablet login form */}
-        <div
+       {/* RIGHT SIDE – Desktop & Tablet login form */}
+       <div
           className="
-            hidden md:flex flex-col h-full justify-center items-center
-            lg:p-20
-            md:p-10
+            hidden sm:flex flex-col h-full justify-between
+            lg:items-start md:items-start sm:items-start
+            lg:p-20 lg:pt-25
+            md:p-20 md:pt-25
+            sm:p-20 sm:pt-25
           "
         >
-          <div className="w-full max-w-sm">
-            <LoginForm />
+          <div className="hidden sm:flex lg:flex flex-col items-center justify-center w-full">
+            <div className="w-full max-w-sm">
+              <LoginForm />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* MOBILE VIEW ONLY */}
-      <div className="md:hidden flex flex-col h-full relative z-10 p-4 bg-white">
-        <div className="flex-shrink-0">
+     {/* MOBILE VIEW ONLY */}
+     <div className="sm:hidden flex flex-col h-full min-h-screen relative z-10">
+        <div className="flex-shrink-0 p-4">
           <Image
             src={ublLogo}
             alt="UBL Digital Logo"
@@ -99,12 +105,12 @@ export default function LoginPage() {
           />
         </div>
 
-        <main className="flex flex-col justify-center flex-grow">
+        <main className="flex flex-col p-4">
           <LoginForm />
         </main>
 
-        <footer className="w-full flex justify-center bg-transparent pb-2">
-          <div className="flex gap-2 w-full max-w-xs">
+        <footer className="w-full flex justify-center bg-transparent mt-auto pb-6">
+          <div className="flex gap-2 w-[50%] justify-center">
             <Button variant="outline" className="w-full bg-white text-primary border-gray-300">
               <Landmark className="mr-2 h-4 w-4" /> Locate Us
             </Button>

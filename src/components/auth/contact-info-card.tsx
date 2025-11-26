@@ -43,13 +43,13 @@ export function ContactInfoCard({ onClose }: ContactInfoCardProps) {
                     <div className="pt-2">
                         <p className="text-sm text-muted-foreground">Social Media</p>
                         <div className="flex gap-4 mt-2">
-                            <a href="#" aria-label="Facebook">
+                            <a href="https://www.facebook.com/UBLUnitedBankLtd/" aria-label="Facebook"  target="_blank"rel="noopener noreferrer">
                                 <Facebook className="h-6 w-6 text-gray-600 hover:text-primary" />
                             </a>
-                            <a href="#" aria-label="Twitter">
+                            <a href="https://x.com/UBLDigital?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor" aria-label="Twitter"  target="_blank"rel="noopener noreferrer">
                                 <Twitter className="h-6 w-6 text-gray-600 hover:text-primary" />
                             </a>
-                            <a href="#" aria-label="LinkedIn">
+                            <a href="https://pk.linkedin.com/company/united-bank-limited?original_referer=https%3A%2F%2Fwww.google.com%2F" aria-label="LinkedIn"  target="_blank"rel="noopener noreferrer">
                                 <Linkedin className="h-6 w-6 text-gray-600 hover:text-primary" />
                             </a>
                         </div>
