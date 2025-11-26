@@ -366,6 +366,7 @@ export function LoginForm() {
   const [view, setView] = useState<View>('signIn');
   const [showOtpDialog, setShowOtpDialog] = useState(false);
   const [showUsernameAlert, setShowUsernameAlert] = useState(false);
+  const [showInvalidOtpAlert, setShowInvalidOtpAlert] = useState(false);
   const [recoveryDetails, setRecoveryDetails] = useState<RecoverUsernameValues | null>(null);
 
   const router = useRouter();
@@ -400,13 +401,11 @@ export function LoginForm() {
             setShowOtpDialog(false);
             setShowUsernameAlert(true); // Show the success alert
         } else {
-             toast({
-                variant: "destructive",
-                title: "Invalid OTP",
-                description: "The OTP you entered is incorrect. Please try again.",
-            });
+            setShowOtpDialog(false);
+            setShowInvalidOtpAlert(true); // Show the invalid OTP alert
         }
     } catch (error) {
+        setShowOtpDialog(false);
         toast({
             variant: "destructive",
             title: "Verification Failed",
@@ -620,6 +619,13 @@ export function LoginForm() {
         title="Username Recovered"
         description="Your username is 'raaststp'."
         onConfirm={handleAlertClose}
+      />
+      <CustomAlertDialog
+        open={showInvalidOtpAlert}
+        onOpenChange={setShowInvalidOtpAlert}
+        title="Error"
+        description="Provided OTP is incorrect."
+        onConfirm={() => setShowInvalidOtpAlert(false)}
       />
     </>
   );
