@@ -16,10 +16,10 @@ export default function LoginPage() {
 
   return (
     <>
-      <div className="sm:hidden fixed inset-0 bg-white -z-10" />
-      <div className="hidden sm:block">
+      <div className="hidden md:block">
         <StripeGradient />
       </div>
+      <div className="md:hidden fixed inset-0 bg-white -z-10" />
 
       <div
         className={cn(
