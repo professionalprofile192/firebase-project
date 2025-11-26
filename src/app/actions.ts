@@ -250,10 +250,32 @@ export async function forgotUsername(values: { email: string, mobileNumber: stri
     }
 }
   
+export async function validateUser(values: { loginId: string, email: string }) {
+    if (values.loginId === 'raaststp' && values.email === 'humna.sadia@ubl.com.pk') {
+        return {
+            "ForgotServices": [
+                {
+                    "email": "humna.sadia@ubl.com.pk",
+                    "phone": "03343498426",
+                    "customer_id": "7884057484"
+                }
+            ],
+            "opstatus": 0,
+            "httpStatusCode": 0
+        };
+    } else {
+        return {
+            opstatus: 1,
+            message: 'User does not exist.',
+            httpStatusCode: 404
+        };
+    }
+}
 
 
 
 
 
     
+
 

@@ -27,7 +27,7 @@ import {
 import { EyeOff, Eye, User, Lock } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { forgotUsername, getLastLoginTime, login, sendOtpForUsernameRecovery, verifyOtp } from '@/app/actions';
+import { forgotUsername, getLastLoginTime, login, sendOtpForUsernameRecovery, validateUser, verifyOtp } from '@/app/actions';
 import { cn } from '@/lib/utils';
 import { OtpDialog } from './otp-dialog';
 import { CustomAlertDialog } from '../common/custom-alert-dialog';
@@ -56,6 +56,7 @@ const corporateEnrollFormSchema = z.object({
 
 type View = 'signIn' | 'forgotOptions' | 'recoverUsername' | 'recoverPassword' | 'corporateEnroll';
 type RecoverUsernameValues = z.infer<typeof recoverUsernameFormSchema>;
+type RecoverPasswordValues = z.infer<typeof recoverPasswordFormSchema>;
 
 
 // ---------------- COMPONENTS ---------------------
@@ -288,7 +289,10 @@ function RecoverUsernameForm({ setView, onOtpRequest }: { setView: (view: View) 
   );
 }
 
-function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
+function RecoverPasswordForm({ setView, onValidateUser }: { setView: (view: View) => void, onValidateUser: (values: RecoverPasswordValues) => void; }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof recoverPasswordFormSchema>>({
     resolver: zodResolver(recoverPasswordFormSchema),
     defaultValues: {
@@ -297,8 +301,19 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
     },
   });
 
-  function onSubmit(values: z.infer<typeof recoverPasswordFormSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof recoverPasswordFormSchema>) {
+    setIsSubmitting(true);
+    try {
+        await onValidateUser(values);
+    } catch (error) {
+         toast({
+            variant: "destructive",
+            title: "An error occurred",
+            description: "Please try again later.",
+        });
+    } finally {
+        setIsSubmitting(false);
+    }
   }
 
   return (
@@ -341,8 +356,8 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
               )}
             />
             
-            <Button type="submit" className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80">
-              Next
+            <Button type="submit" className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80" disabled={isSubmitting}>
+              {isSubmitting ? 'Verifying...' : 'Next'}
             </Button>
           </form>
         </Form>
@@ -387,6 +402,17 @@ export function LoginForm() {
     setShowOtpDialog(true);
   }
 
+  const handleValidateUser = async (values: RecoverPasswordValues) => {
+    const response = await validateUser(values);
+    if (response.opstatus === 0) {
+        setShowOtpDialog(true); // Assuming we reuse the same OTP dialog
+    } else {
+        setAlertTitle("Error");
+        setAlertMessage(response.message || "User does not exist.");
+        setShowResultAlert(true);
+    }
+  }
+
   const handleOtpConfirm = async (otp: string) => {
     if (!recoveryDetails) return;
 
@@ -401,7 +427,7 @@ export function LoginForm() {
 
         if (verifyResponse.opstatus === 0 && verifyResponse.isOtpVerified === "true") {
             const forgotUsernameResponse = await forgotUsername(recoveryDetails) as any;
-            setAlertTitle(forgotUsernameResponse.opstatus === 0 ? "Alert" : "Error");
+            setAlertTitle("Alert");
             setAlertMessage(forgotUsernameResponse.errmsg || forgotUsernameResponse.message || "An unexpected error occurred.");
             setShowResultAlert(true);
         } else {
@@ -598,7 +624,7 @@ export function LoginForm() {
                   <RecoverUsernameForm setView={handleSetView} onOtpRequest={handleOtpRequest} />
                 )}
                 {view === 'recoverPassword' && (
-                  <RecoverPasswordForm setView={handleSetView} />
+                  <RecoverPasswordForm setView={handleSetView} onValidateUser={handleValidateUser}/>
                 )}
                 {view === 'corporateEnroll' && (
                   <CorporateEnrollForm setView={handleSetView} />
