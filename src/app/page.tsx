@@ -6,13 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Landmark, Send } from 'lucide-react';
 import { StripeGradient } from '@/components/auth/stripe-gradient';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { ContactInfoCard } from '@/components/auth/contact-info-card';
 import Link from 'next/link';
 
 export default function LoginPage() {
   const ublLogo = '/ubl_logo.png';
   const [showContactInfo, setShowContactInfo] = useState(false);
+
+  const handleCloseContactInfo = useCallback(() => {
+    setShowContactInfo(false);
+  }, []);
 
   return (
     <>
@@ -128,7 +132,7 @@ export default function LoginPage() {
       </div>
 
       {showContactInfo && (
-        <ContactInfoCard onClose={() => setShowContactInfo(false)} />
+        <ContactInfoCard onClose={handleCloseContactInfo} />
       )}
     </>
   );
