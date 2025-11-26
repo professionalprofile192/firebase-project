@@ -238,7 +238,8 @@ export async function forgotUsername(values: { email: string, mobileNumber: stri
                 }
             ],
             "opstatus": 0,
-            "httpStatusCode": 0
+            "httpStatusCode": 0,
+            "message": "Your username is 'raaststp'."
         };
     } else {
         return {

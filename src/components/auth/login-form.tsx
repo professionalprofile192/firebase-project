@@ -364,8 +364,9 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [view, setView] = useState<View>('signIn');
   const [showOtpDialog, setShowOtpDialog] = useState(false);
-  const [showUsernameAlert, setShowUsernameAlert] = useState(false);
-  const [showInvalidOtpAlert, setShowInvalidOtpAlert] = useState(false);
+  const [showResultAlert, setShowResultAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertTitle, setAlertTitle] = useState('');
   const [recoveryDetails, setRecoveryDetails] = useState<RecoverUsernameValues | null>(null);
 
   const router = useRouter();
@@ -400,30 +401,24 @@ export function LoginForm() {
 
         if (verifyResponse.opstatus === 0 && verifyResponse.isOtpVerified === "true") {
             const forgotUsernameResponse = await forgotUsername(recoveryDetails);
-            if (forgotUsernameResponse.opstatus === 0) {
-              setShowUsernameAlert(true); // Show the success alert
-            } else {
-              toast({
-                variant: "destructive",
-                title: "Recovery Failed",
-                description: forgotUsernameResponse.message || "Could not retrieve username.",
-              });
-            }
+            setAlertTitle(forgotUsernameResponse.opstatus === 0 ? "Username Recovered" : "Error");
+            setAlertMessage(forgotUsernameResponse.message || "An unexpected error occurred.");
+            setShowResultAlert(true);
         } else {
-            setShowInvalidOtpAlert(true); // Show the invalid OTP alert
+            setAlertTitle("Error");
+            setAlertMessage(verifyResponse.message || "Provided OTP is incorrect.");
+            setShowResultAlert(true);
         }
     } catch (error) {
         setShowOtpDialog(false);
-        toast({
-            variant: "destructive",
-            title: "Verification Failed",
-            description: "An error occurred during the recovery process.",
-        });
+        setAlertTitle("Verification Failed");
+        setAlertMessage("An error occurred during the recovery process.");
+        setShowResultAlert(true);
     }
   };
 
   const handleAlertClose = () => {
-    setShowUsernameAlert(false);
+    setShowResultAlert(false);
     setRecoveryDetails(null);
     setView('signIn'); // Go back to the sign in form
   }
@@ -622,18 +617,11 @@ export function LoginForm() {
         onConfirm={handleOtpConfirm}
       />
       <CustomAlertDialog
-        open={showUsernameAlert}
-        onOpenChange={setShowUsernameAlert}
-        title="Username Recovered"
-        description="Your username is 'raaststp'."
+        open={showResultAlert}
+        onOpenChange={setShowResultAlert}
+        title={alertTitle}
+        description={alertMessage}
         onConfirm={handleAlertClose}
-      />
-      <CustomAlertDialog
-        open={showInvalidOtpAlert}
-        onOpenChange={setShowInvalidOtpAlert}
-        title="Error"
-        description="Provided OTP is incorrect."
-        onConfirm={() => setShowInvalidOtpAlert(false)}
       />
     </>
   );
