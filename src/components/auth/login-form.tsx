@@ -41,13 +41,11 @@ const loginFormSchema = z.object({
 const recoverUsernameFormSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
   mobileNumber: z.string().min(1, { message: 'Mobile number is required.' }),
-  captcha: z.string().min(1, { message: 'Captcha is required.' }),
 });
 
 const recoverPasswordFormSchema = z.object({
   loginId: z.string().min(1, { message: 'Login ID is required' }),
   email: z.string().email({ message: 'Please enter a valid email address.' }),
-  captcha: z.string().min(1, { message: 'Captcha is required.' }),
 });
 
 const corporateEnrollFormSchema = z.object({
@@ -201,7 +199,6 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
     defaultValues: {
       email: '',
       mobileNumber: '',
-      captcha: '',
     },
   });
 
@@ -249,32 +246,9 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
               )}
             />
 
-            {/* captcha */}
-            <FormField
-              control={form.control}
-              name="captcha"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Captcha</FormLabel>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 p-2 rounded-md bg-gray-200 text-center line-through tracking-widest text-xl font-serif select-none">
-                      A5Bv7
-                    </div>
-                    <Button variant="ghost" size="icon">
-                      <RefreshCcw className="h-5 w-5" />
-                    </Button>
-                  </div>
-                  <FormControl>
-                    <Input placeholder="Enter Captcha" {...field} className="h-12 text-base bg-white/50" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-              <Button type="submit" className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80">
-                Next
-              </Button>
+            <Button type="submit" className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80">
+              Next
+            </Button>
           </form>
         </Form>
       </CardContent>
@@ -292,7 +266,6 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
     defaultValues: {
       loginId: '',
       email: '',
-      captcha: '',
     },
   });
 
@@ -339,34 +312,10 @@ function RecoverPasswordForm({ setView }: { setView: (view: View) => void }) {
                 </FormItem>
               )}
             />
-
-            {/* captcha */}
-            <FormField
-              control={form.control}
-              name="captcha"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Captcha</FormLabel>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 p-2 rounded-md bg-gray-200 text-center line-through tracking-widest text-xl font-serif select-none">
-                      A5Bv7
-                    </div>
-                    <Button variant="ghost" size="icon">
-                      <RefreshCcw className="h-5 w-5" />
-                    </Button>
-                  </div>
-                  <FormControl>
-                    <Input placeholder="Enter Captcha" {...field} className="h-12 text-base bg-white/50" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             
-              <Button type="submit" className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80">
-                Next
-              </Button>
+            <Button type="submit" className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80">
+              Next
+            </Button>
           </form>
         </Form>
       </CardContent>
@@ -587,3 +536,5 @@ export function LoginForm() {
     </div>
   );
 }
+
+    
