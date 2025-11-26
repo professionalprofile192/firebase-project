@@ -12,7 +12,7 @@ export async function login(values: any) {
         userid: '7884057484',
         firstname: 'Nawaz',
         lastname: 'Ali',
-        email: 'humna.sadia@ubl.com.pk',
+        email: 'profileprofessional192@gmail.com',
         CIF_NO: '20269367', // Adding CIF_NO for the next service call
       },
     };
@@ -191,7 +191,7 @@ export async function sendOtpForUsernameRecovery(values: { email: string, mobile
     // In a real application, you would use fetch to make a POST request to the UBL API.
     // For now, we'll just check for specific values and return a mock response.
   
-    if (values.email === 'humna.sadia@ubl.com.pk' && values.mobileNumber === '03343498426') {
+    if (values.email === 'profileprofessional192@gmail.com' && values.mobileNumber === '03343498426') {
       return {
         "SecurityKEY": "c03fc1f4-6d08-454b-8499-a953dbeaedb3",
         "MessageContent": "Success - In Process",
@@ -211,7 +211,7 @@ export async function sendOtpForUsernameRecovery(values: { email: string, mobile
 export async function verifyOtp(values: { otp: string, email: string, mobileNumber: string }) {
     // This is a placeholder for the actual API call.
     // For now, we'll check for a hardcoded OTP.
-    if (values.email === 'humna.sadia@ubl.com.pk' && values.mobileNumber === '03343498426' && values.otp === '123456') {
+    if (values.email === 'profileprofessional192@gmail.com' && values.mobileNumber === '03343498426' && values.otp === '123456') {
         return {
             "isOtpVerified": "true",
             "opstatus": 0,
@@ -228,4 +228,5 @@ export async function verifyOtp(values: { otp: string, email: string, mobileNumb
     }
 }
   
+
 
