@@ -195,14 +195,9 @@ export async function sendOtpForUsernameRecovery(values: { email: string, mobile
       return {
         "SecurityKEY": "c03fc1f4-6d08-454b-8499-a953dbeaedb3",
         "MessageContent": "Success - In Process",
-        "jsonObjectPrint": "{\"records\":[{\"lastmodifiedts\":\"2025-09-09 18:41:03.0\",\"createdts\":\"2025-09-09 18:41:03.0\",\"countryType\":\"Domestic\",\"softdeleteflag\":\"false\",\"Extension\":\"Mobile\",\"phoneCountryCode\":\"+92\",\"Customer_id\":\"0623803747\",\"isPrimary\":\"true\",\"Value\":\"+92-3343498426\",\"isAlertsRequired\":\"false\",\"id\":\"1c92d37a-b8b5-413a-9616-8ec4600b9b72\",\"synctimestamp\":\"2025-09-09 18:41:03.0\",\"Type_id\":\"COMM_TYPE_PHONE\"}],\"opstatus\":0,\"httpStatusCode\":0}",
         "opstatus": 0,
-        "serviceKey": "c03fc1f4-6d08-454b-8499-a953dbeaedb3",
-        "newCustomerId": "0623803747",
         "message": "Success - In Process",
-        "error": "",
-        "statusCode": "200",
-        "httpStatusCode": 0
+        "httpStatusCode": 200
       };
     } else {
       return {
@@ -211,5 +206,26 @@ export async function sendOtpForUsernameRecovery(values: { email: string, mobile
         httpStatusCode: 400
       };
     }
-  }
+}
+
+export async function verifyOtp(values: { otp: string, email: string, mobileNumber: string }) {
+    // This is a placeholder for the actual API call.
+    // For now, we'll check for a hardcoded OTP.
+    if (values.email === 'humna.sadia@ubl.com.pk' && values.mobileNumber === '03343498426' && values.otp === '123456') {
+        return {
+            "isOtpVerified": "true",
+            "opstatus": 0,
+            "httpStatusCode": 200,
+            "message": "Successfully verified"
+        }
+    } else {
+        return {
+            "isOtpVerified": "false",
+            "opstatus": 1,
+            "httpStatusCode": 400,
+            "message": "Invalid OTP"
+        }
+    }
+}
   
+

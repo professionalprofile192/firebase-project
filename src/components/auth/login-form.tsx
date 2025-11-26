@@ -27,7 +27,7 @@ import {
 import { EyeOff, Eye, User, Lock, RefreshCcw } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { getLastLoginTime, login, sendOtpForUsernameRecovery } from '@/app/actions';
+import { getLastLoginTime, login, sendOtpForUsernameRecovery, verifyOtp } from '@/app/actions';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { OtpDialog } from './otp-dialog';
@@ -56,6 +56,7 @@ const corporateEnrollFormSchema = z.object({
 });
 
 type View = 'signIn' | 'forgotOptions' | 'recoverUsername' | 'recoverPassword' | 'corporateEnroll';
+type RecoverUsernameValues = z.infer<typeof recoverUsernameFormSchema>;
 
 
 // ---------------- COMPONENTS ---------------------
@@ -195,7 +196,7 @@ function ForgotCredentialsOptions({ setView }: { setView: (view: View) => void }
   );
 }
 
-function RecoverUsernameForm({ setView, onOtpSent }: { setView: (view: View) => void, onOtpSent: () => void }) {
+function RecoverUsernameForm({ setView, onOtpRequest }: { setView: (view: View) => void, onOtpRequest: (values: RecoverUsernameValues) => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const form = useForm<z.infer<typeof recoverUsernameFormSchema>>({
@@ -215,7 +216,7 @@ function RecoverUsernameForm({ setView, onOtpSent }: { setView: (view: View) => 
                 title: "OTP Sent",
                 description: "An OTP has been sent to your registered details.",
             });
-            onOtpSent();
+            onOtpRequest(values);
         } else {
             toast({
                 variant: "destructive",
@@ -365,6 +366,8 @@ export function LoginForm() {
   const [view, setView] = useState<View>('signIn');
   const [showOtpDialog, setShowOtpDialog] = useState(false);
   const [showUsernameAlert, setShowUsernameAlert] = useState(false);
+  const [recoveryDetails, setRecoveryDetails] = useState<RecoverUsernameValues | null>(null);
+
   const router = useRouter();
   const { toast } = useToast();
 
@@ -378,16 +381,43 @@ export function LoginForm() {
 
   const handleSetView = (newView: View) => setView(newView);
 
-  const handleOtpConfirm = (otp: string) => {
-    // Here you would typically verify the OTP with another API call.
-    // For now, we'll assume it's correct and show the username.
-    console.log("OTP confirmed:", otp);
-    setShowOtpDialog(false);
-    setShowUsernameAlert(true); // Show the success alert
+  const handleOtpRequest = (values: RecoverUsernameValues) => {
+    setRecoveryDetails(values);
+    setShowOtpDialog(true);
+  }
+
+  const handleOtpConfirm = async (otp: string) => {
+    if (!recoveryDetails) return;
+
+    try {
+        const response = await verifyOtp({
+            otp: otp,
+            email: recoveryDetails.email,
+            mobileNumber: recoveryDetails.mobileNumber,
+        });
+
+        if (response.opstatus === 0 && response.isOtpVerified === "true") {
+            setShowOtpDialog(false);
+            setShowUsernameAlert(true); // Show the success alert
+        } else {
+             toast({
+                variant: "destructive",
+                title: "Invalid OTP",
+                description: "The OTP you entered is incorrect. Please try again.",
+            });
+        }
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Verification Failed",
+            description: "An error occurred while verifying the OTP.",
+        });
+    }
   };
 
   const handleAlertClose = () => {
     setShowUsernameAlert(false);
+    setRecoveryDetails(null);
     setView('signIn'); // Go back to the sign in form
   }
 
@@ -563,7 +593,7 @@ export function LoginForm() {
                   <ForgotCredentialsOptions setView={handleSetView} />
                 )}
                 {view === 'recoverUsername' && (
-                  <RecoverUsernameForm setView={handleSetView} onOtpSent={() => setShowOtpDialog(true)} />
+                  <RecoverUsernameForm setView={handleSetView} onOtpRequest={handleOtpRequest} />
                 )}
                 {view === 'recoverPassword' && (
                   <RecoverPasswordForm setView={handleSetView} />
