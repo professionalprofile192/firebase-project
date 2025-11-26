@@ -400,9 +400,9 @@ export function LoginForm() {
         setShowOtpDialog(false);
 
         if (verifyResponse.opstatus === 0 && verifyResponse.isOtpVerified === "true") {
-            const forgotUsernameResponse = await forgotUsername(recoveryDetails);
+            const forgotUsernameResponse = await forgotUsername(recoveryDetails) as any;
             setAlertTitle(forgotUsernameResponse.opstatus === 0 ? "Username Recovered" : "Error");
-            setAlertMessage(forgotUsernameResponse.message || "An unexpected error occurred.");
+            setAlertMessage(forgotUsernameResponse.errmsg || forgotUsernameResponse.message || "An unexpected error occurred.");
             setShowResultAlert(true);
         } else {
             setAlertTitle("Error");
