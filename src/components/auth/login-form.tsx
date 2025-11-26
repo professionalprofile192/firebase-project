@@ -27,9 +27,11 @@ import {
 import { EyeOff, Eye, User, Lock, RefreshCcw } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { getLastLoginTime, login } from '@/app/actions';
+import { getLastLoginTime, login, sendOtpForUsernameRecovery } from '@/app/actions';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { OtpDialog } from './otp-dialog';
+import { CustomAlertDialog } from '../common/custom-alert-dialog';
 
 // ---------------- SCHEMAS ---------------------
 
@@ -193,7 +195,9 @@ function ForgotCredentialsOptions({ setView }: { setView: (view: View) => void }
   );
 }
 
-function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
+function RecoverUsernameForm({ setView, onOtpSent }: { setView: (view: View) => void, onOtpSent: () => void }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof recoverUsernameFormSchema>>({
     resolver: zodResolver(recoverUsernameFormSchema),
     defaultValues: {
@@ -202,8 +206,32 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
     },
   });
 
-  function onSubmit(values: z.infer<typeof recoverUsernameFormSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof recoverUsernameFormSchema>) {
+    setIsSubmitting(true);
+    try {
+        const response = await sendOtpForUsernameRecovery(values);
+        if (response.opstatus === 0) {
+            toast({
+                title: "OTP Sent",
+                description: "An OTP has been sent to your registered details.",
+            });
+            onOtpSent();
+        } else {
+            toast({
+                variant: "destructive",
+                title: "Failed to send OTP",
+                description: response.message || "Could not process your request.",
+            });
+        }
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "An error occurred",
+            description: "Please try again later.",
+        });
+    } finally {
+        setIsSubmitting(false);
+    }
   }
 
   return (
@@ -246,8 +274,8 @@ function RecoverUsernameForm({ setView }: { setView: (view: View) => void }) {
               )}
             />
 
-            <Button type="submit" className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80">
-              Next
+            <Button type="submit" className="w-full py-6 text-base font-semibold bg-black text-white hover:bg-black/80" disabled={isSubmitting}>
+              {isSubmitting ? 'Sending OTP...' : 'Next'}
             </Button>
           </form>
         </Form>
@@ -335,6 +363,8 @@ export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [view, setView] = useState<View>('signIn');
+  const [showOtpDialog, setShowOtpDialog] = useState(false);
+  const [showUsernameAlert, setShowUsernameAlert] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -347,6 +377,19 @@ export function LoginForm() {
   });
 
   const handleSetView = (newView: View) => setView(newView);
+
+  const handleOtpConfirm = (otp: string) => {
+    // Here you would typically verify the OTP with another API call.
+    // For now, we'll assume it's correct and show the username.
+    console.log("OTP confirmed:", otp);
+    setShowOtpDialog(false);
+    setShowUsernameAlert(true); // Show the success alert
+  };
+
+  const handleAlertClose = () => {
+    setShowUsernameAlert(false);
+    setView('signIn'); // Go back to the sign in form
+  }
 
   async function onSubmit(values: z.infer<typeof loginFormSchema>) {
     setIsSubmitting(true);
@@ -396,145 +439,158 @@ export function LoginForm() {
 
   // ⭐ FINAL LAYOUT (RIGHT SIDE ONLY — MATCHES YOUR NEED)
   return (
-    <div className="w-full h-full flex md:pt-0">
+    <>
+      <div className="w-full h-full flex md:pt-0">
 
-      <div
-        className={cn(
-          'w-full max-w-sm flip-card',
-          { flipped: view !== 'signIn' }
-        )}
-      >
-        <div className="flip-card-inner">
+        <div
+          className={cn(
+            'w-full max-w-sm flip-card',
+            { flipped: view !== 'signIn' }
+          )}
+        >
+          <div className="flip-card-inner">
 
-          {/* FRONT */}
-          <div className="flip-card-front">
-            <Card className="w-full border-none bg-white md:bg-white/80 shadow-none md:shadow-xl relative md:rounded-lg" >
-              <CardHeader>
-                <CardTitle className="text-3xl font-bold tracking-tight">
-                  Sign In
-                </CardTitle>
-                <CardDescription>
-                  Enter your credentials to sign in to UBL Digital.
-                </CardDescription>
-              </CardHeader>
+            {/* FRONT */}
+            <div className="flip-card-front">
+              <Card className="w-full border-none bg-white md:bg-white/80 shadow-none md:shadow-xl relative md:rounded-lg" >
+                <CardHeader>
+                  <CardTitle className="text-3xl font-bold tracking-tight">
+                    Sign In
+                  </CardTitle>
+                  <CardDescription>
+                    Enter your credentials to sign in to UBL Digital.
+                  </CardDescription>
+                </CardHeader>
 
-              <CardContent>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <CardContent>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 
-                    {/* USERNAME */}
-                    <FormField
-                      control={form.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Username:</FormLabel>
-                          <FormControl>
-                            <Input
-                              className="h-12 text-base bg-gray-100 md:bg-white/50"
-                              placeholder="Enter Username"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* PASSWORD */}
-                    <FormField
-                      control={form.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password:</FormLabel>
-
-                          <div className="relative">
+                      {/* USERNAME */}
+                      <FormField
+                        control={form.control}
+                        name="username"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Username:</FormLabel>
                             <FormControl>
                               <Input
-                                type={showPassword ? 'text' : 'password'}
-                                className="h-12 pr-10 text-base bg-gray-100 md:bg-white/50"
-                                placeholder="Enter Password"
+                                className="h-12 text-base bg-gray-100 md:bg-white/50"
+                                placeholder="Enter Username"
                                 {...field}
                               />
                             </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword(!showPassword)}
-                              className="absolute inset-y-0 right-0 flex items-center pr-3"
-                            >
-                              {showPassword ? (
-                                <Eye className="h-5 w-5" />
-                              ) : (
-                                <EyeOff className="h-5 w-5" />
-                              )}
-                            </button>
-                          </div>
+                      {/* PASSWORD */}
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Password:</FormLabel>
 
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                            <div className="relative">
+                              <FormControl>
+                                <Input
+                                  type={showPassword ? 'text' : 'password'}
+                                  className="h-12 pr-10 text-base bg-gray-100 md:bg-white/50"
+                                  placeholder="Enter Password"
+                                  {...field}
+                                />
+                              </FormControl>
 
-                    {/* SUBMIT */}
-                    <Button
-                      type="submit"
-                      className="w-full py-6 text-base font-semibold"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? 'Signing In...' : 'Sign In'}
-                    </Button>
+                              <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-0 flex items-center pr-3"
+                              >
+                                {showPassword ? (
+                                  <Eye className="h-5 w-5" />
+                                ) : (
+                                  <EyeOff className="h-5 w-5" />
+                                )}
+                              </button>
+                            </div>
 
-                  </form>
-                </Form>
-              </CardContent>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-              <CardFooter className="flex-col items-start gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleSetView('forgotOptions')}
-                  className="text-sm font-medium text-primary hover:underline"
-                >
-                  Forgot your credentials?
-                </button>
+                      {/* SUBMIT */}
+                      <Button
+                        type="submit"
+                        className="w-full py-6 text-base font-semibold"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? 'Signing In...' : 'Sign In'}
+                      </Button>
 
-                <button
-                  type="button"
-                  onClick={() => handleSetView('corporateEnroll')}
-                  className="text-sm font-medium text-gray-700 hover:underline"
-                >
-                  Corporate Enroll
-                </button>
-              </CardFooter>
-            </Card>
+                    </form>
+                  </Form>
+                </CardContent>
+
+                <CardFooter className="flex-col items-start gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleSetView('forgotOptions')}
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    Forgot your credentials?
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSetView('corporateEnroll')}
+                    className="text-sm font-medium text-gray-700 hover:underline"
+                  >
+                    Corporate Enroll
+                  </button>
+                </CardFooter>
+              </Card>
+            </div>
+
+            {/* BACK */}
+            <div className="flip-card-back">
+              <Card
+                className="w-full border-none bg-white  bg-white/80 shadow-lg md:shadow-xl  md:rounded-lg"
+              >
+                {view === 'forgotOptions' && (
+                  <ForgotCredentialsOptions setView={handleSetView} />
+                )}
+                {view === 'recoverUsername' && (
+                  <RecoverUsernameForm setView={handleSetView} onOtpSent={() => setShowOtpDialog(true)} />
+                )}
+                {view === 'recoverPassword' && (
+                  <RecoverPasswordForm setView={handleSetView} />
+                )}
+                {view === 'corporateEnroll' && (
+                  <CorporateEnrollForm setView={handleSetView} />
+                )}
+              </Card>
+            </div>
+
           </div>
-
-          {/* BACK */}
-          <div className="flip-card-back">
-            <Card
-              className="w-full border-none bg-white  bg-white/80 shadow-lg md:shadow-xl  md:rounded-lg"
-            >
-              {view === 'forgotOptions' && (
-                <ForgotCredentialsOptions setView={handleSetView} />
-              )}
-              {view === 'recoverUsername' && (
-                <RecoverUsernameForm setView={handleSetView} />
-              )}
-              {view === 'recoverPassword' && (
-                <RecoverPasswordForm setView={handleSetView} />
-              )}
-              {view === 'corporateEnroll' && (
-                <CorporateEnrollForm setView={handleSetView} />
-              )}
-            </Card>
-          </div>
-
         </div>
+
       </div>
 
-    </div>
+      <OtpDialog 
+        open={showOtpDialog}
+        onOpenChange={setShowOtpDialog}
+        onConfirm={handleOtpConfirm}
+      />
+      <CustomAlertDialog
+        open={showUsernameAlert}
+        onOpenChange={setShowUsernameAlert}
+        title="Username Recovered"
+        description="Your username is 'raaststp'."
+        onConfirm={handleAlertClose}
+      />
+    </>
   );
 }
-
-    

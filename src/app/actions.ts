@@ -185,3 +185,31 @@ export async function getNotifications(userId: string) {
         }
     }
 }
+
+export async function sendOtpForUsernameRecovery(values: { email: string, mobileNumber: string }) {
+    // This is a placeholder for the actual API call.
+    // In a real application, you would use fetch to make a POST request to the UBL API.
+    // For now, we'll just check for specific values and return a mock response.
+  
+    if (values.email === 'humna.sadia@ubl.com.pk' && values.mobileNumber === '03343498426') {
+      return {
+        "SecurityKEY": "c03fc1f4-6d08-454b-8499-a953dbeaedb3",
+        "MessageContent": "Success - In Process",
+        "jsonObjectPrint": "{\"records\":[{\"lastmodifiedts\":\"2025-09-09 18:41:03.0\",\"createdts\":\"2025-09-09 18:41:03.0\",\"countryType\":\"Domestic\",\"softdeleteflag\":\"false\",\"Extension\":\"Mobile\",\"phoneCountryCode\":\"+92\",\"Customer_id\":\"0623803747\",\"isPrimary\":\"true\",\"Value\":\"+92-3343498426\",\"isAlertsRequired\":\"false\",\"id\":\"1c92d37a-b8b5-413a-9616-8ec4600b9b72\",\"synctimestamp\":\"2025-09-09 18:41:03.0\",\"Type_id\":\"COMM_TYPE_PHONE\"}],\"opstatus\":0,\"httpStatusCode\":0}",
+        "opstatus": 0,
+        "serviceKey": "c03fc1f4-6d08-454b-8499-a953dbeaedb3",
+        "newCustomerId": "0623803747",
+        "message": "Success - In Process",
+        "error": "",
+        "statusCode": "200",
+        "httpStatusCode": 0
+      };
+    } else {
+      return {
+        opstatus: 1,
+        message: 'Invalid details provided.',
+        httpStatusCode: 400
+      };
+    }
+  }
+  
