@@ -6,11 +6,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface OtpDialogProps {
@@ -95,12 +93,6 @@ export function OtpDialog({ open, onOpenChange, onConfirm }: OtpDialogProps) {
             Confirm
           </Button>
         </div>
-        <DialogClose asChild>
-            <Button variant="ghost" size="icon" className="absolute top-4 right-4 h-6 w-6 rounded-full">
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-            </Button>
-        </DialogClose>
       </DialogContent>
     </Dialog>
   );
