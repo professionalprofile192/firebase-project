@@ -223,7 +223,7 @@ export async function verifyOtp(values: { otp: string, email: string, mobileNumb
             "isOtpVerified": "false",
             "opstatus": 1,
             "httpStatusCode": 400,
-            "message": "Invalid OTP"
+            "message": "Provided OTP is incorrect."
         }
     }
 }
@@ -239,7 +239,7 @@ export async function forgotUsername(values: { email: string, mobileNumber: stri
             ],
             "opstatus": 0,
             "httpStatusCode": 0,
-            "message": "Your username is 'raaststp'."
+            "errmsg": "JSONObject[\"records\"] not found."
         };
     } else {
         return {
@@ -256,3 +256,4 @@ export async function forgotUsername(values: { email: string, mobileNumber: stri
 
 
     
+
