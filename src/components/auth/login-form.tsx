@@ -24,12 +24,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import { EyeOff, Eye, User, Lock, RefreshCcw } from 'lucide-react';
-import { useState } from 'react';
+import { EyeOff, Eye, User, Lock } from 'lucide-react';
+import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { getLastLoginTime, login, sendOtpForUsernameRecovery, verifyOtp } from '@/app/actions';
+import { forgotUsername, getLastLoginTime, login, sendOtpForUsernameRecovery, verifyOtp } from '@/app/actions';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
 import { OtpDialog } from './otp-dialog';
 import { CustomAlertDialog } from '../common/custom-alert-dialog';
 
@@ -391,17 +390,26 @@ export function LoginForm() {
     if (!recoveryDetails) return;
 
     try {
-        const response = await verifyOtp({
+        const verifyResponse = await verifyOtp({
             otp: otp,
             email: recoveryDetails.email,
             mobileNumber: recoveryDetails.mobileNumber,
         });
+        
+        setShowOtpDialog(false);
 
-        if (response.opstatus === 0 && response.isOtpVerified === "true") {
-            setShowOtpDialog(false);
-            setShowUsernameAlert(true); // Show the success alert
+        if (verifyResponse.opstatus === 0 && verifyResponse.isOtpVerified === "true") {
+            const forgotUsernameResponse = await forgotUsername(recoveryDetails);
+            if (forgotUsernameResponse.opstatus === 0) {
+              setShowUsernameAlert(true); // Show the success alert
+            } else {
+              toast({
+                variant: "destructive",
+                title: "Recovery Failed",
+                description: forgotUsernameResponse.message || "Could not retrieve username.",
+              });
+            }
         } else {
-            setShowOtpDialog(false);
             setShowInvalidOtpAlert(true); // Show the invalid OTP alert
         }
     } catch (error) {
@@ -409,7 +417,7 @@ export function LoginForm() {
         toast({
             variant: "destructive",
             title: "Verification Failed",
-            description: "An error occurred while verifying the OTP.",
+            description: "An error occurred during the recovery process.",
         });
     }
   };

@@ -227,6 +227,27 @@ export async function verifyOtp(values: { otp: string, email: string, mobileNumb
         }
     }
 }
+
+export async function forgotUsername(values: { email: string, mobileNumber: string }) {
+    // This is a placeholder for the actual API call.
+    if (values.email === 'humna.sadia@ubl.com.pk' && values.mobileNumber === '03343498426') {
+        return {
+            "ForgotServices": [
+                {
+                    "responseCode": "02"
+                }
+            ],
+            "opstatus": 0,
+            "httpStatusCode": 0
+        };
+    } else {
+        return {
+            opstatus: 1,
+            message: 'User not found.',
+            httpStatusCode: 404
+        };
+    }
+}
   
 
 
