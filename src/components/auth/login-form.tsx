@@ -57,6 +57,7 @@ const corporateEnrollFormSchema = z.object({
 type View = 'signIn' | 'forgotOptions' | 'recoverUsername' | 'recoverPassword' | 'corporateEnroll';
 type RecoverUsernameValues = z.infer<typeof recoverUsernameFormSchema>;
 type RecoverPasswordValues = z.infer<typeof recoverPasswordFormSchema>;
+type RecoveryFlow = 'username' | 'password';
 
 
 // ---------------- COMPONENTS ---------------------
@@ -210,20 +211,7 @@ function RecoverUsernameForm({ setView, onOtpRequest }: { setView: (view: View) 
   async function onSubmit(values: z.infer<typeof recoverUsernameFormSchema>) {
     setIsSubmitting(true);
     try {
-        const response = await sendOtpForUsernameRecovery(values);
-        if (response.opstatus === 0) {
-            toast({
-                title: "OTP Sent",
-                description: "An OTP has been sent to your registered details.",
-            });
-            onOtpRequest(values);
-        } else {
-            toast({
-                variant: "destructive",
-                title: "Failed to send OTP",
-                description: response.message || "Could not process your request.",
-            });
-        }
+        await onOtpRequest(values);
     } catch (error) {
         toast({
             variant: "destructive",
@@ -383,6 +371,7 @@ export function LoginForm() {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
   const [recoveryDetails, setRecoveryDetails] = useState<RecoverUsernameValues | null>(null);
+  const [currentFlow, setCurrentFlow] = useState<RecoveryFlow>('username');
 
   const router = useRouter();
   const { toast } = useToast();
@@ -397,15 +386,41 @@ export function LoginForm() {
 
   const handleSetView = (newView: View) => setView(newView);
 
-  const handleOtpRequest = (values: RecoverUsernameValues) => {
-    setRecoveryDetails(values);
-    setShowOtpDialog(true);
+  const handleOtpRequest = async (values: RecoverUsernameValues) => {
+    setCurrentFlow('username');
+    const response = await sendOtpForUsernameRecovery(values);
+    if (response.opstatus === 0) {
+        toast({
+            title: "OTP Sent",
+            description: "An OTP has been sent to your registered details.",
+        });
+        setRecoveryDetails(values);
+        setShowOtpDialog(true);
+    } else {
+        setAlertTitle("Error");
+        setAlertMessage(response.message || "Could not process your request.");
+        setShowResultAlert(true);
+    }
   }
 
   const handleValidateUser = async (values: RecoverPasswordValues) => {
     const response = await validateUser(values);
-    if (response.opstatus === 0) {
-        setShowOtpDialog(true); // Assuming we reuse the same OTP dialog
+    if (response.opstatus === 0 && response.ForgotServices.length > 0) {
+        setCurrentFlow('password');
+        const userDetails = response.ForgotServices[0];
+        const otpPayload = { email: userDetails.email, mobileNumber: userDetails.phone };
+        
+        const otpResponse = await sendOtpForUsernameRecovery(otpPayload);
+        if (otpResponse.opstatus === 0) {
+            toast({ title: "OTP Sent", description: "An OTP has been sent for password recovery." });
+            setRecoveryDetails(otpPayload);
+            setShowOtpDialog(true);
+        } else {
+            setAlertTitle("Error");
+            setAlertMessage(otpResponse.message || "Failed to send OTP.");
+            setShowResultAlert(true);
+        }
+
     } else {
         setAlertTitle("Error");
         setAlertMessage(response.message || "User does not exist.");
@@ -426,10 +441,16 @@ export function LoginForm() {
         setShowOtpDialog(false);
 
         if (verifyResponse.opstatus === 0 && verifyResponse.isOtpVerified === "true") {
-            const forgotUsernameResponse = await forgotUsername(recoveryDetails) as any;
-            setAlertTitle("Alert");
-            setAlertMessage(forgotUsernameResponse.errmsg || forgotUsernameResponse.message || "An unexpected error occurred.");
-            setShowResultAlert(true);
+            if (currentFlow === 'username') {
+                const forgotUsernameResponse = await forgotUsername(recoveryDetails) as any;
+                setAlertTitle("Alert");
+                setAlertMessage(forgotUsernameResponse.errmsg || forgotUsernameResponse.message || "An unexpected error occurred.");
+                setShowResultAlert(true);
+            } else {
+                setAlertTitle("Success");
+                setAlertMessage("OTP Verified successfully. You can now reset your password."); // Placeholder for next step
+                setShowResultAlert(true);
+            }
         } else {
             setAlertTitle("Error");
             setAlertMessage(verifyResponse.message || "Provided OTP is incorrect.");
@@ -652,3 +673,5 @@ export function LoginForm() {
     </>
   );
 }
+
+    
