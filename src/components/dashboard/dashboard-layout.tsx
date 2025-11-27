@@ -80,8 +80,11 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 
     return (
         <>
-            <div className="flex min-h-screen w-full flex-col bg-muted/40 overflow-y-auto">
+            <div className="flex min-h-screen w-full flex-col bg-muted/40 overflow-y-auto no-print">
                 <Header />
+                {children}
+            </div>
+            <div className="hidden print:block">
                 {children}
             </div>
             <SessionTimeoutDialog
