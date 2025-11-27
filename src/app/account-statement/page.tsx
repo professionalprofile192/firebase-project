@@ -44,7 +44,7 @@ export default function AccountStatementPage() {
   const fetchTransactionsForAccount = async (acctNo: string) => {
     setTransactionsLoading(true);
     try {
-        const statementsData = await getRecentTransactions(acctNo);
+        const statementsData = await getRecentTransactions(acctNo, 30); // Fetch more for statement
         if (statementsData.opstatus === 0) {
             setTransactions(statementsData.payments);
         } else {
@@ -111,7 +111,7 @@ export default function AccountStatementPage() {
 
   return (
     <DashboardLayout>
-      <main className="flex flex-1 flex-col p-4 sm:px-6 sm:py-4 gap-6 overflow-auto">
+      <main className="flex flex-1 flex-col p-4 sm:px-6 sm:py-4 gap-6 h-full overflow-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-3">
                 <Card className="p-4 h-full">
