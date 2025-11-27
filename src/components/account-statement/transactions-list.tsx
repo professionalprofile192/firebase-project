@@ -20,7 +20,7 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
             <CardHeader className="flex flex-col md:flex-row sm:flex-row items-start md:items-center sm:items-center justify-between gap-4">
                 <CardTitle className="text-base">Transactions</CardTitle>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-                     <Select defaultValue="pdf">
+                     <Select>
                         <SelectTrigger className="w-full sm:w-[150px]">
                             <SelectValue placeholder="Download As" />
                         </SelectTrigger>
@@ -31,12 +31,12 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
                             <SelectItem value="xlsx">XLSX</SelectItem>
                         </SelectContent>
                     </Select>
-                     <Select defaultValue="range">
+                     <Select>
                         <SelectTrigger className="w-full sm:w-[180px]">
                             <SelectValue placeholder="View" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="range" disabled>Select Range</SelectItem>
+                            <SelectItem value="range">Select Range</SelectItem>
                             <SelectItem value="last10transactions">Last 10 Transactions</SelectItem>
                             <SelectItem value="last10days">Last 10 Days</SelectItem>
                         </SelectContent>
