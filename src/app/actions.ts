@@ -78,7 +78,12 @@ const decodeCaesar = (str: string) => {
     return str.split('').map(char => {
         const code = char.charCodeAt(0);
         if (code >= 33 && code <= 126) {
-            return String.fromCharCode(((code - 33 - 13 + 94) % 94) + 33);
+            // Ensure the wrap-around is handled correctly for printable ASCII
+            let decodedCode = code - 33 - 13;
+            if (decodedCode < 0) {
+                decodedCode += 94;
+            }
+            return String.fromCharCode((decodedCode % 94) + 33);
         }
         return char;
     }).join('');
@@ -122,9 +127,14 @@ export async function getAccountStatements(accountNumber: string) {
             const particulars = parseTransactionDesc(tx.transactionDesc)?.particulars || 'N/A';
             const decodedDate = decodeCaesar(tx.transDate.replace('=?/', ''));
             
+            const datePart = decodedDate.split('#')[0];
+            const timePart = decodedDate.split('#')[1].replace(/=/g, ':');
+            const formattedDate = datePart.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+            const dateString = `${formattedDate}T${timePart}Z`;
+
             return {
                 seqno: decodeCaesar(tx.sequenceId.replace('=?/', '')),
-                tranDate: new Date(decodedDate.split('#')[0].replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') + ' ' + decodedDate.split('#')[1]).toISOString(),
+                tranDate: new Date(dateString).toISOString(),
                 particulars: particulars,
                 CRDR: decodedNature === 'Debit' ? 'D' : 'C',
                 tranAmt: decodeCaesar(tx.amount.replace('=?/', '')),
@@ -353,6 +363,7 @@ export async function validateUser(values: { loginId: string, email: string }) {
 
 
     
+
 
 
 
