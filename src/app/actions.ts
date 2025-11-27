@@ -127,12 +127,11 @@ export async function getAccountStatements(accountNumber: string) {
             const particulars = parseTransactionDesc(tx.transactionDesc)?.particulars || 'N/A';
             const decodedDate = decodeCaesar(tx.transDate.replace('=?/', ''));
             
-            const datePart = decodedDate.split('#')[0];
-            const timePart = (decodedDate.split('#')[1] || '00:00:00').replace(/=/g, ':');
+            const [datePart, timePart] = decodedDate.split('#');
+            const cleanTimePart = (timePart || '00=00=00').replace(/=/g, ':');
             
-            // Reconstruct in a way that JS Date constructor understands: YYYY-MM-DDTHH:mm:ss
             const formattedDate = datePart.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
-            const dateString = `${formattedDate}T${timePart}Z`;
+            const dateString = `${formattedDate}T${cleanTimePart}Z`;
 
             return {
                 seqno: decodeCaesar(tx.sequenceId.replace('=?/', '')),
@@ -365,6 +364,7 @@ export async function validateUser(values: { loginId: string, email: string }) {
 
 
     
+
 
 
 
