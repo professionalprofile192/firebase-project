@@ -106,7 +106,7 @@ export default function AccountStatementPage() {
 
   return (
     <DashboardLayout>
-      <main className="flex-1 p-4 sm:px-6 sm:py-4 gap-6 flex flex-col">
+      <main className="flex flex-1 flex-col p-4 sm:px-6 sm:py-4 gap-6 overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="col-span-1 lg:col-span-3">
                 <Card className="p-4 h-full">
@@ -132,7 +132,7 @@ export default function AccountStatementPage() {
                 {selectedAccount && <AccountDetails account={selectedAccount} />}
             </div>
         </div>
-        <div className="flex-1">
+        <div className="flex-1 overflow-hidden">
             <TransactionsList transactions={transactions} />
         </div>
       </main>
