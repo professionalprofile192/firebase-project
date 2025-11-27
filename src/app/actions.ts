@@ -128,7 +128,9 @@ export async function getAccountStatements(accountNumber: string) {
             const decodedDate = decodeCaesar(tx.transDate.replace('=?/', ''));
             
             const datePart = decodedDate.split('#')[0];
-            const timePart = decodedDate.split('#')[1].replace(/=/g, ':');
+            const timePart = (decodedDate.split('#')[1] || '00:00:00').replace(/=/g, ':');
+            
+            // Reconstruct in a way that JS Date constructor understands: YYYY-MM-DDTHH:mm:ss
             const formattedDate = datePart.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
             const dateString = `${formattedDate}T${timePart}Z`;
 
@@ -363,6 +365,7 @@ export async function validateUser(values: { loginId: string, email: string }) {
 
 
     
+
 
 
 
