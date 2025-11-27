@@ -73,6 +73,82 @@ export async function getAccounts(customerId: string, cif: string) {
     }
 }
 
+
+const decodeCaesar = (str: string) => {
+    return str.split('').map(char => {
+        const code = char.charCodeAt(0);
+        if (code >= 33 && code <= 126) {
+            return String.fromCharCode(((code - 33 - 13 + 94) % 94) + 33);
+        }
+        return char;
+    }).join('');
+};
+
+const parseTransactionDesc = (desc: string): { [key: string]: string } => {
+    const decodedDesc = decodeCaesar(desc);
+    const result: { [key: string]: string } = {};
+
+    decodedDesc.split('`/~').forEach(item => {
+        const parts = item.replace(/~%dwwulexwhOlvw%=/g, '').replace(/%/g, '').split('`/%wudqvdfwlrqGdwh%');
+        parts.forEach(part => {
+            const sections = part.split('~%dwwulexwhYdoxh%=');
+            if (sections.length > 1) {
+                const value = sections[1].split('%/%dwwulexwhNh|%=%');
+                if (value.length > 1) {
+                    result[value[1].replace(/%/g, '').toLowerCase()] = value[0];
+                }
+            }
+        });
+    });
+    return result;
+};
+
+
+export async function getAccountStatements(accountNumber: string) {
+     if (accountNumber === '060510224211') {
+        const response = {
+            "Account_Statements": [
+                {"amount": "43=?/","runningBalance": "484596:18=?/","sequenceId": "8<4<675<3:=?/", "transactionNature": "Fuhglw=?/","transDate": "5358044053#33=33=33=?/","transactionDesc": "~%dwwulexwhOlvw%=^~%dwwulexwhYdoxh%=%UDDVW#S5S#IW#IURP#V\\HG#EDVKLU#XO#KDVDQ#PHEO#DFFW=#SN4:PH]Q---------<<:#PVJLG=#DPH]QSNND336334435;;<<:5844536368%/%dwwulexwhNh|%=%SDUWLFXODUV%`/%wudqvdfwlrqGdwh%=%5358044053#33=33=33%=?/"},
+                {"amount": "8=?/","runningBalance": "484597518=?/","sequenceId": "8<4<693758=?/", "transactionNature": "Fuhglw=?/","transDate": "5358044053#33=33=33=?/","transactionDesc": "~%dwwulexwhOlvw%=^~%dwwulexwhYdoxh%=%XEO#GLJLWDO=LQWHUQDO#IXQGV#WUDQVIHU#IURP#V\\HG#EDVKLU0XO0KDVDQ##dqg##X]PD#+D2F#36<8----879;,#0#EDQN=#XEO%/%dwwulexwhNh|%=%SDUWLFXODUV%`/%wudqvdfwlrqGdwh%=%5358044053#33=33=33%=?/"},
+                {"amount": "5=?/","runningBalance": "484597718=?/","sequenceId": "8<53859665=?/", "transactionNature": "Fuhglw=?/","transDate": "5358044053#33=33=33=?/","transactionDesc": "~%dwwulexwhOlvw%=^~%dwwulexwhYdoxh%=%XEO#GLJLWDO=LQWHUQDO#IXQGV#WUDQVIHU#IURP#KXPQD#VDGLD#VDHHG#+D2F#3336----:974,#0#EDQN=#XEO%/%dwwulexwhNh|%=%SDUWLFXODUV%`/%wudqvdfwlrqGdwh%=%5358044053#33=33=33%=?/"},
+                {"amount": "4=?/","runningBalance": "484597818=?/","sequenceId": "8<53:44554=?/", "transactionNature": "Fuhglw=?/","transDate": "5358044053#33=33=33=?/","transactionDesc": "~%dwwulexwhOlvw%=^~%dwwulexwhYdoxh%=%XEO#GLJLWDO=LQWHUQDO#IXQGV#WUDQVIHU#IURP#KXPQD#VDGLD#VDHHG#+D2F#3336----:974,#0#EDQN=#XEO%/%dwwulexwhNh|%=%SDUWLFXODUV%`/%wudqvdfwlrqGdwh%=%5358044053#33=33=33%=?/"},
+                {"amount": "8333=?/","runningBalance": "483:97818=?/","sequenceId": "8<53:46964=?/", "transactionNature": "Ghelw=?/","transDate": "5358044053#33=33=33=?/","transactionDesc": "~%dwwulexwhOlvw%=^~%dwwulexwhYdoxh%=%FDVK#ZLWKGUDZDO#0#DWP#+EU=#4;:5,%/%dwwulexwhNh|%=%SDUWLFXODUV%`/%wudqvdfwlrqGdwh%=%5358044053#33=33=33%=?/"}
+            ],
+            "responseCode": "33=?/","opstatus": 0,"httpStatusCode": 0
+        };
+
+        const decodedTransactions = response.Account_Statements.map(tx => {
+            const decodedNature = decodeCaesar(tx.transactionNature.replace('=?/', ''));
+            const particulars = parseTransactionDesc(tx.transactionDesc)?.particulars || 'N/A';
+            const decodedDate = decodeCaesar(tx.transDate.replace('=?/', ''));
+            
+            return {
+                seqno: decodeCaesar(tx.sequenceId.replace('=?/', '')),
+                tranDate: new Date(decodedDate.split('#')[0].replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') + ' ' + decodedDate.split('#')[1]).toISOString(),
+                particulars: particulars,
+                CRDR: decodedNature === 'Debit' ? 'D' : 'C',
+                tranAmt: decodeCaesar(tx.amount.replace('=?/', '')),
+                runBal: decodeCaesar(tx.runningBalance.replace('=?/', '')),
+            }
+        });
+        
+        return {
+            "payments": decodedTransactions,
+            "opstatus": 0,
+            "httpStatusCode": 0
+        };
+    }
+     else {
+        return {
+            payments: [],
+            opstatus: 1,
+            httpStatusCode: 404,
+            message: 'Transactions not found for this account'
+        }
+    }
+}
+
+
 // This is a placeholder for the actual API call
 export async function getRecentTransactions(acctNo: string) {
     if (acctNo === '060510224211') {
@@ -277,5 +353,6 @@ export async function validateUser(values: { loginId: string, email: string }) {
 
 
     
+
 
 

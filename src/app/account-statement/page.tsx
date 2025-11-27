@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getAccounts, getRecentTransactions } from '../actions';
+import { getAccounts, getAccountStatements } from '../actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
@@ -25,7 +25,7 @@ type Account = {
 export type Transaction = {
     CRDR: 'C' | 'D';
     seqno: string;
-    instNo: string;
+    instNo?: string;
     tranAmt: string;
     tranDate: string;
     particulars: string;
@@ -38,19 +38,23 @@ export default function AccountStatementPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [transactionsLoading, setTransactionsLoading] = useState(false);
   const router = useRouter();
 
   const fetchTransactionsForAccount = async (acctNo: string) => {
+    setTransactionsLoading(true);
     try {
-        const recentTransactionsData = await getRecentTransactions(acctNo);
-        if (recentTransactionsData.opstatus === 0) {
-            setTransactions(recentTransactionsData.payments);
+        const statementsData = await getAccountStatements(acctNo);
+        if (statementsData.opstatus === 0) {
+            setTransactions(statementsData.payments);
         } else {
             setTransactions([]);
         }
     } catch (error) {
         console.error("Failed to fetch transactions for account", error);
         setTransactions([]);
+    } finally {
+        setTransactionsLoading(false);
     }
   }
 
@@ -66,8 +70,9 @@ export default function AccountStatementPage() {
             if (accountsData.opstatus === 0 && accountsData.payments.length > 0) {
                 const fetchedAccounts = accountsData.payments;
                 setAccounts(fetchedAccounts);
-                setSelectedAccount(fetchedAccounts[0]);
-                await fetchTransactionsForAccount(fetchedAccounts[0].ACCT_NO);
+                const initialAccount = fetchedAccounts[0];
+                setSelectedAccount(initialAccount);
+                await fetchTransactionsForAccount(initialAccount.ACCT_NO);
             }
         } catch (error) {
             console.error("Failed to fetch dashboard data", error);
@@ -133,7 +138,7 @@ export default function AccountStatementPage() {
             </div>
         </div>
         <div className="flex-1 overflow-hidden">
-            <TransactionsList transactions={transactions} />
+            <TransactionsList transactions={transactions} loading={transactionsLoading} />
         </div>
       </main>
     </DashboardLayout>

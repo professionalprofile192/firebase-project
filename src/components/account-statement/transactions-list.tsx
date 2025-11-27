@@ -9,9 +9,10 @@ import { TransactionCards } from "./transaction-cards";
 
 interface TransactionsListProps {
     transactions: Transaction[];
+    loading?: boolean;
 }
 
-export function TransactionsList({ transactions }: TransactionsListProps) {
+export function TransactionsList({ transactions, loading }: TransactionsListProps) {
     const isMobile = useIsMobile();
     
     return (
@@ -42,9 +43,9 @@ export function TransactionsList({ transactions }: TransactionsListProps) {
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden">
                 {isMobile ? (
-                    <TransactionCards transactions={transactions} />
+                    <TransactionCards transactions={transactions} loading={loading} />
                 ) : (
-                    <TransactionTable transactions={transactions} />
+                    <TransactionTable transactions={transactions} loading={loading} />
                 )}
             </CardContent>
         </Card>

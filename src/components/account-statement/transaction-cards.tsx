@@ -9,9 +9,11 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { Card, CardContent } from "../ui/card";
 import { ScrollArea } from "../ui/scroll-area";
+import { Skeleton } from "../ui/skeleton";
 
 interface TransactionCardsProps {
     transactions: Transaction[];
+    loading?: boolean;
 }
 
 const formatAmount = (amount: string) => new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(amount));
@@ -72,7 +74,21 @@ function TransactionCardItem({ transaction }: { transaction: Transaction }) {
     )
 }
 
-export function TransactionCards({ transactions }: TransactionCardsProps) {
+export function TransactionCards({ transactions, loading }: TransactionCardsProps) {
+    if (loading) {
+        return (
+            <div className="space-y-4 pr-4">
+                {[...Array(5)].map((_, i) => (
+                    <Card key={i}>
+                        <CardContent className="p-4">
+                            <Skeleton className="h-20 w-full" />
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        )
+    }
+    
     return (
         <ScrollArea className="h-full">
             <div className="space-y-4 pr-4">
