@@ -17,7 +17,7 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
     
     return (
         <Card className="h-full flex flex-col flex-1">
-            <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <CardHeader className="flex flex-col md:flex-row sm:flex-row items-start md:items-center sm:items-center justify-between gap-4">
                 <CardTitle className="text-base">Transactions</CardTitle>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                      <Select defaultValue="pdf">

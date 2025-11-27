@@ -44,7 +44,7 @@ function TransactionCardItem({ transaction }: { transaction: Transaction }) {
         <Card>
             <CardContent className="p-4">
                 <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-                    <div className="flex justify-between items-start gap-4">
+                    <div className="flex flex-wrap justify-between items-start gap-2">
                         <div className="flex-1 min-w-0">
                             <p className="text-sm text-muted-foreground">{format(date, 'dd/MM/yyyy')}</p>
                             <p className="font-medium text-sm break-words truncate" title={transaction.particulars}>
