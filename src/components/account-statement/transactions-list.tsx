@@ -26,7 +26,9 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="pdf">PDF</SelectItem>
-                            <SelectItem value="excel">Excel</SelectItem>
+                            <SelectItem value="csv">CSV</SelectItem>
+                            <SelectItem value="xls">XLS</SelectItem>
+                            <SelectItem value="xlsx">XLSX</SelectItem>
                         </SelectContent>
                     </Select>
                      <Select defaultValue="range">
