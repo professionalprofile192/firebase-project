@@ -16,7 +16,7 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
     const isMobile = useIsMobile();
     
     return (
-        <Card className="h-full flex flex-col">
+        <Card className="h-full flex flex-col flex-1">
             <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <CardTitle className="text-base">Transactions</CardTitle>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">

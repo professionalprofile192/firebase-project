@@ -113,7 +113,7 @@ export default function AccountStatementPage() {
     <DashboardLayout>
       <main className="flex flex-1 flex-col p-4 sm:px-6 sm:py-4 gap-6 overflow-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="col-span-1 lg:col-span-3">
+            <div className="lg:col-span-3">
                 <Card className="p-4 h-full">
                     <h3 className="text-sm font-semibold text-muted-foreground mb-2">Today's Snapshot</h3>
                      <Select
@@ -133,11 +133,11 @@ export default function AccountStatementPage() {
                     </Select>
                 </Card>
             </div>
-            <div className="col-span-1 lg:col-span-9">
+            <div className="lg:col-span-9">
                 {selectedAccount && <AccountDetails account={selectedAccount} />}
             </div>
         </div>
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden">
             <TransactionsList transactions={transactions} loading={transactionsLoading} />
         </div>
       </main>
