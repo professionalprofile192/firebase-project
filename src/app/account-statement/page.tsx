@@ -111,7 +111,8 @@ export default function AccountStatementPage() {
 
   return (
     <DashboardLayout>
-      <main className="flex flex-1 flex-col p-4 sm:px-6 sm:py-4 gap-6 h-full overflow-auto">
+      <main className="flex flex-1 flex-col p-4 sm:px-6 sm:py-4 gap-6 ">
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-3">
                 <Card className="p-4 h-full">
@@ -137,7 +138,7 @@ export default function AccountStatementPage() {
                 {selectedAccount && <AccountDetails account={selectedAccount} />}
             </div>
         </div>
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col w-full min-w-[360px] px-2 sm:px-0">
             <TransactionsList transactions={transactions} loading={transactionsLoading} />
         </div>
       </main>

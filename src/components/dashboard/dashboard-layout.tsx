@@ -80,7 +80,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 
     return (
         <>
-            <div className="flex h-screen w-full flex-col bg-muted/40">
+            <div className="flex min-h-screen w-full flex-col bg-muted/40 overflow-y-auto">
                 <Header />
                 {children}
             </div>

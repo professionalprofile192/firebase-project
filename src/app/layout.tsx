@@ -23,7 +23,8 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={cn("font-body antialiased h-full")}>
+      <body className={cn("font-body antialiased min-h-screen overflow-y-auto")}>
+
         {children}
         <Toaster />
       </body>

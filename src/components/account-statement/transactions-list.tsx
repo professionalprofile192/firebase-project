@@ -41,7 +41,7 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
                     </Select>
                 </div>
             </CardHeader>
-            <CardContent className="flex-1 overflow-hidden">
+            <CardContent className="flex-1 overflow-auto">
                 {isMobile ? (
                     <TransactionCards transactions={transactions} loading={loading} />
                 ) : (

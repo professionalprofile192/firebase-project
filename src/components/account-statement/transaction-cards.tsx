@@ -27,23 +27,36 @@ function TransactionCardItem({ transaction }: { transaction: Transaction }) {
         fromAccount: '060510224211',
     };
 
+    const truncateDescription = (description: string) => {
+        const parts = description.split(":");
+        if (parts.length > 1 && parts[0].startsWith('EB')) {
+            const firstPart = parts[0];
+            const secondPart = parts[1].split(' ')[0];
+            return `${firstPart}:${secondPart}...`;
+        }
+        if (description.length > 30) {
+            return `${description.substring(0, 30)}...`;
+        }
+        return description;
+    }
+
     return (
         <Card>
             <CardContent className="p-4">
                 <Collapsible open={isOpen} onOpenChange={setIsOpen}>
                     <div className="flex justify-between items-start gap-4">
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                             <p className="text-sm text-muted-foreground">{format(date, 'dd/MM/yyyy')}</p>
-                            <p className="font-medium text-sm break-words">{transaction.particulars}</p>
+                            <p className="font-medium text-sm break-words truncate" title={transaction.particulars}>
+                                {truncateDescription(transaction.particulars)}
+                            </p>
                         </div>
-                        <div className="flex flex-col items-end gap-2">
+                        <div className="flex flex-col items-end gap-2 shrink-0">
                              <Link href={{
                                 pathname: `/account-statement/${transaction.seqno}`,
                                 query: { tx: JSON.stringify(transactionData) }
-                            }} passHref legacyBehavior>
-                                <Button variant="outline" size="sm" asChild>
-                                    <a>View</a>
-                                </Button>
+                            }} passHref>
+                                <Button variant="outline" size="sm">View</Button>
                             </Link>
                             <CollapsibleTrigger asChild>
                                 <Button variant="ghost" size="sm" className="w-full justify-center">
