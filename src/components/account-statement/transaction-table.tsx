@@ -50,7 +50,7 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                                     <Link href={{
                                         pathname: `/account-statement/${tx.seqno}`,
                                         query: { tx: JSON.stringify(transactionData) }
-                                    }} passHref>
+                                    }} passHref legacyBehavior>
                                        <Button variant="outline" size="sm" asChild><a>View</a></Button>
                                     </Link>
                                 </TableCell>

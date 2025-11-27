@@ -38,7 +38,7 @@ function TransactionCardItem({ transaction }: { transaction: Transaction }) {
                              <Link href={{
                                 pathname: `/account-statement/${transaction.seqno}`,
                                 query: { tx: JSON.stringify(transactionData) }
-                            }} passHref>
+                            }} passHref legacyBehavior>
                                 <Button variant="outline" size="sm" asChild>
                                     <a>View</a>
                                 </Button>
