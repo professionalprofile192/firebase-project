@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getAccounts, getAccountStatements } from '../actions';
+import { getAccounts, getRecentTransactions } from '../actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
@@ -44,7 +44,7 @@ export default function AccountStatementPage() {
   const fetchTransactionsForAccount = async (acctNo: string) => {
     setTransactionsLoading(true);
     try {
-        const statementsData = await getAccountStatements(acctNo);
+        const statementsData = await getRecentTransactions(acctNo);
         if (statementsData.opstatus === 0) {
             setTransactions(statementsData.payments);
         } else {
