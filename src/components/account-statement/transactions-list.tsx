@@ -25,18 +25,18 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
                             <SelectValue placeholder="Download As" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="pdf">Download As: PDF</SelectItem>
-                            <SelectItem value="excel">Download As: Excel</SelectItem>
+                            <SelectItem value="pdf">PDF</SelectItem>
+                            <SelectItem value="excel">Excel</SelectItem>
                         </SelectContent>
                     </Select>
-                     <Select defaultValue="all">
-                        <SelectTrigger className="w-full sm:w-[120px]">
+                     <Select defaultValue="range">
+                        <SelectTrigger className="w-full sm:w-[180px]">
                             <SelectValue placeholder="View" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">View: All</SelectItem>
-                            <SelectItem value="debit">View: Debit</SelectItem>
-                            <SelectItem value="credit">View: Credit</SelectItem>
+                            <SelectItem value="range" disabled>Select Range</SelectItem>
+                            <SelectItem value="last10transactions">Last 10 Transactions</SelectItem>
+                            <SelectItem value="last10days">Last 10 Days</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
