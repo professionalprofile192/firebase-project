@@ -127,15 +127,29 @@ export async function getAccountStatements(accountNumber: string) {
             const particulars = parseTransactionDesc(tx.transactionDesc)?.particulars || 'N/A';
             const decodedDate = decodeCaesar(tx.transDate.replace('=?/', ''));
             
-            const [datePart, timePart] = decodedDate.split('#');
-            const cleanTimePart = (timePart || '00=00=00').replace(/=/g, ':');
-            
-            const formattedDate = datePart.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
-            const dateString = `${formattedDate}T${cleanTimePart}Z`;
+            let date;
+            try {
+                const [datePart, timePart] = decodedDate.split('#');
+                if (datePart && datePart.length === 8) {
+                    const year = datePart.substring(0, 4);
+                    const month = datePart.substring(4, 6);
+                    const day = datePart.substring(6, 8);
+                    const cleanTime = (timePart || '00=00=00').replace(/=/g, ':');
+                    const dateString = `${year}-${month}-${day}T${cleanTime}Z`;
+                    date = new Date(dateString);
+                    if (isNaN(date.getTime())) {
+                        throw new Error('Invalid date created');
+                    }
+                } else {
+                    throw new Error('Invalid date part');
+                }
+            } catch (e) {
+                date = new Date(); // Fallback to current date
+            }
 
             return {
                 seqno: decodeCaesar(tx.sequenceId.replace('=?/', '')),
-                tranDate: new Date(dateString).toISOString(),
+                tranDate: date.toISOString(),
                 particulars: particulars,
                 CRDR: decodedNature === 'Debit' ? 'D' : 'C',
                 tranAmt: decodeCaesar(tx.amount.replace('=?/', '')),
@@ -364,6 +378,7 @@ export async function validateUser(values: { loginId: string, email: string }) {
 
 
     
+
 
 
 
