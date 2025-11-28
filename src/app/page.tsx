@@ -37,6 +37,7 @@ export default function LoginPage() {
             alt="UBL Digital Logo"
             width={100}
             height={100}
+            priority
             className="
               rounded-lg shadow-md
               sm:w-16 sm:h-16
