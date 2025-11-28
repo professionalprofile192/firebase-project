@@ -131,27 +131,28 @@
 }
 
 @media print {
-  body {
-    background-color: white;
+  body, html {
+    visibility: visible;
+    background: white;
   }
   .printable-container {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
+    height: 100%;
     padding: 2rem;
-  }
-  .printable {
-    visibility: visible;
-  }
-  .printable * {
+    background: white;
     visibility: visible;
   }
   .no-print, .no-print * {
     display: none !important;
-    visibility: hidden;
   }
-  body * {
-    visibility: hidden;
+  body > * {
+    display: none;
+  }
+  .printable-container, .printable-container * {
+    display: block;
+    visibility: visible;
   }
 }
