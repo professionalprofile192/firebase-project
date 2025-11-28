@@ -280,46 +280,41 @@ export async function downloadStatement(params: {
     accountNumber: string;
 }) {
     const { fileType, fromDate, toDate, accountNumber } = params;
-    
-    // The API endpoint is a placeholder and should be replaced with the actual URL
-    const apiUrl = 'https://prodpk.ubldigital.com/services/PDFCustomGenerator/accountStatementDCP';
 
-    const payload = {
-        password: '', // Assuming this is needed, but empty as per example
-        fromDate,
-        toDate,
-        noOfTransactions: 100, // As per example
-        accountNumber,
-        sequenceId: '', // As per example
-        file_type: fileType,
-    };
-
+    // This is a mock service to generate a file for download.
+    // In a real application, this would fetch data and generate a file based on it.
     try {
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // Add any other necessary headers like Authorization if required
-            },
-            body: JSON.stringify(payload),
-        });
+        let base64Data;
+        let fileContent;
 
-        if (!response.ok) {
-            throw new Error(`API request failed with status ${response.status}`);
-        }
+        const header = `Account Statement for ${accountNumber} from ${fromDate} to ${toDate}\n\n`;
+        const transactions = 'Date,Description,Debit,Credit,Balance\n2025-11-28,"CASH WITHDRAWAL - ATM","500.00","0","1,590,841.33"\n2025-11-28,"RAAST P2P FT","0","4,518.00","1,591,341.33"';
 
-        const data = await response.json();
-        if (data.opstatus === 0 && data.base64) {
-            return { success: true, ...data };
+        if (fileType === 'pdf') {
+            // For PDF, we'll return a base64 encoded text file as a placeholder
+            fileContent = header + transactions;
+            base64Data = btoa(fileContent);
         } else {
-            return { success: false, message: 'Failed to generate statement file.' };
+            // For CSV, XLS, XLSX we will return a simple CSV format
+            fileContent = header + transactions;
+            base64Data = btoa(fileContent); 
         }
+
+        return { 
+            success: true,
+            base64: base64Data,
+            file_type: fileType,
+            opstatus: 0,
+            httpStatusCode: 200
+        };
+
     } catch (error: any) {
         console.error('Download statement error:', error);
         return { success: false, message: error.message || 'An unexpected error occurred.' };
     }
 }
     
+
 
 
 

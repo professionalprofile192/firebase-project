@@ -47,7 +47,22 @@ export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNum
             });
 
             if (response.success && response.base64) {
-                const mimeType = fileType === 'pdf' ? 'application/pdf' : `text/${fileType}`;
+                let mimeType;
+                switch (fileType) {
+                    case 'pdf':
+                        mimeType = 'application/pdf';
+                        break;
+                    case 'csv':
+                        mimeType = 'text/csv';
+                        break;
+                    case 'xls':
+                    case 'xlsx':
+                         mimeType = 'application/vnd.ms-excel';
+                        break;
+                    default:
+                        mimeType = 'application/octet-stream';
+                }
+
                 const byteCharacters = atob(response.base64);
                 const byteNumbers = new Array(byteCharacters.length);
                 for (let i = 0; i < byteCharacters.length; i++) {
