@@ -20,10 +20,10 @@ export function AccountDetails({ account }: AccountDetailsProps) {
 
     return (
         <Card>
-            <CardHeader>
+            <CardHeader className="bg-muted/50 p-4">
                 <CardTitle className="text-base">Details</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="col-span-1">
                         <p className="font-semibold">{account.ACCT_TITLE}</p>

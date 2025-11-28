@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getAccounts, getRecentTransactions } from '../actions';
+import { getRecentTransactions } from '../actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card } from '@/components/ui/card';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { AccountDetails } from '@/components/account-statement/account-details';
 import { TransactionsList } from '@/components/account-statement/transactions-list';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
@@ -59,28 +59,22 @@ export default function AccountStatementPage() {
   }
 
   useEffect(() => {
-    const profile = sessionStorage.getItem('userProfile');
-    if (profile) {
-      const parsedProfile = JSON.parse(profile);
-      setUserProfile(parsedProfile);
+    const profileString = sessionStorage.getItem('userProfile');
+    const accountsString = sessionStorage.getItem('accounts');
 
-      const fetchData = async () => {
-        try {
-            const accountsData = await getAccounts(parsedProfile.userid, parsedProfile.CIF_NO);
-            if (accountsData.opstatus === 0 && accountsData.payments.length > 0) {
-                const fetchedAccounts = accountsData.payments;
-                setAccounts(fetchedAccounts);
-                const initialAccount = fetchedAccounts[0];
-                setSelectedAccount(initialAccount);
-                await fetchTransactionsForAccount(initialAccount.ACCT_NO);
-            }
-        } catch (error) {
-            console.error("Failed to fetch dashboard data", error);
-        } finally {
-            setLoading(false);
-        }
-      };
-      fetchData();
+    if (profileString && accountsString) {
+      const parsedProfile = JSON.parse(profileString);
+      const parsedAccounts = JSON.parse(accountsString);
+
+      setUserProfile(parsedProfile);
+      setAccounts(parsedAccounts);
+      
+      if (parsedAccounts.length > 0) {
+        const initialAccount = parsedAccounts[0];
+        setSelectedAccount(initialAccount);
+        fetchTransactionsForAccount(initialAccount.ACCT_NO);
+      }
+      setLoading(false);
     } else {
         router.push('/');
     }
@@ -111,27 +105,31 @@ export default function AccountStatementPage() {
 
   return (
     <DashboardLayout>
-      <main className="flex flex-1 flex-col p-4 sm:px-6 sm:py-4 gap-6 ">
+      <main className="flex flex-1 flex-col p-4 sm:px-6 sm:py-4 gap-6 h-screen">
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-3">
-                <Card className="p-4 h-full">
-                    <h3 className="text-sm font-semibold text-muted-foreground mb-2">Today's Snapshot</h3>
-                     <Select
-                        value={selectedAccount?.ACCT_NO}
-                        onValueChange={handleAccountChange}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select Account Type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                             {accounts.map((account) => (
-                                <SelectItem key={account.ACCT_NO} value={account.ACCT_NO}>
-                                    {account.DEPOSIT_TYPE === 'S' ? 'Saving' : 'Current'} - {account.ACCT_NO}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                <Card>
+                    <CardHeader className="bg-muted/50 p-4">
+                      <h3 className="text-sm font-semibold text-muted-foreground">Today's Snapshot</h3>
+                    </CardHeader>
+                    <CardContent className='p-4'>
+                      <Select
+                          value={selectedAccount?.ACCT_NO}
+                          onValueChange={handleAccountChange}
+                      >
+                          <SelectTrigger>
+                              <SelectValue placeholder="Select Account Type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                              {accounts.map((account) => (
+                                  <SelectItem key={account.ACCT_NO} value={account.ACCT_NO}>
+                                      {account.DEPOSIT_TYPE === 'S' ? 'Saving' : 'Current'} - {account.ACCT_NO}
+                                  </SelectItem>
+                              ))}
+                          </SelectContent>
+                      </Select>
+                    </CardContent>
                 </Card>
             </div>
             <div className="lg:col-span-9">
