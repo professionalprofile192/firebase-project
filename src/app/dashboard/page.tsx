@@ -66,6 +66,7 @@ export default function DashboardPage() {
             const accountsData = await getAccounts(parsedProfile.userid, parsedProfile.CIF_NO);
             if (accountsData.opstatus === 0 && accountsData.payments.length > 0) {
                 setAccounts(accountsData.payments);
+                sessionStorage.setItem('accounts', JSON.stringify(accountsData.payments));
                 await fetchTransactionsForAccount(accountsData.payments[0].ACCT_NO);
             }
         } catch (error) {
