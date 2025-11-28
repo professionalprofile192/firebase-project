@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -78,7 +79,7 @@ export default function AccountStatementPage() {
     } else {
         router.push('/');
     }
-  }, [router, fetchTransactionsForAccount]);
+  }, [fetchTransactionsForAccount]);
   
   const handleAccountChange = (acctNo: string) => {
     const account = accounts.find(a => a.ACCT_NO === acctNo);
@@ -87,6 +88,10 @@ export default function AccountStatementPage() {
         fetchTransactionsForAccount(acctNo);
     }
   };
+
+  const formatCurrency = (amount: string) => {
+    return `PKR ${new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(amount))}`;
+  }
 
 
   if (loading || !userProfile) {
@@ -119,12 +124,18 @@ export default function AccountStatementPage() {
                           onValueChange={handleAccountChange}
                       >
                           <SelectTrigger>
-                              <SelectValue placeholder="Select Account Type" />
+                            <SelectValue>
+                                {selectedAccount ? `${selectedAccount.DEPOSIT_TYPE === 'S' ? 'Saving' : 'Current'} - ${selectedAccount.ACCT_NO}` : "Select Account Type"}
+                            </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
                               {accounts.map((account) => (
                                   <SelectItem key={account.ACCT_NO} value={account.ACCT_NO}>
-                                      {account.DEPOSIT_TYPE === 'S' ? 'Saving' : 'Current'} - {account.ACCT_NO}
+                                      <div className="bg-primary text-primary-foreground p-3 rounded-md my-1">
+                                        <p className="font-semibold">{account.ACCT_TITLE}</p>
+                                        <p className="text-sm">{account.ACCT_NO}</p>
+                                        <p className="text-lg font-bold mt-2">{formatCurrency(account.AVAIL_BAL)}</p>
+                                      </div>
                                   </SelectItem>
                               ))}
                           </SelectContent>
