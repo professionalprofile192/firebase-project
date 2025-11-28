@@ -285,25 +285,36 @@ export async function downloadStatement(params: {
     // In a real application, this would fetch data and generate a file based on it.
     try {
         let base64Data;
-        let fileContent;
-
-        const header = `Account Statement for ${accountNumber} from ${fromDate} to ${toDate}\n\n`;
-        const transactions = 'Date,Description,Debit,Credit,Balance\n2025-11-28,"CASH WITHDRAWAL - ATM","500.00","0","1,590,841.33"\n2025-11-28,"RAAST P2P FT","0","4,518.00","1,591,341.33"';
+        let mimeType;
 
         if (fileType === 'pdf') {
-            // For PDF, we'll return a base64 encoded text file as a placeholder
-            fileContent = header + transactions;
-            base64Data = btoa(fileContent);
+            // A valid, minimal PDF file encoded in Base64
+            base64Data = 'JVBERi0xLjQKJfbk/N8KMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovT3V0bGluZXMgMiAwIFIKL1BhZ2VzIDMgMCBSCi9QYWdlTW9kZSAvVXNlT3V0bGluZXMKL1ZpZXdlclByZWZlcmVuY2VzIDw8Ci9GaXQgV2luZG93IHRydWUKPj4KPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL091dGxpbmVzCi9Db3VudCAwCj4+CmVuZG9iagozIDAgb2JqCjw8Ci9UeXBlIC9QYWdlcwovS2lkcyBbNCAwIFJdCi9Db3VudCAxCi9NZWRpYUJveCBbMCAwIDU5NSA4NDJdCj4+CmVuZG9iago0IDAgb2JqCjw8Ci9UeXBlIC9QYWdlCi9QYXJlbnQgMyAwIFIKL1JvdGF0ZSAwCi9Db250ZW50cyA1IDAgUgovUmVzb3VyY2VzIDw8Ci9Gb250IDw8Ci9GMSA2IDAgUgovRmEuIDw8Ci9GMSA2IDAgUgovRmIgIDw8Ci9GMSA2IDAgUgovRmMuIDw8Ci9GMSA2IDAgUgovRmQuIDw8Ci9GMSA2IDAgUgovRmUuIDw8Ci9GMSA2IDAgUgovRmYuIDw8Ci9GMSA2IDAgUgo+Pgo+Pgo+Pgo+PgplbmRvYmoKNSAwIG9iago8PAovTGVuZ3RoIDE0NQo+PgpzdHJlYW0KMSAwIDAgLTEgMCA4NDIgY20KLjYwMCAwIDAgLjYwMCAwIDAgY20KQlQKMCBUZAooQWNjb3VudCBTdGF0ZW1lbnQgZm9yIC0gYWNjb3VudE51bWJlcjogKSBUagplbmRzdHJlYW0KZW5kb2JqCjYgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL1N1YnR5cGUgL1R5cGUxCi9CYXNlRm9udCAvSGVsdmV0aWNhCi9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nCj4+CmVuZG9iagp4cmVmCjAgOAowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA5MyAwMDAwMCBuIAowMDAwMDAwMTQ4IDAwMDAwIG4gCjAwMDAwMDAyMzAgMDAwMDAgbiAKMDAwMDAwMDM3OCAwMDAwMCBuIAowMDAwMDAwNTA5IDAwMDAwIG4gCnRyYWlsZXIKPDwKL1NpemUgOAovUm9vdCAxIDAgUgovSW5mbyA3IDAgUgo+PgpzdGFydHhyZWYKNzE5CiUlRU9GCg==';
+            mimeType = 'application/pdf';
         } else {
-            // For CSV, XLS, XLSX we will return a simple CSV format
-            fileContent = header + transactions;
-            base64Data = btoa(fileContent); 
+            const header = `Account Statement for ${accountNumber} from ${fromDate} to ${toDate}\n\n`;
+            const transactions = 'Date,Description,Debit,Credit,Balance\n2025-11-28,"CASH WITHDRAWAL - ATM","500.00","0","1,590,841.33"\n2025-11-28,"RAAST P2P FT","0","4,518.00","1,591,341.33"';
+            const fileContent = header + transactions;
+            base64Data = btoa(fileContent);
+            
+            switch (fileType) {
+                case 'csv':
+                    mimeType = 'text/csv';
+                    break;
+                case 'xls':
+                case 'xlsx':
+                     mimeType = 'application/vnd.ms-excel';
+                    break;
+                default:
+                    mimeType = 'application/octet-stream';
+            }
         }
 
         return { 
             success: true,
             base64: base64Data,
-            file_type: fileType,
+            mimeType,
+            fileType,
             opstatus: 0,
             httpStatusCode: 200
         };
@@ -315,12 +326,4 @@ export async function downloadStatement(params: {
 }
     
 
-
-
-
-
-
-
-
-
-
+    

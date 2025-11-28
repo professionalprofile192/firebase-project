@@ -46,30 +46,14 @@ export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNum
                 accountNumber,
             });
 
-            if (response.success && response.base64) {
-                let mimeType;
-                switch (fileType) {
-                    case 'pdf':
-                        mimeType = 'application/pdf';
-                        break;
-                    case 'csv':
-                        mimeType = 'text/csv';
-                        break;
-                    case 'xls':
-                    case 'xlsx':
-                         mimeType = 'application/vnd.ms-excel';
-                        break;
-                    default:
-                        mimeType = 'application/octet-stream';
-                }
-
+            if (response.success && response.base64 && response.mimeType) {
                 const byteCharacters = atob(response.base64);
                 const byteNumbers = new Array(byteCharacters.length);
                 for (let i = 0; i < byteCharacters.length; i++) {
                     byteNumbers[i] = byteCharacters.charCodeAt(i);
                 }
                 const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: mimeType });
+                const blob = new Blob([byteArray], { type: response.mimeType });
                 
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
@@ -174,9 +158,11 @@ export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNum
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleAction} disabled={isDownloading}>{buttonText}</Button>
+          <Button onClick={handleAction} disabled={!fromDate || !toDate || isDownloading}>{buttonText}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
+
+    
