@@ -110,8 +110,8 @@ export default function AccountStatementPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-3">
                 <Card>
-                    <CardHeader className="bg-muted/50 p-4">
-                      <h3 className="text-sm font-semibold text-muted-foreground">Today's Snapshot</h3>
+                    <CardHeader className="bg-[#007DC5]/50 p-4 rounded-md">
+                      <h3 className="text-sm font-semibold text-gray-700">Today's Snapshot</h3>
                     </CardHeader>
                     <CardContent className='p-4'>
                       <Select

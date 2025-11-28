@@ -16,9 +16,9 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
     const isMobile = useIsMobile();
     
     return (
-        <Card className="h-full flex flex-col flex-1">
-            <CardHeader className="flex flex-col md:flex-row sm:flex-row items-start md:items-center sm:items-center justify-between gap-4 bg-muted/50 p-4">
-                <CardTitle className="text-base">Transactions</CardTitle>
+        <Card className="h-full flex flex-col flex-1 rounded-md">
+            <CardHeader className="flex flex-col md:flex-row sm:flex-row rounded-md items-start md:items-center sm:items-center justify-between bg-[#007DC5]/50 p-3">
+                <CardTitle className="text-[18px] text-gray-700 ml-9">Transactions</CardTitle>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                      <Select>
                         <SelectTrigger className="w-full sm:w-[150px]">

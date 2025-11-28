@@ -20,8 +20,8 @@ export function AccountDetails({ account }: AccountDetailsProps) {
 
     return (
         <Card>
-            <CardHeader className="bg-muted/50 p-4">
-                <CardTitle className="text-base">Details</CardTitle>
+            <CardHeader className="bg-[#007DC5]/50 p-4 rounded-md">
+                <CardTitle className="text-base text-gray-700">Details</CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -47,16 +47,15 @@ export function AccountDetails({ account }: AccountDetailsProps) {
                             <p className="text-sm text-muted-foreground">Total Reserved Amount</p>
                             <p className="font-semibold">PKR 0.00</p>
                         </div>
-                         <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
-                            <div className="sm:text-right">
+                            <div>
                                 <p className="text-sm text-muted-foreground">Current Balance:</p>
                                 <p className="font-semibold text-primary">{formatCurrency(account.LEDGER_BAL)}</p>
                             </div>
-                            <div className="sm:text-right">
+                            <div>
                                 <p className="text-sm text-muted-foreground">Available Balance:</p>
                                 <p className="font-semibold text-primary">{formatCurrency(account.AVAIL_BAL)}</p>
                             </div>
-                        </div>
+                        
                     </div>
                 </div>
             </CardContent>
