@@ -131,19 +131,27 @@
 }
 
 @media print {
-  body * {
-    visibility: hidden;
+  body {
+    background-color: white;
   }
-  .printable, .printable * {
-    visibility: visible;
-  }
-  .printable {
+  .printable-container {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
+    padding: 2rem;
   }
-  .no-print {
-    display: none;
+  .printable {
+    visibility: visible;
+  }
+  .printable * {
+    visibility: visible;
+  }
+  .no-print, .no-print * {
+    display: none !important;
+    visibility: hidden;
+  }
+  body * {
+    visibility: hidden;
   }
 }
