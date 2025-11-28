@@ -565,12 +565,15 @@ export class Gradient {
           requestAnimationFrame(this.animate);
       }),
       e(this, 'addIsLoadedClass', () => {
-        this.isLoadedClass ||
-          ((this.isLoadedClass = !0),
-          this.el.classList.add('isLoaded'),
+        if (!this.isLoadedClass) {
+          this.isLoadedClass = true;
+          this.el.classList.add('isLoaded');
           setTimeout(() => {
-            this.el.parentElement.classList.add('isLoaded');
-          }, 3e3));
+            if (this.el && this.el.parentElement) {
+              this.el.parentElement.classList.add('isLoaded');
+            }
+          }, 3000);
+        }
       }),
       e(this, 'pause', () => {
         this.conf.playing = false;
