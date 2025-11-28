@@ -79,7 +79,7 @@ export default function DashboardPage() {
     } else {
         router.push('/');
     }
-  }, [router]);
+  }, []);
 
   if (loading || !userProfile) {
     return (
