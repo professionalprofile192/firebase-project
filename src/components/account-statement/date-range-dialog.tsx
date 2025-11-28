@@ -13,25 +13,29 @@ import { Label } from '../ui/label';
 interface DateRangeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  mode: 'view' | 'download';
 }
 
-export function DateRangeDialog({ open, onOpenChange }: DateRangeDialogProps) {
+export function DateRangeDialog({ open, onOpenChange, mode }: DateRangeDialogProps) {
   const [fromDate, setFromDate] = useState<Date | undefined>();
   const [toDate, setToDate] = useState<Date | undefined>();
 
-  const handleView = () => {
+  const handleAction = () => {
     // Logic to handle viewing/downloading transactions for the selected date range
-    console.log('From:', fromDate, 'To:', toDate);
+    console.log('Mode:', mode, 'From:', fromDate, 'To:', toDate);
     onOpenChange(false);
   };
+
+  const title = mode === 'download' ? "Download Transaction" : "View Transactions";
+  const buttonText = mode === 'download' ? "Download" : "View";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-center">View Transactions</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-center">{title}</DialogTitle>
           <DialogDescription className="text-center">
-            Please select the date to initiate view.
+            Please select the date to initiate.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -100,7 +104,7 @@ export function DateRangeDialog({ open, onOpenChange }: DateRangeDialogProps) {
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleView}>View</Button>
+          <Button onClick={handleAction}>{buttonText}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -17,9 +17,11 @@ interface TransactionsListProps {
 export function TransactionsList({ transactions, loading }: TransactionsListProps) {
     const isMobile = useIsMobile();
     const [showDateRangeDialog, setShowDateRangeDialog] = useState(false);
+    const [dialogMode, setDialogMode] = useState<'view' | 'download'>('view');
     
     const handleViewChange = (value: string) => {
         if (value === 'range') {
+            setDialogMode('view');
             setShowDateRangeDialog(true);
         }
         // Handle other view options if necessary
@@ -28,6 +30,7 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
     const handleDownload = (value: string) => {
         // Any download option will trigger the date range dialog
         if (value) {
+            setDialogMode('download');
             setShowDateRangeDialog(true);
         }
     }
@@ -69,7 +72,11 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
                     )}
                 </CardContent>
             </Card>
-            <DateRangeDialog open={showDateRangeDialog} onOpenChange={setShowDateRangeDialog} />
+            <DateRangeDialog 
+                open={showDateRangeDialog} 
+                onOpenChange={setShowDateRangeDialog} 
+                mode={dialogMode}
+            />
         </>
     )
 }
