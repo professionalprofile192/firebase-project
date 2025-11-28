@@ -10,6 +10,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { AccountDetails } from '@/components/account-statement/account-details';
 import { TransactionsList } from '@/components/account-statement/transactions-list';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
+import { subDays, isAfter } from 'date-fns';
 
 type Account = {
     responseCode: string;
@@ -36,7 +37,8 @@ export type Transaction = {
 export default function AccountStatementPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
+  const [displayedTransactions, setDisplayedTransactions] = useState<Transaction[]>([]);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [transactionsLoading, setTransactionsLoading] = useState(false);
@@ -47,13 +49,16 @@ export default function AccountStatementPage() {
     try {
         const statementsData = await getRecentTransactions(acctNo, 30); // Fetch more for statement
         if (statementsData.opstatus === 0) {
-            setTransactions(statementsData.payments);
+            setAllTransactions(statementsData.payments);
+            setDisplayedTransactions(statementsData.payments); // Initially display all
         } else {
-            setTransactions([]);
+            setAllTransactions([]);
+            setDisplayedTransactions([]);
         }
     } catch (error) {
         console.error("Failed to fetch transactions for account", error);
-        setTransactions([]);
+        setAllTransactions([]);
+        setDisplayedTransactions([]);
     } finally {
         setTransactionsLoading(false);
     }
@@ -88,6 +93,20 @@ export default function AccountStatementPage() {
         fetchTransactionsForAccount(acctNo);
     }
   };
+
+  const handleViewFilterChange = (filter: string) => {
+    if (filter === 'last10transactions') {
+      const last10 = allTransactions.slice(0, 10);
+      setDisplayedTransactions(last10);
+    } else if (filter === 'last10days') {
+      const tenDaysAgo = subDays(new Date(), 10);
+      const last10Days = allTransactions.filter(tx => isAfter(new Date(tx.tranDate), tenDaysAgo));
+      setDisplayedTransactions(last10Days);
+    } else if (filter === 'all') { // To reset filter
+      setDisplayedTransactions(allTransactions);
+    }
+  };
+
 
   const formatCurrency = (amount: string) => {
     return `PKR ${new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(amount))}`;
@@ -148,7 +167,11 @@ export default function AccountStatementPage() {
             </div>
         </div>
         <div className="flex-1 flex flex-col w-full min-w-[360px] px-2 sm:px-0">
-            <TransactionsList transactions={transactions} loading={transactionsLoading} />
+            <TransactionsList 
+                transactions={displayedTransactions} 
+                loading={transactionsLoading}
+                onViewChange={handleViewFilterChange} 
+            />
         </div>
       </main>
     </DashboardLayout>

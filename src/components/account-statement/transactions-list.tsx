@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,22 +13,24 @@ import { DateRangeDialog } from "./date-range-dialog";
 interface TransactionsListProps {
     transactions: Transaction[];
     loading?: boolean;
+    onViewChange?: (value: string) => void;
 }
 
-export function TransactionsList({ transactions, loading }: TransactionsListProps) {
+export function TransactionsList({ transactions, loading, onViewChange }: TransactionsListProps) {
     const isMobile = useIsMobile();
     const [showDateRangeDialog, setShowDateRangeDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'view' | 'download'>('view');
     const [downloadValue, setDownloadValue] = useState('');
     const [viewValue, setViewValue] = useState('');
     
-    const handleViewChange = (value: string) => {
+    const handleViewSelectChange = (value: string) => {
         setViewValue(value);
         if (value === 'range') {
             setDialogMode('view');
             setShowDateRangeDialog(true);
+        } else if (onViewChange) {
+            onViewChange(value);
         }
-        // Handle other view options if necessary
     }
 
     const handleDownload = (value: string) => {
@@ -44,6 +47,9 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
         if (!open) {
             setDownloadValue('');
             setViewValue('');
+            if (onViewChange) {
+                onViewChange('all'); // Reset to show all transactions
+            }
         }
     }
 
@@ -65,7 +71,7 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
                                 <SelectItem value="xlsx">XLSX</SelectItem>
                             </SelectContent>
                         </Select>
-                        <Select onValueChange={handleViewChange} value={viewValue}>
+                        <Select onValueChange={handleViewSelectChange} value={viewValue}>
                             <SelectTrigger className="w-full sm:w-[180px]">
                                 <SelectValue placeholder="View" />
                             </SelectTrigger>
