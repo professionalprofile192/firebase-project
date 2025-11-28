@@ -5,7 +5,7 @@ import { MyAccounts } from '@/components/dashboard/my-accounts';
 import { RecentTransactions } from '@/components/dashboard/recent-transactions';
 import { Notifications } from '@/components/dashboard/notifications';
 import { ChartCard } from '@/components/dashboard/chart-card';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAccounts, getRecentTransactions } from '../actions';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -40,7 +40,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const fetchTransactionsForAccount = async (acctNo: string) => {
+  const fetchTransactionsForAccount = useCallback(async (acctNo: string) => {
     try {
         const recentTransactionsData = await getRecentTransactions(acctNo);
         if (recentTransactionsData.opstatus === 0) {
@@ -53,7 +53,7 @@ export default function DashboardPage() {
         console.error("Failed to fetch transactions for account", error);
         setTransactions([]);
     }
-  }
+  }, []);
 
   useEffect(() => {
     const profile = sessionStorage.getItem('userProfile');
@@ -79,7 +79,7 @@ export default function DashboardPage() {
     } else {
         router.push('/');
     }
-  }, []);
+  }, [fetchTransactionsForAccount, router]);
 
   if (loading || !userProfile) {
     return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getRecentTransactions } from '../actions';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -41,7 +41,7 @@ export default function AccountStatementPage() {
   const [transactionsLoading, setTransactionsLoading] = useState(false);
   const router = useRouter();
 
-  const fetchTransactionsForAccount = async (acctNo: string) => {
+  const fetchTransactionsForAccount = useCallback(async (acctNo: string) => {
     setTransactionsLoading(true);
     try {
         const statementsData = await getRecentTransactions(acctNo, 30); // Fetch more for statement
@@ -56,7 +56,7 @@ export default function AccountStatementPage() {
     } finally {
         setTransactionsLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     const profileString = sessionStorage.getItem('userProfile');
@@ -78,7 +78,7 @@ export default function AccountStatementPage() {
     } else {
         router.push('/');
     }
-  }, [router]);
+  }, [router, fetchTransactionsForAccount]);
   
   const handleAccountChange = (acctNo: string) => {
     const account = accounts.find(a => a.ACCT_NO === acctNo);
@@ -110,7 +110,7 @@ export default function AccountStatementPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-3">
                 <Card>
-                    <CardHeader className="bg-[#007DC5]/50 p-4 rounded-md">
+                    <CardHeader className="bg-[#f2f2f2] p-4 rounded-t-lg">
                       <h3 className="text-sm font-semibold text-gray-700">Today's Snapshot</h3>
                     </CardHeader>
                     <CardContent className='p-4'>
