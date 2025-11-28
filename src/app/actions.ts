@@ -273,11 +273,54 @@ export async function validateUser(values: { loginId: string, email: string }) {
     }
 }
 
-
-
-
-
+export async function downloadStatement(params: {
+    fileType: string;
+    fromDate: string;
+    toDate: string;
+    accountNumber: string;
+}) {
+    const { fileType, fromDate, toDate, accountNumber } = params;
     
+    // The API endpoint is a placeholder and should be replaced with the actual URL
+    const apiUrl = 'https://prodpk.ubldigital.com/services/PDFCustomGenerator/accountStatementDCP';
+
+    const payload = {
+        password: '', // Assuming this is needed, but empty as per example
+        fromDate,
+        toDate,
+        noOfTransactions: 100, // As per example
+        accountNumber,
+        sequenceId: '', // As per example
+        file_type: fileType,
+    };
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add any other necessary headers like Authorization if required
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.opstatus === 0 && data.base64) {
+            return { success: true, ...data };
+        } else {
+            return { success: false, message: 'Failed to generate statement file.' };
+        }
+    } catch (error: any) {
+        console.error('Download statement error:', error);
+        return { success: false, message: error.message || 'An unexpected error occurred.' };
+    }
+}
+    
+
 
 
 

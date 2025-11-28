@@ -14,9 +14,10 @@ interface TransactionsListProps {
     transactions: Transaction[];
     loading?: boolean;
     onViewChange?: (value: string) => void;
+    accountNumber?: string;
 }
 
-export function TransactionsList({ transactions, loading, onViewChange }: TransactionsListProps) {
+export function TransactionsList({ transactions, loading, onViewChange, accountNumber }: TransactionsListProps) {
     const isMobile = useIsMobile();
     const [showDateRangeDialog, setShowDateRangeDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'view' | 'download'>('view');
@@ -35,7 +36,6 @@ export function TransactionsList({ transactions, loading, onViewChange }: Transa
 
     const handleDownload = (value: string) => {
         setDownloadValue(value);
-        // Any download option will trigger the date range dialog
         if (value && value !== 'placeholder') {
             setDialogMode('download');
             setShowDateRangeDialog(true);
@@ -96,6 +96,8 @@ export function TransactionsList({ transactions, loading, onViewChange }: Transa
                 open={showDateRangeDialog} 
                 onOpenChange={onDialogClose} 
                 mode={dialogMode}
+                fileType={downloadValue}
+                accountNumber={accountNumber}
             />
         </>
     )

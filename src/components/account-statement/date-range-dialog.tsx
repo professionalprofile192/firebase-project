@@ -9,25 +9,80 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { Label } from '../ui/label';
+import { downloadStatement } from '@/app/actions';
+import { useToast } from '@/hooks/use-toast';
 
 interface DateRangeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mode: 'view' | 'download';
+  fileType?: string;
+  accountNumber?: string;
 }
 
-export function DateRangeDialog({ open, onOpenChange, mode }: DateRangeDialogProps) {
+export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNumber }: DateRangeDialogProps) {
   const [fromDate, setFromDate] = useState<Date | undefined>();
   const [toDate, setToDate] = useState<Date | undefined>();
+  const [isDownloading, setIsDownloading] = useState(false);
+  const { toast } = useToast();
 
-  const handleAction = () => {
-    // Logic to handle viewing/downloading transactions for the selected date range
-    console.log('Mode:', mode, 'From:', fromDate, 'To:', toDate);
-    onOpenChange(false);
+  const handleAction = async () => {
+    if (mode === 'download') {
+        if (!fileType || !fromDate || !toDate || !accountNumber) {
+            toast({
+                variant: 'destructive',
+                title: 'Missing information',
+                description: 'Please select a file type, date range, and account.',
+            });
+            return;
+        }
+
+        setIsDownloading(true);
+        try {
+            const response = await downloadStatement({
+                fileType,
+                fromDate: format(fromDate, 'yyyy-MM-dd'),
+                toDate: format(toDate, 'yyyy-MM-dd'),
+                accountNumber,
+            });
+
+            if (response.success && response.base64) {
+                const mimeType = fileType === 'pdf' ? 'application/pdf' : `text/${fileType}`;
+                const byteCharacters = atob(response.base64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: mimeType });
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `statement.${fileType}`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                toast({ title: 'Download Started', description: `Your statement is downloading as a ${fileType.toUpperCase()} file.` });
+                onOpenChange(false);
+            } else {
+                 toast({ variant: 'destructive', title: 'Download Failed', description: response.message });
+            }
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Error', description: 'An unexpected error occurred during download.' });
+        } finally {
+            setIsDownloading(false);
+        }
+
+    } else {
+        // Logic to handle viewing transactions for the selected date range
+        console.log('Mode:', mode, 'From:', fromDate, 'To:', toDate);
+        onOpenChange(false);
+    }
   };
 
   const title = mode === 'download' ? "Download Transaction" : "View Transactions";
-  const buttonText = mode === 'download' ? "Download" : "View";
+  const buttonText = mode === 'download' ? (isDownloading ? 'Downloading...' : 'Download') : "View";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -104,7 +159,7 @@ export function DateRangeDialog({ open, onOpenChange, mode }: DateRangeDialogPro
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleAction}>{buttonText}</Button>
+          <Button onClick={handleAction} disabled={isDownloading}>{buttonText}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -47,7 +47,7 @@ export default function AccountStatementPage() {
   const fetchTransactionsForAccount = useCallback(async (acctNo: string) => {
     setTransactionsLoading(true);
     try {
-        const statementsData = await getRecentTransactions(acctNo, 30); // Fetch more for statement
+        const statementsData = await getRecentTransactions(acctNo); 
         if (statementsData.opstatus === 0) {
             setAllTransactions(statementsData.payments);
             setDisplayedTransactions(statementsData.payments); // Initially display all
@@ -84,7 +84,8 @@ export default function AccountStatementPage() {
     } else {
         router.push('/');
     }
-  }, [fetchTransactionsForAccount]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   const handleAccountChange = (acctNo: string) => {
     const account = accounts.find(a => a.ACCT_NO === acctNo);
@@ -171,6 +172,7 @@ export default function AccountStatementPage() {
                 transactions={displayedTransactions} 
                 loading={transactionsLoading}
                 onViewChange={handleViewFilterChange} 
+                accountNumber={selectedAccount?.ACCT_NO}
             />
         </div>
       </main>
