@@ -18,8 +18,11 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
     const isMobile = useIsMobile();
     const [showDateRangeDialog, setShowDateRangeDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'view' | 'download'>('view');
+    const [downloadValue, setDownloadValue] = useState('');
+    const [viewValue, setViewValue] = useState('');
     
     const handleViewChange = (value: string) => {
+        setViewValue(value);
         if (value === 'range') {
             setDialogMode('view');
             setShowDateRangeDialog(true);
@@ -28,10 +31,19 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
     }
 
     const handleDownload = (value: string) => {
+        setDownloadValue(value);
         // Any download option will trigger the date range dialog
-        if (value) {
+        if (value && value !== 'placeholder') {
             setDialogMode('download');
             setShowDateRangeDialog(true);
+        }
+    }
+
+    const onDialogClose = (open: boolean) => {
+        setShowDateRangeDialog(open);
+        if (!open) {
+            setDownloadValue('');
+            setViewValue('');
         }
     }
 
@@ -41,22 +53,24 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
                 <CardHeader className="flex flex-col md:flex-row sm:flex-row rounded-md items-start md:items-center sm:items-center justify-between bg-[#f2f2f2] p-3">
                     <CardTitle className="text-[18px] text-gray-700">Transactions</CardTitle>
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-                        <Select onValueChange={handleDownload}>
+                        <Select onValueChange={handleDownload} value={downloadValue}>
                             <SelectTrigger className="w-full sm:w-[150px]">
                                 <SelectValue placeholder="Download As" />
                             </SelectTrigger>
                             <SelectContent>
+                                <SelectItem value="placeholder" disabled>Download As</SelectItem>
                                 <SelectItem value="pdf">PDF</SelectItem>
                                 <SelectItem value="csv">CSV</SelectItem>
                                 <SelectItem value="xls">XLS</SelectItem>
                                 <SelectItem value="xlsx">XLSX</SelectItem>
                             </SelectContent>
                         </Select>
-                        <Select onValueChange={handleViewChange}>
+                        <Select onValueChange={handleViewChange} value={viewValue}>
                             <SelectTrigger className="w-full sm:w-[180px]">
                                 <SelectValue placeholder="View" />
                             </SelectTrigger>
                             <SelectContent>
+                                <SelectItem value="placeholder" disabled>View</SelectItem>
                                 <SelectItem value="range">Select Range</SelectItem>
                                 <SelectItem value="last10transactions">Last 10 Transactions</SelectItem>
                                 <SelectItem value="last10days">Last 10 Days</SelectItem>
@@ -74,7 +88,7 @@ export function TransactionsList({ transactions, loading }: TransactionsListProp
             </Card>
             <DateRangeDialog 
                 open={showDateRangeDialog} 
-                onOpenChange={setShowDateRangeDialog} 
+                onOpenChange={onDialogClose} 
                 mode={dialogMode}
             />
         </>
