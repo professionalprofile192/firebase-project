@@ -85,7 +85,7 @@ export default function AccountStatementPage() {
         router.push('/');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [router, fetchTransactionsForAccount]);
   
   const handleAccountChange = (acctNo: string) => {
     const account = accounts.find(a => a.ACCT_NO === acctNo);
