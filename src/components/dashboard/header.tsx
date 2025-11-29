@@ -1,3 +1,4 @@
+
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -18,6 +19,8 @@ import { LogoutDialog } from '../auth/logout-dialog';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
 import { cn } from '@/lib/utils';
+import { logout } from '@/app/login/actions';
+
 
 type UserProfile = {
     firstname: string;
@@ -177,8 +180,9 @@ export function Header() {
     setShowLogoutDialog(true);
   };
 
-  const confirmLogout = () => {
+  const confirmLogout = async () => {
     setShowLogoutDialog(false);
+    await logout();
     sessionStorage.clear();
     router.push('/');
   };

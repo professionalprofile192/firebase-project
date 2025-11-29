@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -27,7 +28,8 @@ import {
 import { EyeOff, Eye, User, Lock } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { forgotUsername, getLastLoginTime, login, sendOtpForUsernameRecovery, validateUser, verifyOtp } from '@/app/actions';
+import { sendOtpForUsernameRecovery, validateUser, verifyOtp, forgotUsername } from '@/app/actions';
+import { loginAndSetSession } from '@/app/login/actions';
 import { cn } from '@/lib/utils';
 import { OtpDialog } from './otp-dialog';
 import { CustomAlertDialog } from '../common/custom-alert-dialog';
@@ -474,29 +476,13 @@ export function LoginForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await login(values);
+      const response = await loginAndSetSession(values);
 
       if (response.success) {
         toast({
           title: 'Login Successful',
           description: 'Redirecting to your dashboard...',
         });
-
-        sessionStorage.setItem(
-          'userProfile',
-          JSON.stringify(response.profile)
-        );
-
-        const loginTimeResponse = await getLastLoginTime(
-          response.profile.userid
-        );
-
-        if (loginTimeResponse.opstatus === 0) {
-          const lastLogin =
-            loginTimeResponse.LoginServices[0].Lastlogintime;
-          sessionStorage.setItem('lastLoginTime', lastLogin);
-        }
-
         router.push('/dashboard');
       } else {
         toast({

@@ -1,3 +1,4 @@
+
 'use client';
 import {
     Card,
@@ -17,8 +18,7 @@ import {
   import { ChevronRight, FileQuestion } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '../ui/scroll-area';
-import { useEffect, useState } from 'react';
-import { getNotifications } from '@/app/actions';
+import { useState } from 'react';
 import { Skeleton } from '../ui/skeleton';
 import { format } from 'date-fns';
   
@@ -33,30 +33,14 @@ const featureActionToMessage: Record<string, string> = {
     "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE": "Inter-bank fund transfer request"
 }
 
-export function Notifications() {
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [loading, setLoading] = useState(true);
+interface NotificationsProps {
+    initialNotifications: Notification[];
+}
 
-    useEffect(() => {
-        const profile = sessionStorage.getItem('userProfile');
-        if (profile) {
-            const parsedProfile = JSON.parse(profile);
-            const fetchNotifications = async () => {
-                try {
-                    setLoading(true);
-                    const notificationData = await getNotifications(parsedProfile.userid);
-                    if (notificationData.opstatus === 0) {
-                        setNotifications(notificationData.ApprovalMatrix);
-                    }
-                } catch (error) {
-                    console.error("Failed to fetch notifications", error);
-                } finally {
-                    setLoading(false);
-                }
-            }
-            fetchNotifications();
-        }
-    }, []);
+export function Notifications({ initialNotifications }: NotificationsProps) {
+    const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+    const [loading, setLoading] = useState(false);
+
 
     const getNotificationMessage = (notification: Notification) => {
         const baseMessage = featureActionToMessage[notification.featureActionId] || "A new request";
