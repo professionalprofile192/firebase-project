@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Menu, User, LogOut, Settings, X, Landmark, CheckSquare, CreditCard, ArrowRightLeft, Clock, Briefcase, BarChart, Upload, ChevronDown, ChevronUp, LayoutDashboard } from 'lucide-react';
+import { Menu, User, LogOut, Settings, X, Landmark, CheckSquare, CreditCard, ArrowRightLeft, Clock, Briefcase, BarChart, Upload, ChevronDown, ChevronUp, LayoutDashboard, FileClock } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
@@ -73,8 +73,8 @@ const SidebarNav = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             subItems: [
                 { label: 'Pending Approvals', href: '/pending-approvals' },
                 { label: 'Approvals History', href: '/pending-approvals?tab=history' },
-                { label: 'Pending Requests', href: '#' },
-                { label: 'Requests History', href: '#' }
+                { label: 'Pending Requests', href: '/requests?tab=pending' },
+                { label: 'Requests History', href: '/requests?tab=history' }
             ] 
         },
         { 
