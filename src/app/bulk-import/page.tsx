@@ -9,20 +9,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Paperclip } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { UploadStatusDialog } from '@/components/bulk-import/upload-status-dialog';
 
 type Account = {
     ACCT_NO: string;
     ACCT_TITLE: string;
 };
 
-const FileInput = ({ id, label, onFileSelect, acceptedFormats }: { id: string, label: string, onFileSelect: (file: File | null) => void, acceptedFormats: string }) => {
+const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey }: { id: string, label: string, onFileSelect: (key: string, file: File | null) => void, acceptedFormats: string, fileKey: string }) => {
     const [fileName, setFileName] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || null;
         setFileName(file ? file.name : '');
-        onFileSelect(file);
+        onFileSelect(fileKey, file);
     };
     
     const handleButtonClick = () => {
@@ -62,8 +64,10 @@ const FileInput = ({ id, label, onFileSelect, acceptedFormats }: { id: string, l
 export default function BulkImportPage() {
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-    const [bulkFile, setBulkFile] = useState<File | null>(null);
-    const [chequeInvoiceFile, setChequeInvoiceFile] = useState<File | null>(null);
+    const [files, setFiles] = useState<{ bulkFile: File | null, chequeInvoiceFile: File | null }>({ bulkFile: null, chequeInvoiceFile: null });
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [dialogContent, setDialogContent] = useState<{ status: 'success' | 'error'; title: string; message: string; refNumber?: string }>({ status: 'success', title: '', message: '' });
+    const { toast } = useToast();
 
     useEffect(() => {
         const accountsString = sessionStorage.getItem('accounts');
@@ -71,6 +75,10 @@ export default function BulkImportPage() {
             setAccounts(JSON.parse(accountsString));
         }
     }, []);
+
+    const handleFileSelect = (key: string, file: File | null) => {
+        setFiles(prev => ({...prev, [key]: file}));
+    }
     
     const handleAccountChange = (acctNo: string) => {
         const account = accounts.find(a => a.ACCT_NO === acctNo);
@@ -79,14 +87,58 @@ export default function BulkImportPage() {
 
     const handleCancel = () => {
         setSelectedAccount(null);
-        setBulkFile(null);
-        setChequeInvoiceFile(null);
+        setFiles({ bulkFile: null, chequeInvoiceFile: null });
+        // This is a bit of a hack to reset the uncontrolled file inputs
+        window.location.reload();
     };
     
     const handleUpload = () => {
-        // Handle file upload logic here
-        console.log('Uploading files:', { bulkFile, chequeInvoiceFile, selectedAccount });
+        if (!selectedAccount) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Please select an account.' });
+            return;
+        }
+        if (!files.bulkFile && !files.chequeInvoiceFile) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Please upload at least one file.' });
+            return;
+        }
+
+        const checkFile = (file: File | null) => {
+            if (file) {
+                const extension = file.name.split('.').pop()?.toLowerCase();
+                if (extension !== 'csv' && extension !== 'txt') {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        if (!checkFile(files.bulkFile) || !checkFile(files.chequeInvoiceFile)) {
+            setDialogContent({
+                status: 'error',
+                title: 'Upload Failed',
+                message: 'File format is not supported. Please upload a .csv or .txt file.'
+            });
+            setDialogOpen(true);
+            return;
+        }
+
+        // --- Mock successful upload ---
+        const refNumber = `008${Date.now().toString().slice(-12)}`;
+        setDialogContent({
+            status: 'success',
+            title: 'Single Bulk Upload',
+            message: 'Bulk file has been uploaded and is being validated by the system. Please refer to the Bulk History Tab in case of any errors.',
+            refNumber
+        });
+        setDialogOpen(true);
     };
+
+    const closeDialog = () => {
+        setDialogOpen(false);
+        if (dialogContent.status === 'success') {
+            handleCancel(); // Reset form on success
+        }
+    }
 
     return (
         <DashboardLayout>
@@ -122,9 +174,9 @@ export default function BulkImportPage() {
                                 />
                             </div>
                             
-                            <FileInput id="bulk-file" label="Bulk File Upload" onFileSelect={setBulkFile} acceptedFormats=".csv,.txt" />
+                            <FileInput id="bulk-file" label="Bulk File Upload" onFileSelect={handleFileSelect} acceptedFormats=".csv,.txt" fileKey="bulkFile" />
 
-                            <FileInput id="cheque-invoice-file" label="Upload Cheque Invoice File" onFileSelect={setChequeInvoiceFile} acceptedFormats=".csv,.txt" />
+                            <FileInput id="cheque-invoice-file" label="Upload Cheque Invoice File" onFileSelect={handleFileSelect} acceptedFormats=".csv,.txt" fileKey="chequeInvoiceFile" />
 
                             <div className="md:col-span-2">
                                 <p className="text-sm text-muted-foreground">
@@ -140,6 +192,15 @@ export default function BulkImportPage() {
                     </CardContent>
                 </Card>
             </main>
+            <UploadStatusDialog 
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+                status={dialogContent.status}
+                title={dialogContent.title}
+                message={dialogContent.message}
+                transactionRef={dialogContent.refNumber}
+                onDone={closeDialog}
+            />
         </DashboardLayout>
     );
 }
