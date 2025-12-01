@@ -6,19 +6,13 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, FileQuestion } from 'lucide-react';
 import { Transaction } from './dashboard';
 import { useMemo, useState } from 'react';
-import { format, startOfWeek, addDays, getDay } from 'date-fns';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { format, getDay } from 'date-fns';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface ChartCardProps {
     transactions: Transaction[];
     accounts: { ACCT_NO: string; ACCT_TITLE: string }[];
 }
-
-type ChartData = {
-  name: string;
-  credit: number;
-  debit: number;
-};
   
 export function ChartCard({ transactions, accounts }: ChartCardProps) {
     const [selectedAccount, setSelectedAccount] = useState(accounts.length > 0 ? accounts[0] : null);
@@ -66,7 +60,7 @@ export function ChartCard({ transactions, accounts }: ChartCardProps) {
                         <span className="text-sm">Credit</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-destructive"></div>
+                        <div className="w-3 h-3 rounded-full bg-primary"></div>
                         <span className="text-sm">Debit</span>
                     </div>
                 </div>
@@ -113,7 +107,7 @@ export function ChartCard({ transactions, accounts }: ChartCardProps) {
                         }}
                     />
                     <Bar dataKey="credit" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={20}/>
-                    <Bar dataKey="debit" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} barSize={20} />
+                    <Bar dataKey="debit" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={20} />
                 </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -126,4 +120,3 @@ export function ChartCard({ transactions, accounts }: ChartCardProps) {
       </Card>
     );
   }
-  
