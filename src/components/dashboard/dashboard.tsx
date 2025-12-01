@@ -1,4 +1,3 @@
-
 'use client';
 
 import { NetWorth } from '@/components/dashboard/net-worth';
@@ -8,7 +7,7 @@ import { Notifications } from '@/components/dashboard/notifications';
 import { ChartCard } from '@/components/dashboard/chart-card';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { getRecentTransactions } from '@/app/actions';
+import { getRecentTransactions, getAccounts } from '@/app/actions';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 
 type Account = {
@@ -54,7 +53,8 @@ export function Dashboard({
     initialNotifications
 }: DashboardProps) {
   const [accounts, setAccounts] = useState<Account[]>(initialAccounts);
-  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>(initialTransactions);
   const [userProfile, setUserProfile] = useState<any>(initialUserProfile);
   const router = useRouter();
 
@@ -62,24 +62,42 @@ export function Dashboard({
     if (!initialUserProfile) {
       router.push('/');
     } else {
-        // Data is now primarily passed via props, but we can still store it
-        // for client-side access on other pages if needed, though cookies are better.
         sessionStorage.setItem('userProfile', JSON.stringify(initialUserProfile));
         sessionStorage.setItem('accounts', JSON.stringify(initialAccounts));
+        if (initialAccounts.length > 0) {
+            fetchAllTransactions(initialAccounts[0].ACCT_NO);
+        }
     }
   }, [initialUserProfile, initialAccounts, router]);
+
+  const fetchAllTransactions = async (acctNo: string) => {
+    try {
+        const transactionsData = await getRecentTransactions(acctNo);
+        if (transactionsData.opstatus === 0) {
+            setAllTransactions(transactionsData.payments);
+        } else {
+            setAllTransactions([]);
+        }
+    } catch (error) {
+        console.error("Failed to fetch all transactions", error);
+        setAllTransactions([]);
+    }
+  };
 
   const fetchTransactionsForAccount = useCallback(async (acctNo: string) => {
     try {
         const recentTransactionsData = await getRecentTransactions(acctNo);
         if (recentTransactionsData.opstatus === 0) {
-            setTransactions(recentTransactionsData.payments.slice(0, 3));
+            setRecentTransactions(recentTransactionsData.payments.slice(0, 3));
+            setAllTransactions(recentTransactionsData.payments);
         } else {
-            setTransactions([]);
+            setRecentTransactions([]);
+            setAllTransactions([]);
         }
     } catch (error) {
         console.error("Failed to fetch transactions for account", error);
-        setTransactions([]);
+        setRecentTransactions([]);
+        setAllTransactions([]);
     }
   }, []);
 
@@ -106,12 +124,12 @@ export function Dashboard({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <MyAccounts accounts={accounts} />
                         <RecentTransactions 
-                            transactions={transactions} 
+                            transactions={recentTransactions} 
                             accounts={accounts}
                             onAccountChange={fetchTransactionsForAccount}
                         />
                     </div>
-                    <ChartCard />
+                    <ChartCard transactions={allTransactions} accounts={accounts}/>
                 </div>
             </div>
         </main>
