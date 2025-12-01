@@ -2,13 +2,14 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { login as apiLogin, getLastLoginTime } from '../actions';
+import { login as apiLogin, getLastLoginTime, getAccounts } from '../actions';
 
 export async function loginAndSetSession(values: any) {
     const response = await apiLogin(values);
 
     if (response.success && response.profile) {
-        cookies().set('userProfile', JSON.stringify(response.profile), {
+        const userProfile = response.profile;
+        cookies().set('userProfile', JSON.stringify(userProfile), {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
@@ -16,7 +17,8 @@ export async function loginAndSetSession(values: any) {
         });
         
         try {
-            const loginTimeResponse = await getLastLoginTime(response.profile.userid);
+            // Set last login time cookie
+            const loginTimeResponse = await getLastLoginTime(userProfile.userid);
             if (loginTimeResponse.opstatus === 0) {
                 const lastLogin = loginTimeResponse.LoginServices[0].Lastlogintime;
                 cookies().set('lastLoginTime', lastLogin, {
@@ -26,8 +28,20 @@ export async function loginAndSetSession(values: any) {
                     path: '/',
                 });
             }
+
+            // Set accounts cookie
+            const accountsData = await getAccounts(userProfile.userid, userProfile.CIF_NO);
+            if (accountsData.opstatus === 0) {
+                 cookies().set('accounts', JSON.stringify(accountsData.payments), {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'strict',
+                    path: '/',
+                });
+            }
+
         } catch (e) {
-            console.error("Could not fetch last login time", e);
+            console.error("Could not fetch additional session data", e);
         }
     }
     
