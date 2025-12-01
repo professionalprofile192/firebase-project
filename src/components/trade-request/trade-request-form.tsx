@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Select,
@@ -23,6 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { SuccessDialog } from './success-dialog';
+import { getBulkFileData, createBulkFileData } from '@/app/actions';
 
 const productTypes = [
   'Contract Reg - DP',
@@ -57,6 +58,7 @@ type UploadedFile = {
     file: File;
     requestType: string;
     productType: string;
+    fileReferenceNumber: string;
 }
 
 export function TradeRequestForm() {
@@ -70,20 +72,35 @@ export function TradeRequestForm() {
   const { toast } = useToast();
   const [editFileId, setEditFileId] = useState<number | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [transactionRef, setTransactionRef] = useState('');
-  const [showUploadSuccessDialog, setShowUploadSuccessDialog] = useState(false);
-  const [fileToUpload, setFileToUpload] = useState<UploadedFile | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogMessage, setDialogMessage] = useState('');
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const profile = sessionStorage.getItem('userProfile');
+    if (profile) {
+      setUserProfile(JSON.parse(profile));
+    }
+  }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
         if (editFileId !== null) {
-            setUploadedFiles(prevFiles => prevFiles.map(f => f.id === editFileId ? {...f, file: selectedFile} : f));
+            // Find the original file details
+            const originalFile = uploadedFiles.find(f => f.id === editFileId);
+            if (originalFile) {
+                // Prepare new uploaded file object before calling upload service
+                 const newFileToUpload: Omit<UploadedFile, 'id'|'fileReferenceNumber'> & { file: File } = {
+                    file: selectedFile,
+                    requestType: originalFile.requestType,
+                    productType: originalFile.productType,
+                };
+                handleUpload(newFileToUpload, editFileId);
+            }
             setEditFileId(null);
-            toast({ title: "File Updated", description: `${selectedFile.name} has been updated.` });
-
         } else {
             setFile(selectedFile);
         }
@@ -98,8 +115,12 @@ export function TradeRequestForm() {
     fileInputRef.current?.click();
   };
 
-  const handleUpload = () => {
-    if (!file || !requestType || !productType) {
+  const handleUpload = async (fileToUpload?: {file: File, requestType: string, productType: string}, existingId?: number | null) => {
+    const currentFile = fileToUpload?.file || file;
+    const currentRequestType = fileToUpload?.requestType || requestType;
+    const currentProductType = fileToUpload?.productType || productType;
+
+    if (!currentFile || !currentRequestType || !currentProductType) {
         toast({
             variant: 'destructive',
             title: "Missing Information",
@@ -107,17 +128,54 @@ export function TradeRequestForm() {
         });
         return;
     }
-    const newFile: UploadedFile = {
-        id: Date.now(),
-        file,
-        requestType,
-        productType,
-    };
-    setFileToUpload(newFile);
-    setDialogTitle('Single Bulk Upload');
-    setDialogMessage('File has been uploaded and is being validated by the system. Please refer to the Dashboard to view it.');
-    setTransactionRef(`00${Date.now().toString().slice(-14)}`);
-    setShowUploadSuccessDialog(true);
+
+    if (!userProfile) {
+        toast({ variant: 'destructive', title: "User not found", description: "Could not find user profile. Please log in again." });
+        return;
+    }
+
+    setIsUploading(true);
+
+    try {
+        const file_refid = `00${Date.now().toString().slice(-14)}`;
+        const response = await getBulkFileData({
+            user_id: userProfile.userid,
+            file_refid: file_refid,
+            file_name: currentFile.name,
+            file_type: currentRequestType,
+            product_type: currentProductType,
+            file_content: currentFile,
+        });
+
+        if (response.opstatus === 0 && response.records) {
+            const newFile: UploadedFile = {
+                id: existingId || Date.now(),
+                file: currentFile,
+                requestType: currentRequestType,
+                productType: currentProductType,
+                fileReferenceNumber: response.records[0].file_refid,
+            };
+
+            setDialogTitle('Single Bulk Upload');
+            setDialogMessage('File has been uploaded and is being validated by the system. Please refer to the Dashboard to view it.');
+            setShowSuccessDialog(true);
+            
+            if(existingId !== null && existingId !== undefined) {
+                 setUploadedFiles(prevFiles => prevFiles.map(f => f.id === existingId ? newFile : f));
+            } else {
+                setUploadedFiles(prev => [...prev, newFile]);
+            }
+        } else {
+            toast({ variant: 'destructive', title: 'Upload Failed', description: response.message || "Failed to upload file." });
+        }
+
+    } catch(error) {
+        toast({ variant: 'destructive', title: 'Error', description: 'An unexpected error occurred during upload.' });
+    } finally {
+        setIsUploading(false);
+        setFile(null);
+        if(fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
   
   const handleCancel = () => {
@@ -140,34 +198,40 @@ export function TradeRequestForm() {
     toast({ title: 'File Removed', description: 'The selected file has been removed.' });
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       if(uploadedFiles.length === 0) {
           toast({ variant: 'destructive', title: "No Files Uploaded", description: "Please upload at least one file before submitting." });
           return;
       }
+      if (!userProfile) {
+        toast({ variant: 'destructive', title: "User not found", description: "Could not find user profile. Please log in again." });
+        return;
+      }
+
+      setIsSubmitting(true);
+      try {
+        const promises = uploadedFiles.map(file => createBulkFileData({
+            user_id: userProfile.userid,
+            file_refid: file.fileReferenceNumber
+        }));
+
+        await Promise.all(promises);
+        
+        setDialogTitle('Single Bulk Upload');
+        setDialogMessage('File has been uploaded and is being validated by the system. Please refer to the Dashboard to view it.');
+        setShowSuccessDialog(true);
       
-      const refId = `00${Date.now().toString().slice(-14)}`;
-      setTransactionRef(refId);
-      setDialogTitle('Single Bulk Upload');
-      setDialogMessage('File has been uploaded and is being validated by the system. Please refer to the Dashboard to view it.');
-      setShowSuccessDialog(true);
+      } catch (error) {
+        toast({ variant: 'destructive', title: 'Submission Failed', description: 'An error occurred while submitting your request.' });
+      } finally {
+        setIsSubmitting(false);
+      }
   }
 
   const handleDone = () => {
       setShowSuccessDialog(false);
       handleCancel();
-  }
-
-  const handleUploadDone = () => {
-    setShowUploadSuccessDialog(false);
-    if(fileToUpload) {
-        setUploadedFiles(prev => [...prev, fileToUpload]);
-        setFileToUpload(null);
-    }
-    // Clear the file input after upload
-    setFile(null);
-    if(fileInputRef.current) fileInputRef.current.value = '';
   }
 
   const getFileName = () => {
@@ -253,7 +317,7 @@ export function TradeRequestForm() {
                         ref={fileInputRef}
                         className="hidden"
                         onChange={handleFileChange}
-                        accept=".pdf,.png,.jpeg,.doc,.docx,.xls,.xlsx,.txt"
+                        accept=".pdf,.png,.jpeg,.jpg,.doc,.docx,.xls,.xlsx,.txt"
                       />
                       <Button
                         type="button"
@@ -271,7 +335,9 @@ export function TradeRequestForm() {
                   </div>
 
                   <div className="flex justify-start">
-                      <Button type="button" onClick={handleUpload}>Upload</Button>
+                      <Button type="button" onClick={() => handleUpload()} disabled={isUploading}>
+                        {isUploading ? 'Uploading...' : 'Upload'}
+                      </Button>
                   </div>
 
                   {uploadedFiles.length > 0 && (
@@ -309,10 +375,12 @@ export function TradeRequestForm() {
 
 
                   <div className="flex justify-end gap-4 pt-4">
-                    <Button type="button" variant="outline" onClick={handleCancel}>
+                    <Button type="button" variant="outline" onClick={handleCancel} disabled={isSubmitting}>
                       Cancel
                     </Button>
-                    <Button type="submit">Submit</Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting ? 'Submitting...' : 'Submit'}
+                    </Button>
                   </div>
                 </div>
               )}
@@ -324,13 +392,6 @@ export function TradeRequestForm() {
         open={showSuccessDialog}
         onOpenChange={setShowSuccessDialog}
         onDone={handleDone}
-        title={dialogTitle}
-        message={dialogMessage}
-      />
-       <SuccessDialog 
-        open={showUploadSuccessDialog}
-        onOpenChange={setShowUploadSuccessDialog}
-        onDone={handleUploadDone}
         title={dialogTitle}
         message={dialogMessage}
       />

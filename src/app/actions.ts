@@ -435,5 +435,62 @@ export async function uploadBulkFile(accountNumber: string, file: File) {
     }
 }
 
+async function fileToBase64(file: File): Promise<string> {
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    return buffer.toString('base64');
+}
 
+export async function getBulkFileData(payload: {
+    user_id: string;
+    file_refid: string;
+    file_name: string;
+    file_type: string;
+    product_type: string;
+    file_content: File; // Changed to File
+}) {
+    // This is a mock service. In a real scenario, you'd post this to your backend.
+    const { user_id, file_refid, file_name, file_type, product_type, file_content } = payload;
+    
+    // Simulate converting file to base64
+    const base64String = await fileToBase64(file_content);
+
+    // Basic validation
+    if (!user_id || !file_name || !base64String) {
+        return { opstatus: 1, httpStatusCode: 400, message: "Invalid payload provided" };
+    }
+
+    // Mock successful response
+    return {
+        "records": [
+            {
+                "file_refid": file_refid,
+                "file_name": file_name,
+                "product_type": product_type,
+                "file_type": file_type,
+            }
+        ],
+        "opstatus": 0,
+        "httpStatusCode": 0
+    };
+}
+
+
+export async function createBulkFileData(payload: {
+    user_id: string;
+    file_refid: string;
+}) {
+    // This is a mock service.
+     const { user_id, file_refid } = payload;
+    
+    if (!user_id || !file_refid) {
+         return { opstatus: 1, httpStatusCode: 400, message: "Invalid payload for createBulkFileData" };
+    }
+    
+    return {
+        "response": "{\"map\":{\"records\":{\"myArrayList\":[{\"map\":{\"resCode\":\"2\"}}]},\"opstatus\":0,\"httpStatusCode\":0}}",
+        "opstatus": 0,
+        "httpStatusCode": 0
+    };
+}
     
