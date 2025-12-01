@@ -1,10 +1,13 @@
 'use client';
 
+import { Suspense, useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { ApprovalsTable } from '@/components/pending-approvals/approvals-table';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { ApprovalsHistoryTable } from '@/components/pending-approvals/approvals-history-table';
 
 export type Approval = {
   transactionNumber: string;
@@ -15,8 +18,17 @@ export type Approval = {
 
 // No data as per the screenshot
 const approvalsData: Approval[] = [];
+const approvalsHistoryData: Approval[] = [];
 
-export default function PendingApprovalsPage() {
+function PendingApprovalsContent() {
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tab || 'pending');
+
+  useEffect(() => {
+    setActiveTab(tab || 'pending');
+  }, [tab]);
+
   return (
     <DashboardLayout>
       <main className="flex-1 p-4 sm:px-6 sm:py-4 flex flex-col gap-6">
@@ -30,7 +42,7 @@ export default function PendingApprovalsPage() {
             />
         </div>
 
-        <Tabs defaultValue="pending">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="pending">Pending Approvals</TabsTrigger>
             <TabsTrigger value="history">Approvals History</TabsTrigger>
@@ -39,12 +51,18 @@ export default function PendingApprovalsPage() {
             <ApprovalsTable data={approvalsData} />
           </TabsContent>
           <TabsContent value="history">
-            <div className="flex items-center justify-center p-10 bg-card rounded-lg border">
-                <p className="text-muted-foreground">No approval history found.</p>
-            </div>
+            <ApprovalsHistoryTable data={approvalsHistoryData} />
           </TabsContent>
         </Tabs>
       </main>
     </DashboardLayout>
   );
+}
+
+export default function PendingApprovalsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PendingApprovalsContent />
+    </Suspense>
+  )
 }

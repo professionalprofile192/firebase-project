@@ -72,7 +72,7 @@ const SidebarNav = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             icon: CheckSquare, 
             subItems: [
                 { label: 'Pending Approvals', href: '/pending-approvals' },
-                { label: 'Approvals History', href: '#' },
+                { label: 'Approvals History', href: '/pending-approvals?tab=history' },
                 { label: 'Pending Requests', href: '#' },
                 { label: 'Requests History', href: '#' }
             ] 
