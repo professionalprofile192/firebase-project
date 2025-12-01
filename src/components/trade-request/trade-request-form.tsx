@@ -71,6 +71,8 @@ export function TradeRequestForm() {
   const [editFileId, setEditFileId] = useState<number | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [transactionRef, setTransactionRef] = useState('');
+  const [showUploadSuccessDialog, setShowUploadSuccessDialog] = useState(false);
+  const [fileToUpload, setFileToUpload] = useState<UploadedFile | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -109,10 +111,9 @@ export function TradeRequestForm() {
         requestType,
         productType,
     };
-    setUploadedFiles(prev => [...prev, newFile]);
-    // Clear the file input after upload
-    setFile(null);
-    if(fileInputRef.current) fileInputRef.current.value = '';
+    setFileToUpload(newFile);
+    setTransactionRef(`00${Date.now().toString().slice(-14)}`);
+    setShowUploadSuccessDialog(true);
   };
   
   const handleCancel = () => {
@@ -150,6 +151,17 @@ export function TradeRequestForm() {
   const handleDone = () => {
       setShowSuccessDialog(false);
       handleCancel();
+  }
+
+  const handleUploadDone = () => {
+    setShowUploadSuccessDialog(false);
+    if(fileToUpload) {
+        setUploadedFiles(prev => [...prev, fileToUpload]);
+        setFileToUpload(null);
+    }
+    // Clear the file input after upload
+    setFile(null);
+    if(fileInputRef.current) fileInputRef.current.value = '';
   }
 
   const getFileName = () => {
@@ -306,6 +318,12 @@ export function TradeRequestForm() {
         open={showSuccessDialog}
         onOpenChange={setShowSuccessDialog}
         onDone={handleDone}
+        transactionRef={transactionRef}
+      />
+       <SuccessDialog 
+        open={showUploadSuccessDialog}
+        onOpenChange={setShowUploadSuccessDialog}
+        onDone={handleUploadDone}
         transactionRef={transactionRef}
       />
     </>
