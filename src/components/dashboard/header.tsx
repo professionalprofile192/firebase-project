@@ -1,3 +1,4 @@
+
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -110,7 +111,7 @@ const SidebarNav = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             icon: Briefcase, 
             subItems: [
                 { label: 'Trade Request', href: '/trade-request' },
-                { label: 'Trade Request History', href: '#' }
+                { label: 'Trade Request History', href: '/trade-request-history' }
             ] 
         },
         { 

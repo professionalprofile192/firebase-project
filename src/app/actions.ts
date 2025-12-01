@@ -494,3 +494,50 @@ export async function createBulkFileData(payload: {
     };
 }
     
+export async function getTradeRequestHistory(userId: string) {
+    if (userId === '6747741730') {
+        return {
+            "records": [
+                {
+                    "file_refid": "0008068236624052",
+                    "product_type": "Contract Reg - DP",
+                    "user_id": "6747741730",
+                    "children": "[{\"id\": 174, \"extra3\": \"{\\\"Applicant_Name\\\":\\\"\\\",\\\"Currency\\\":\\\"usd\\\",\\\"Amount_CCY\\\":\\\"23\\\",\\\"Tenor\\\":\\\"\\\",\\\"Shipment_Date\\\":\\\"\\\",\\\"HS_Code\\\":\\\"\\\",\\\"userName\\\":\\\"Hassan Ahmed4\\\"}\", \"status\": \"Open\", \"createdts\": \"2025-12-01 16:30:35.000000\", \"file_name\": \"ubl_logo.png\", \"file_type\": \"LC Application\", \"product_type\": \"Contract Reg - DP\"}]",
+                    "FirstName": "Hassan",
+                    "name": "NAWAZ ALI 2",
+                    "extra1": "Open",
+                    "LastName": "Ahmed4"
+                },
+                {
+                    "file_refid": "0008849199402560",
+                    "product_type": "Contract Reg - DP",
+                    "user_id": "6747741730",
+                    "children": "[{\"id\": 172, \"extra3\": \"{\\\"Applicant_Name\\\":\\\"\\\",\\\"Currency\\\":\\\"fvf\\\",\\\"Amount_CCY\\\":\\\"344\\\",\\\"Tenor\\\":\\\"\\\",\\\"Shipment_Date\\\":\\\"\\\",\\\"HS_Code\\\":\\\"\\\",\\\"userName\\\":\\\"Hassan Ahmed4\\\"}\", \"status\": \"Open\", \"createdts\": \"2025-12-01 15:53:49.000000\", \"file_name\": \"omni app testing.xlsx\", \"file_type\": \"LC Application\", \"product_type\": \"Contract Reg - DP\"}]",
+                    "FirstName": "Hassan",
+                    "name": "NAWAZ ALI 2",
+                    "extra1": "Open",
+                    "LastName": "Ahmed4"
+                },
+                {
+                    "file_refid": "0036233731207122",
+                    "product_type": "Contract Reg - DP",
+                    "user_id": "6747741730",
+                    "children": "[{\"id\": 173, \"extra3\": \"{\\\"Applicant_Name\\\":\\\"\\\",\\\"Currency\\\":\\\"eee\\\",\\\"Amount_CCY\\\":\\\"20\\\",\\\"Tenor\\\":\\\"\\\",\\\"Shipment_Date\\\":\\\"\\\",\\\"HS_Code\\\":\\\"\\\",\\\"userName\\\":\\\"Hassan Ahmed4\\\"}\", \"status\": \"Open\", \"createdts\": \"2025-12-01 16:26:40.000000\", \"file_name\": \"ubl_logo.png\", \"file_type\": \"LC Application\", \"product_type\": \"Contract Reg - DP\"}]",
+                    "FirstName": "Hassan",
+                    "name": "NAWAZ ALI 2",
+                    "extra1": "Open",
+                    "LastName": "Ahmed4"
+                }
+            ],
+            "opstatus": 0,
+            "httpStatusCode": 0
+        }
+    } else {
+        return {
+            records: [],
+            opstatus: 1,
+            httpStatusCode: 404,
+            message: 'Trade request history not found'
+        }
+    }
+}
