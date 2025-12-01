@@ -1,3 +1,4 @@
+
 'use server';
 
 // This is a placeholder for the actual API call.
@@ -433,6 +434,3 @@ export async function uploadBulkFile(accountNumber: string, file: File) {
         };
     }
 }
-    
-
-```
