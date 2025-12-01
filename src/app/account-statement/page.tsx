@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -65,6 +66,8 @@ export default function AccountStatementPage() {
   }, []);
 
   useEffect(() => {
+    // We get the user profile and accounts from session storage which is set on dashboard load.
+    // This avoids fetching it again. A more robust solution might involve a global state manager (like Context or Redux).
     const profileString = sessionStorage.getItem('userProfile');
     const accountsString = sessionStorage.getItem('accounts');
 
@@ -79,13 +82,22 @@ export default function AccountStatementPage() {
         const initialAccount = parsedAccounts[0];
         setSelectedAccount(initialAccount);
         fetchTransactionsForAccount(initialAccount.ACCT_NO);
+      } else {
+        setLoading(false);
       }
-      setLoading(false);
     } else {
-        router.push('/');
+        // If session storage is empty (e.g., direct navigation/reload), redirect to dashboard
+        // The dashboard will fetch fresh data and set session storage.
+        router.push('/dashboard');
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, fetchTransactionsForAccount]);
+  
+  useEffect(() => {
+    // This effect is to stop the main loading spinner once transactions have been loaded (or failed)
+    if (!transactionsLoading) {
+      setLoading(false);
+    }
+  }, [transactionsLoading]);
   
   const handleAccountChange = (acctNo: string) => {
     const account = accounts.find(a => a.ACCT_NO === acctNo);

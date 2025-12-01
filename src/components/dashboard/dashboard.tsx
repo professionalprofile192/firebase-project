@@ -62,6 +62,8 @@ export function Dashboard({
     if (!initialUserProfile) {
       router.push('/');
     } else {
+        // Data is now primarily passed via props, but we can still store it
+        // for client-side access on other pages if needed, though cookies are better.
         sessionStorage.setItem('userProfile', JSON.stringify(initialUserProfile));
         sessionStorage.setItem('accounts', JSON.stringify(initialAccounts));
     }

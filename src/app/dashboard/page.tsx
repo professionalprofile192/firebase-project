@@ -19,6 +19,14 @@ async function getDashboardData() {
 
         let transactions = [];
         if (accounts.length > 0) {
+            // Save accounts to a cookie to be used on other pages
+            cookies().set('accounts', JSON.stringify(accounts), {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                path: '/',
+            });
+
             const recentTransactionsData = await getRecentTransactions(accounts[0].ACCT_NO);
             if (recentTransactionsData.opstatus === 0) {
                 transactions = recentTransactionsData.payments.slice(0, 3);

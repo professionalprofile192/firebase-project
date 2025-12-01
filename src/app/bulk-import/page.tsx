@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Paperclip } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { UploadStatusDialog } from '@/components/bulk-import/upload-status-dialog';
+import { useRouter } from 'next/navigation';
 
 type Account = {
     ACCT_NO: string;
@@ -68,13 +69,18 @@ export default function BulkImportPage() {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogContent, setDialogContent] = useState<{ status: 'success' | 'error'; title: string; message: string; refNumber?: string }>({ status: 'success', title: '', message: '' });
     const { toast } = useToast();
+    const router = useRouter();
 
     useEffect(() => {
         const accountsString = sessionStorage.getItem('accounts');
         if (accountsString) {
             setAccounts(JSON.parse(accountsString));
+        } else {
+             // If session storage is empty (e.g., direct navigation/reload), redirect to dashboard
+            // The dashboard will fetch fresh data and set session storage.
+            router.push('/dashboard');
         }
-    }, []);
+    }, [router]);
 
     const handleFileSelect = (key: string, file: File | null) => {
         setFiles(prev => ({...prev, [key]: file}));
@@ -204,4 +210,3 @@ export default function BulkImportPage() {
         </DashboardLayout>
     );
 }
-
