@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -189,11 +190,20 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
     const filteredBulkFiles = bulkFiles.filter(file => {
         const formattedDate = format(new Date(file.uploadDate), 'dd/MM/yyyy');
         const statusLabel = file.status === '1' ? 'Success' : file.status === '0' ? 'Failed' : 'In Progress';
+        const isSuccessComment = file.comment.toLowerCase().includes('success');
+        const isFailedComment = !isSuccessComment;
+        
+        let commentMatch = true;
+        if (commentFilter.toLowerCase() === 'success') {
+            commentMatch = isSuccessComment;
+        } else if (commentFilter.toLowerCase() === 'failed') {
+            commentMatch = isFailedComment;
+        }
 
         return (
             (dateFilter === '' || formattedDate.includes(dateFilter)) &&
             (statusFilter === '' || statusFilter.toLowerCase() === 'all' || statusLabel.toLowerCase() === statusFilter.toLowerCase()) &&
-            (commentFilter === '' || file.comment.toLowerCase().includes(commentFilter.toLowerCase()))
+            (commentFilter === '' || commentFilter.toLowerCase() === 'all' || commentMatch)
         );
     });
 
@@ -280,11 +290,16 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
                                             <SelectItem value="Failed">Failed</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <Input 
-                                        placeholder="Filter by Comment..."
-                                        value={commentFilter}
-                                        onChange={(e) => setCommentFilter(e.target.value)}
-                                    />
+                                    <Select value={commentFilter} onValueChange={setCommentFilter}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Filter by Comment..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All</SelectItem>
+                                            <SelectItem value="Success">Success</SelectItem>
+                                            <SelectItem value="Failed">Failed</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </CardContent>
                         </Card>
