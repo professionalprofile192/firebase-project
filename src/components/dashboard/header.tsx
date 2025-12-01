@@ -109,7 +109,7 @@ const SidebarNav = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             label: 'Trade Request', 
             icon: Briefcase, 
             subItems: [
-                { label: 'Trade Request', href: '#' },
+                { label: 'Trade Request', href: '/trade-request' },
                 { label: 'Trade Request History', href: '#' }
             ] 
         },
