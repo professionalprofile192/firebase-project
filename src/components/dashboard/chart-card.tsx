@@ -56,7 +56,7 @@ export function ChartCard({ transactions, accounts }: ChartCardProps) {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-primary"></div>
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
                         <span className="text-sm">Credit</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -106,7 +106,7 @@ export function ChartCard({ transactions, accounts }: ChartCardProps) {
                             borderRadius: '0.5rem',
                         }}
                     />
-                    <Bar dataKey="credit" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={20}/>
+                    <Bar dataKey="credit" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={20}/>
                     <Bar dataKey="debit" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={20} />
                 </BarChart>
             </ResponsiveContainer>
