@@ -14,7 +14,7 @@ import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { BulkFileHistoryTable } from './bulk-file-history-table';
 import type { BulkFile } from '@/app/bulk-import/page';
-import { uploadBulkFile } from '@/app/actions';
+import { uploadBulkFile, getBulkFiles } from '@/app/actions';
 
 type Account = {
     ACCT_NO: string;
@@ -83,6 +83,7 @@ const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey, formRese
 
 export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: BulkImportClientPageProps) {
     const [accounts, setAccounts] = useState<Account[]>(initialAccounts);
+    const [bulkFiles, setBulkFiles] = useState<BulkFile[]>(initialBulkFiles);
     const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
     const [files, setFiles] = useState<{ bulkFile: File | null, chequeInvoiceFile: File | null }>({ bulkFile: null, chequeInvoiceFile: null });
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -91,14 +92,16 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
     const { toast } = useToast();
     const router = useRouter();
     const [formResetKey, setFormResetKey] = useState(0);
+    const [userProfile, setUserProfile] = useState<any>(null);
 
     useEffect(() => {
         const userProfileString = sessionStorage.getItem('userProfile');
-        if (!userProfileString && !initialAccounts.length) {
+        if (userProfileString) {
+            setUserProfile(JSON.parse(userProfileString));
+        } else if (!initialAccounts.length) {
             router.push('/dashboard');
-        } else {
-            setAccounts(initialAccounts);
         }
+        setAccounts(initialAccounts);
     }, [initialAccounts, router]);
 
     const handleFileSelect = (key: string, file: File | null) => {
@@ -115,6 +118,14 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
         setFiles({ bulkFile: null, chequeInvoiceFile: null });
         setFormResetKey(prevKey => prevKey + 1);
     };
+
+    const fetchBulkFiles = async () => {
+        if (!userProfile?.userid) return;
+        const bulkFilesData = await getBulkFiles(userProfile.userid);
+        if (bulkFilesData.opstatus === 0) {
+            setBulkFiles(bulkFilesData.NDC_BulkPayments);
+        }
+    }
     
     const handleUpload = async () => {
         if (!selectedAccount) {
@@ -159,12 +170,11 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
         }
     };
 
-    const closeDialog = () => {
+    const closeDialog = async () => {
         setDialogOpen(false);
         if (dialogContent.status === 'success') {
             handleCancel();
-            // Optionally, you can refresh the history tab here
-            router.refresh();
+            await fetchBulkFiles();
         }
     }
 
@@ -181,7 +191,7 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
                     <TabsContent value="upload">
                         <Card className="w-full max-w-4xl mx-auto shadow-md">
                             <CardContent className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                                <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6" onSubmit={(e) => e.preventDefault()}>
                                     <div className="space-y-2">
                                         <Label htmlFor="account-number">Account Number</Label>
                                         <Select onValueChange={handleAccountChange} value={selectedAccount?.ACCT_NO || ''}>
@@ -224,12 +234,12 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
                                             {isUploading ? 'Uploading...' : 'Upload'}
                                         </Button>
                                     </div>
-                                </div>
+                                </form>
                             </CardContent>
                         </Card>
                     </TabsContent>
                     <TabsContent value="history">
-                        <BulkFileHistoryTable data={initialBulkFiles} />
+                        <BulkFileHistoryTable data={bulkFiles} />
                     </TabsContent>
                 </Tabs>
             </main>
