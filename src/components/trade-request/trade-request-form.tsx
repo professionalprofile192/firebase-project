@@ -12,9 +12,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Paperclip } from 'lucide-react';
+import { Paperclip, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 const productTypes = [
   'Contract Reg - DP',
@@ -36,19 +43,42 @@ const productTypes = [
   'FI amendment/correction',
 ];
 
+const requestTypes = [
+    'LC Application',
+    'Amendment',
+    'Cancellation',
+    'Payment Request',
+];
+
+type UploadedFile = {
+    id: number;
+    file: File;
+    requestType: string;
+    productType: string;
+}
+
 export function TradeRequestForm() {
   const [productType, setProductType] = useState('');
   const [currency, setCurrency] = useState('');
   const [amount, setAmount] = useState('');
-  const [requestType, setRequestType] = useState('fresh');
-  const [fileName, setFileName] = useState('');
+  const [requestType, setRequestType] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const [editFileId, setEditFileId] = useState<number | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setFileName(file.name);
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+        if (editFileId !== null) {
+            setUploadedFiles(prevFiles => prevFiles.map(f => f.id === editFileId ? {...f, file: selectedFile} : f));
+            setEditFileId(null);
+            toast({ title: "File Updated", description: `${selectedFile.name} has been updated.` });
+
+        } else {
+            setFile(selectedFile);
+        }
     }
   };
 
@@ -56,18 +86,24 @@ export function TradeRequestForm() {
     fileInputRef.current?.click();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-        title: "Request Submitted",
-        description: "Your trade request has been submitted successfully."
-    })
-    // Reset form
-    setProductType('');
-    setCurrency('');
-    setAmount('');
-    setRequestType('fresh');
-    setFileName('');
+  const handleUpload = () => {
+    if (!file || !requestType || !productType) {
+        toast({
+            variant: 'destructive',
+            title: "Missing Information",
+            description: "Please select a product type, request type, and a file to upload."
+        });
+        return;
+    }
+    const newFile: UploadedFile = {
+        id: Date.now(),
+        file,
+        requestType,
+        productType,
+    };
+    setUploadedFiles(prev => [...prev, newFile]);
+    // Clear the file input after upload
+    setFile(null);
     if(fileInputRef.current) fileInputRef.current.value = '';
   };
   
@@ -75,9 +111,38 @@ export function TradeRequestForm() {
     setProductType('');
     setCurrency('');
     setAmount('');
-    setRequestType('fresh');
-    setFileName('');
-     if(fileInputRef.current) fileInputRef.current.value = '';
+    setRequestType('');
+    setFile(null);
+    setUploadedFiles([]);
+    if(fileInputRef.current) fileInputRef.current.value = '';
+  }
+
+  const handleEdit = (id: number) => {
+    setEditFileId(id);
+    fileInputRef.current?.click();
+  }
+
+  const handleDelete = (id: number) => {
+    setUploadedFiles(prevFiles => prevFiles.filter(f => f.id !== id));
+    toast({ title: 'File Removed', description: 'The selected file has been removed.' });
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      if(uploadedFiles.length === 0) {
+          toast({ variant: 'destructive', title: "No Files Uploaded", description: "Please upload at least one file before submitting." });
+          return;
+      }
+      toast({
+          title: "Request Submitted",
+          description: "Your trade request has been submitted successfully."
+      });
+      handleCancel();
+  }
+
+  const getFileName = () => {
+      if (editFileId !== null) return "Editing...";
+      return file?.name || "";
   }
 
   return (
@@ -126,31 +191,29 @@ export function TradeRequestForm() {
                 </div>
 
                 <div>
-                    <Label>Request Type</Label>
-                    <RadioGroup
-                        value={requestType}
-                        onValueChange={setRequestType}
-                        className="flex items-center gap-6 mt-2"
-                    >
-                        <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="fresh" id="fresh" />
-                        <Label htmlFor="fresh">Fresh</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="cancellation" id="cancellation" />
-                        <Label htmlFor="cancellation">Cancellation</Label>
-                        </div>
-                    </RadioGroup>
+                  <Label htmlFor="request-type">Request Type</Label>
+                  <Select value={requestType} onValueChange={setRequestType}>
+                    <SelectTrigger id="request-type">
+                      <SelectValue placeholder="Select Request Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {requestTypes.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div>
-                  <Label htmlFor="attachment">Attachment</Label>
+                  <Label htmlFor="attachment">File Upload</Label>
                   <div className="relative mt-1">
                     <Input
                       id="attachment-display"
                       readOnly
                       placeholder="Click to attach file"
-                      value={fileName}
+                      value={getFileName()}
                       className="cursor-pointer"
                       onClick={handleAttachmentClick}
                     />
@@ -159,6 +222,7 @@ export function TradeRequestForm() {
                       ref={fileInputRef}
                       className="hidden"
                       onChange={handleFileChange}
+                      accept=".pdf,.png,.jpeg,.doc,.docx,.xls,.xlsx,.txt"
                     />
                     <Button
                       type="button"
@@ -170,7 +234,47 @@ export function TradeRequestForm() {
                       <Paperclip className="h-5 w-5 text-muted-foreground" />
                     </Button>
                   </div>
+                   <p className="text-xs text-muted-foreground mt-2">
+                        Note: The file size must be less than 5 MB and the supported formats are .pdf, .png, .jpeg, .doc, .docx, .xls, .xlsx and .txt.
+                    </p>
                 </div>
+
+                <div className="flex justify-start">
+                    <Button type="button" onClick={handleUpload}>Upload</Button>
+                </div>
+
+                {uploadedFiles.length > 0 && (
+                    <div className="pt-4 border-t">
+                        <h3 className="text-lg font-semibold mb-2">File Details</h3>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>File Name</TableHead>
+                                    <TableHead>Request Type</TableHead>
+                                    <TableHead>Product Type</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {uploadedFiles.map(uploaded => (
+                                    <TableRow key={uploaded.id}>
+                                        <TableCell className="font-medium">{uploaded.file.name}</TableCell>
+                                        <TableCell>{uploaded.requestType}</TableCell>
+                                        <TableCell>{uploaded.productType}</TableCell>
+                                        <TableCell className="text-right">
+                                            <Button variant="outline" size="sm" className="mr-2" onClick={() => handleEdit(uploaded.id)}>
+                                                <Edit className="h-4 w-4 mr-1" /> Edit
+                                            </Button>
+                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(uploaded.id)}>
+                                                <Trash2 className="h-4 w-4 mr-1" /> Delete
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                )}
 
 
                 <div className="flex justify-end gap-4 pt-4">
