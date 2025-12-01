@@ -403,5 +403,36 @@ export async function getBulkFiles(userId: string) {
     }
 }
     
+export async function uploadBulkFile(accountNumber: string, file: File) {
+    if (accountNumber === '060510224211') {
+        const extension = file.name.split('.').pop()?.toLowerCase();
+        if (extension !== 'csv' && extension !== 'txt') {
+             return {
+                opstatus: 1,
+                httpStatusCode: 400,
+                message: 'File format is not supported. Please upload a .csv or .txt file.'
+            };
+        }
 
+        // Mocking the API call
+        return {
+            "NDC_BulkPayments": [
+                {
+                    "accountNumber": accountNumber,
+                    "fileType": extension?.toUpperCase()
+                }
+            ],
+            "opstatus": 0,
+            "httpStatusCode": 200
+        };
+    } else {
+         return {
+            opstatus: 1,
+            httpStatusCode: 404,
+            message: 'Account not found for bulk file upload.'
+        };
+    }
+}
     
+
+```

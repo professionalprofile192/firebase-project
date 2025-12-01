@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { BulkFileHistoryTable } from './bulk-file-history-table';
 import type { BulkFile } from '@/app/bulk-import/page';
+import { uploadBulkFile } from '@/app/actions';
 
 type Account = {
     ACCT_NO: string;
@@ -86,14 +87,12 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
     const [files, setFiles] = useState<{ bulkFile: File | null, chequeInvoiceFile: File | null }>({ bulkFile: null, chequeInvoiceFile: null });
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogContent, setDialogContent] = useState<{ status: 'success' | 'error'; title: string; message: string; refNumber?: string }>({ status: 'success', title: '', message: '' });
+    const [isUploading, setIsUploading] = useState(false);
     const { toast } = useToast();
     const router = useRouter();
     const [formResetKey, setFormResetKey] = useState(0);
 
     useEffect(() => {
-        // On initial load, user might not have accounts in session yet if they deep-link.
-        // The server component (`page.tsx`) handles fetching.
-        // We only need to redirect if the server explicitly found no user profile.
         const userProfileString = sessionStorage.getItem('userProfile');
         if (!userProfileString && !initialAccounts.length) {
             router.push('/dashboard');
@@ -117,51 +116,55 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
         setFormResetKey(prevKey => prevKey + 1);
     };
     
-    const handleUpload = () => {
+    const handleUpload = async () => {
         if (!selectedAccount) {
             toast({ variant: 'destructive', title: 'Error', description: 'Please select an account.' });
             return;
         }
-        if (!files.bulkFile && !files.chequeInvoiceFile) {
+        const fileToUpload = files.bulkFile || files.chequeInvoiceFile;
+        if (!fileToUpload) {
             toast({ variant: 'destructive', title: 'Error', description: 'Please upload at least one file.' });
             return;
         }
 
-        const checkFile = (file: File | null) => {
-            if (file) {
-                const extension = file.name.split('.').pop()?.toLowerCase();
-                if (extension !== 'csv' && extension !== 'txt') {
-                    return false;
-                }
-            }
-            return true;
-        }
+        setIsUploading(true);
 
-        if (!checkFile(files.bulkFile) || !checkFile(files.chequeInvoiceFile)) {
+        try {
+            const response = await uploadBulkFile(selectedAccount.ACCT_NO, fileToUpload);
+            
+            if (response.opstatus === 0) {
+                const refNumber = `008${Date.now().toString().slice(-12)}`;
+                setDialogContent({
+                    status: 'success',
+                    title: 'Single Bulk Upload',
+                    message: 'Bulk file has been uploaded and is being validated by the system. Please refer to the Bulk History Tab in case of any errors.',
+                    refNumber
+                });
+            } else {
+                setDialogContent({
+                    status: 'error',
+                    title: 'Upload Failed',
+                    message: response.message || 'An unknown error occurred.'
+                });
+            }
+        } catch (error) {
             setDialogContent({
                 status: 'error',
                 title: 'Upload Failed',
-                message: 'File format is not supported. Please upload a .csv or .txt file.'
+                message: 'An unexpected error occurred during upload.'
             });
+        } finally {
+            setIsUploading(false);
             setDialogOpen(true);
-            return;
         }
-
-        // --- Mock successful upload ---
-        const refNumber = `008${Date.now().toString().slice(-12)}`;
-        setDialogContent({
-            status: 'success',
-            title: 'Single Bulk Upload',
-            message: 'Bulk file has been uploaded and is being validated by the system. Please refer to the Bulk History Tab in case of any errors.',
-            refNumber
-        });
-        setDialogOpen(true);
     };
 
     const closeDialog = () => {
         setDialogOpen(false);
         if (dialogContent.status === 'success') {
             handleCancel();
+            // Optionally, you can refresh the history tab here
+            router.refresh();
         }
     }
 
@@ -216,8 +219,10 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
                                     </div>
 
                                     <div className="md:col-span-2 flex items-center gap-4 mt-4">
-                                        <Button variant="outline" type="button" onClick={handleCancel}>Cancel</Button>
-                                        <Button type="button" onClick={handleUpload}>Upload</Button>
+                                        <Button variant="outline" type="button" onClick={handleCancel} disabled={isUploading}>Cancel</Button>
+                                        <Button type="button" onClick={handleUpload} disabled={isUploading}>
+                                            {isUploading ? 'Uploading...' : 'Upload'}
+                                        </Button>
                                     </div>
                                 </div>
                             </CardContent>
