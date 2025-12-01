@@ -14,6 +14,16 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
     const router = useRouter();
     const timeoutId = useRef<NodeJS.Timeout | null>(null);
 
+    // This effect will run on every page reload, logging the user out.
+    useEffect(() => {
+        const performLogout = async () => {
+            await logout();
+            router.push('/');
+        };
+        performLogout();
+    }, [router]);
+
+
     const handleLogout = useCallback(async () => {
         await logout();
         if (timeoutId.current) {
