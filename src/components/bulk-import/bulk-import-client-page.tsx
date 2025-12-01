@@ -192,7 +192,7 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
 
         return (
             (dateFilter === '' || formattedDate.includes(dateFilter)) &&
-            (statusFilter === '' || statusLabel.toLowerCase().includes(statusFilter.toLowerCase())) &&
+            (statusFilter === '' || statusFilter.toLowerCase() === 'all' || statusLabel.toLowerCase() === statusFilter.toLowerCase()) &&
             (commentFilter === '' || file.comment.toLowerCase().includes(commentFilter.toLowerCase()))
         );
     });
@@ -270,11 +270,16 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
                                         value={dateFilter}
                                         onChange={(e) => setDateFilter(e.target.value)}
                                     />
-                                    <Input 
-                                        placeholder="Filter by Status..."
-                                        value={statusFilter}
-                                        onChange={(e) => setStatusFilter(e.target.value)}
-                                    />
+                                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Filter by Status..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All</SelectItem>
+                                            <SelectItem value="Success">Success</SelectItem>
+                                            <SelectItem value="Failed">Failed</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                     <Input 
                                         placeholder="Filter by Comment..."
                                         value={commentFilter}
