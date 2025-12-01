@@ -126,6 +126,17 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
             setBulkFiles(bulkFilesData.NDC_BulkPayments);
         }
     }
+
+    const handleSuccessfulUpload = (file: File, refNumber: string) => {
+        const newFileEntry: BulkFile = {
+            fileName: file.name,
+            uploadDate: new Date().toISOString(),
+            fileReferenceNumber: refNumber,
+            status: '1', // '1' for success
+            comment: 'FILE UPLOADED SUCCESS',
+        };
+        setBulkFiles(prevFiles => [newFileEntry, ...prevFiles]);
+    };
     
     const handleUpload = async () => {
         if (!selectedAccount) {
@@ -151,6 +162,7 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
                     message: 'Bulk file has been uploaded and is being validated by the system. Please refer to the Bulk History Tab in case of any errors.',
                     refNumber
                 });
+                handleSuccessfulUpload(fileToUpload, refNumber);
             } else {
                 setDialogContent({
                     status: 'error',
@@ -170,11 +182,10 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
         }
     };
 
-    const closeDialog = async () => {
+    const closeDialog = () => {
         setDialogOpen(false);
         if (dialogContent.status === 'success') {
             handleCancel();
-            await fetchBulkFiles();
         }
     }
 
