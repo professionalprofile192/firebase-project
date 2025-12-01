@@ -73,6 +73,8 @@ export function TradeRequestForm() {
   const [transactionRef, setTransactionRef] = useState('');
   const [showUploadSuccessDialog, setShowUploadSuccessDialog] = useState(false);
   const [fileToUpload, setFileToUpload] = useState<UploadedFile | null>(null);
+  const [dialogTitle, setDialogTitle] = useState('');
+  const [dialogMessage, setDialogMessage] = useState('');
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -112,6 +114,8 @@ export function TradeRequestForm() {
         productType,
     };
     setFileToUpload(newFile);
+    setDialogTitle('Single Bulk Upload');
+    setDialogMessage('File has been uploaded and is being validated by the system. Please refer to the Dashboard to view it.');
     setTransactionRef(`00${Date.now().toString().slice(-14)}`);
     setShowUploadSuccessDialog(true);
   };
@@ -145,6 +149,8 @@ export function TradeRequestForm() {
       
       const refId = `00${Date.now().toString().slice(-14)}`;
       setTransactionRef(refId);
+      setDialogTitle('Single Bulk Upload');
+      setDialogMessage('File has been uploaded and is being validated by the system. Please refer to the Dashboard to view it.');
       setShowSuccessDialog(true);
   }
 
@@ -318,13 +324,15 @@ export function TradeRequestForm() {
         open={showSuccessDialog}
         onOpenChange={setShowSuccessDialog}
         onDone={handleDone}
-        transactionRef={transactionRef}
+        title={dialogTitle}
+        message={dialogMessage}
       />
        <SuccessDialog 
         open={showUploadSuccessDialog}
         onOpenChange={setShowUploadSuccessDialog}
         onDone={handleUploadDone}
-        transactionRef={transactionRef}
+        title={dialogTitle}
+        message={dialogMessage}
       />
     </>
   );

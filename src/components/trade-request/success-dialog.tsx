@@ -13,14 +13,16 @@ import { CheckCircle2, X } from 'lucide-react';
 interface SuccessDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  transactionRef: string;
+  title: string;
+  message: string;
   onDone: () => void;
 }
 
 export function SuccessDialog({
   open,
   onOpenChange,
-  transactionRef,
+  title,
+  message,
   onDone,
 }: SuccessDialogProps) {
     
@@ -31,9 +33,9 @@ export function SuccessDialog({
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-500">
                 <CheckCircle2 className="h-8 w-8" strokeWidth={2} />
             </div>
-          <AlertDialogTitle className="text-xl font-bold">Success</AlertDialogTitle>
+          <AlertDialogTitle className="text-xl font-bold">{title}</AlertDialogTitle>
           <p className="text-muted-foreground text-sm">
-            Request has been sent successfully with file reference id: <strong>{transactionRef}</strong>.
+            {message}
           </p>
         </AlertDialogHeader>
         <AlertDialogFooter className="mt-4">
