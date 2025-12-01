@@ -45,9 +45,7 @@ const productTypes = [
 
 const requestTypes = [
     'LC Application',
-    'Amendment',
-    'Cancellation',
-    'Payment Request',
+    'Proforma Invoice / Order / Intent'
 ];
 
 type UploadedFile = {
