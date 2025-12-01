@@ -1,8 +1,7 @@
-
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Menu, User, LogOut, Settings, X, Landmark, CheckSquare, CreditCard, ArrowRightLeft, Clock, Briefcase, BarChart, Upload, ChevronDown, ChevronUp } from 'lucide-react';
+import { Menu, User, LogOut, Settings, X, Landmark, CheckSquare, CreditCard, ArrowRightLeft, Clock, Briefcase, BarChart, Upload, ChevronDown, ChevronUp, LayoutDashboard } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
@@ -42,12 +41,17 @@ const SidebarNav = () => {
     }
 
     const navItems = [
+        {
+            id: 'dashboard',
+            label: 'Dashboard',
+            icon: LayoutDashboard,
+            href: '/dashboard',
+        },
         { 
             id: 'accounts', 
             label: 'Accounts', 
             icon: Landmark, 
             subItems: [
-                { label: 'My Accounts', href: '/dashboard' },
                 { label: 'Account Statements', href: '/account-statement' }
             ] 
         },
