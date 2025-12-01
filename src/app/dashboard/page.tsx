@@ -7,7 +7,7 @@ async function getDashboardData() {
     const cookieStore = cookies();
     const userProfileCookie = cookieStore.get('userProfile');
 
-    if (!userProfileCookie) {
+    if (!userProfileCookie || !userProfileCookie.value) {
         return { userProfile: null, accounts: [], transactions: [], notifications: [] };
     }
 
