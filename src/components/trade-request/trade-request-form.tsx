@@ -81,6 +81,10 @@ export function TradeRequestForm() {
             setFile(selectedFile);
         }
     }
+    // Reset file input value to allow re-uploading the same file
+    if(event.target) {
+        event.target.value = '';
+    }
   };
 
   const handleAttachmentClick = () => {
@@ -120,7 +124,7 @@ export function TradeRequestForm() {
 
   const handleEdit = (id: number) => {
     setEditFileId(id);
-    fileInputRef.current?.click();
+    handleAttachmentClick();
   }
 
   const handleDelete = (id: number) => {
@@ -142,7 +146,7 @@ export function TradeRequestForm() {
   }
 
   const getFileName = () => {
-      if (editFileId !== null) return "Editing...";
+      if (editFileId !== null) return "Select a new file...";
       return file?.name || "";
   }
 
