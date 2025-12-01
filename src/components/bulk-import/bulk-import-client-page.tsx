@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,7 @@ import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { BulkFileHistoryTable } from './bulk-file-history-table';
 import type { BulkFile } from '@/app/bulk-import/page';
-import { uploadBulkFile, getBulkFiles } from '@/app/actions';
+import { uploadBulkFile } from '@/app/actions';
 import { format } from 'date-fns';
 
 type Account = {
