@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { SuccessDialog } from './success-dialog';
 
 const productTypes = [
   'Contract Reg - DP',
@@ -68,6 +69,8 @@ export function TradeRequestForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [editFileId, setEditFileId] = useState<number | null>(null);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [transactionRef, setTransactionRef] = useState('');
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -138,10 +141,14 @@ export function TradeRequestForm() {
           toast({ variant: 'destructive', title: "No Files Uploaded", description: "Please upload at least one file before submitting." });
           return;
       }
-      toast({
-          title: "Request Submitted",
-          description: "Your trade request has been submitted successfully."
-      });
+      
+      const refId = `00${Date.now().toString().slice(-14)}`;
+      setTransactionRef(refId);
+      setShowSuccessDialog(true);
+  }
+
+  const handleDone = () => {
+      setShowSuccessDialog(false);
       handleCancel();
   }
 
@@ -151,148 +158,156 @@ export function TradeRequestForm() {
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto shadow-md">
-      <CardContent className="p-6">
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="product-type">Product Type</Label>
-              <Select value={productType} onValueChange={setProductType}>
-                <SelectTrigger id="product-type">
-                  <SelectValue placeholder="Select Product Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {productTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {productType && (
-              <div className="space-y-6 pt-4 border-t">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <Label htmlFor="ccy">CCY</Label>
-                        <Input
-                        id="ccy"
-                        placeholder="e.g., USD, EUR"
-                        value={currency}
-                        onChange={(e) => setCurrency(e.target.value)}
-                        />
-                    </div>
-                    <div>
-                        <Label htmlFor="amount">Amount</Label>
-                        <Input
-                        id="amount"
-                        type="number"
-                        placeholder="Enter Amount"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        />
-                    </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="request-type">Request Type</Label>
-                  <Select value={requestType} onValueChange={setRequestType}>
-                    <SelectTrigger id="request-type">
-                      <SelectValue placeholder="Select Request Type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {requestTypes.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Label htmlFor="attachment">File Upload</Label>
-                  <div className="relative mt-1">
-                    <Input
-                      id="attachment-display"
-                      readOnly
-                      placeholder="Click to attach file"
-                      value={getFileName()}
-                      className="cursor-pointer"
-                      onClick={handleAttachmentClick}
-                    />
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      className="hidden"
-                      onChange={handleFileChange}
-                      accept=".pdf,.png,.jpeg,.doc,.docx,.xls,.xlsx,.txt"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2"
-                      onClick={handleAttachmentClick}
-                    >
-                      <Paperclip className="h-5 w-5 text-muted-foreground" />
-                    </Button>
-                  </div>
-                   <p className="text-xs text-muted-foreground mt-2">
-                        Note: The file size must be less than 5 MB and the supported formats are .pdf, .png, .jpeg, .doc, .docx, .xls, .xlsx and .txt.
-                    </p>
-                </div>
-
-                <div className="flex justify-start">
-                    <Button type="button" onClick={handleUpload}>Upload</Button>
-                </div>
-
-                {uploadedFiles.length > 0 && (
-                    <div className="pt-4 border-t">
-                        <h3 className="text-lg font-semibold mb-2">File Details</h3>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>File Name</TableHead>
-                                    <TableHead>Request Type</TableHead>
-                                    <TableHead>Product Type</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {uploadedFiles.map(uploaded => (
-                                    <TableRow key={uploaded.id}>
-                                        <TableCell className="font-medium">{uploaded.file.name}</TableCell>
-                                        <TableCell>{uploaded.requestType}</TableCell>
-                                        <TableCell>{uploaded.productType}</TableCell>
-                                        <TableCell className="text-right">
-                                            <Button type="button" variant="outline" size="sm" className="mr-2" onClick={() => handleEdit(uploaded.id)}>
-                                                <Edit className="h-4 w-4 mr-1" /> Edit
-                                            </Button>
-                                            <Button type="button" variant="destructive" size="sm" onClick={() => handleDelete(uploaded.id)}>
-                                                <Trash2 className="h-4 w-4 mr-1" /> Delete
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                )}
-
-
-                <div className="flex justify-end gap-4 pt-4">
-                  <Button type="button" variant="outline" onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                  <Button type="submit">Submit</Button>
-                </div>
+    <>
+      <Card className="w-full max-w-4xl mx-auto shadow-md">
+        <CardContent className="p-6">
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="product-type">Product Type</Label>
+                <Select value={productType} onValueChange={setProductType}>
+                  <SelectTrigger id="product-type">
+                    <SelectValue placeholder="Select Product Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {productTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+
+              {productType && (
+                <div className="space-y-6 pt-4 border-t">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                          <Label htmlFor="ccy">CCY</Label>
+                          <Input
+                          id="ccy"
+                          placeholder="e.g., USD, EUR"
+                          value={currency}
+                          onChange={(e) => setCurrency(e.target.value)}
+                          />
+                      </div>
+                      <div>
+                          <Label htmlFor="amount">Amount</Label>
+                          <Input
+                          id="amount"
+                          type="number"
+                          placeholder="Enter Amount"
+                          value={amount}
+                          onChange={(e) => setAmount(e.target.value)}
+                          />
+                      </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="request-type">Request Type</Label>
+                    <Select value={requestType} onValueChange={setRequestType}>
+                      <SelectTrigger id="request-type">
+                        <SelectValue placeholder="Select Request Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {requestTypes.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="attachment">File Upload</Label>
+                    <div className="relative mt-1">
+                      <Input
+                        id="attachment-display"
+                        readOnly
+                        placeholder="Click to attach file"
+                        value={getFileName()}
+                        className="cursor-pointer"
+                        onClick={handleAttachmentClick}
+                      />
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        onChange={handleFileChange}
+                        accept=".pdf,.png,.jpeg,.doc,.docx,.xls,.xlsx,.txt"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-2 top-1/2 -translate-y-1/2"
+                        onClick={handleAttachmentClick}
+                      >
+                        <Paperclip className="h-5 w-5 text-muted-foreground" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                          Note: The file size must be less than 5 MB and the supported formats are .pdf, .png, .jpeg, .doc, .docx, .xls, .xlsx and .txt.
+                      </p>
+                  </div>
+
+                  <div className="flex justify-start">
+                      <Button type="button" onClick={handleUpload}>Upload</Button>
+                  </div>
+
+                  {uploadedFiles.length > 0 && (
+                      <div className="pt-4 border-t">
+                          <h3 className="text-lg font-semibold mb-2">File Details</h3>
+                          <Table>
+                              <TableHeader>
+                                  <TableRow>
+                                      <TableHead>File Name</TableHead>
+                                      <TableHead>Request Type</TableHead>
+                                      <TableHead>Product Type</TableHead>
+                                      <TableHead className="text-right">Actions</TableHead>
+                                  </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                  {uploadedFiles.map(uploaded => (
+                                      <TableRow key={uploaded.id}>
+                                          <TableCell className="font-medium">{uploaded.file.name}</TableCell>
+                                          <TableCell>{uploaded.requestType}</TableCell>
+                                          <TableCell>{uploaded.productType}</TableCell>
+                                          <TableCell className="text-right">
+                                              <Button type="button" variant="outline" size="sm" className="mr-2" onClick={() => handleEdit(uploaded.id)}>
+                                                  <Edit className="h-4 w-4 mr-1" /> Edit
+                                              </Button>
+                                              <Button type="button" variant="destructive" size="sm" onClick={() => handleDelete(uploaded.id)}>
+                                                  <Trash2 className="h-4 w-4 mr-1" /> Delete
+                                              </Button>
+                                          </TableCell>
+                                      </TableRow>
+                                  ))}
+                              </TableBody>
+                          </Table>
+                      </div>
+                  )}
+
+
+                  <div className="flex justify-end gap-4 pt-4">
+                    <Button type="button" variant="outline" onClick={handleCancel}>
+                      Cancel
+                    </Button>
+                    <Button type="submit">Submit</Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+      <SuccessDialog 
+        open={showSuccessDialog}
+        onOpenChange={setShowSuccessDialog}
+        onDone={handleDone}
+        transactionRef={transactionRef}
+      />
+    </>
   );
 }
