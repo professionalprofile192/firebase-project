@@ -18,9 +18,16 @@ type Account = {
     ACCT_TITLE: string;
 };
 
-const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey }: { id: string, label: string, onFileSelect: (key: string, file: File | null) => void, acceptedFormats: string, fileKey: string }) => {
+const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey, formResetKey }: { id: string, label: string, onFileSelect: (key: string, file: File | null) => void, acceptedFormats: string, fileKey: string, formResetKey: number }) => {
     const [fileName, setFileName] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        // Reset fileName when the formResetKey changes, which indicates a form reset.
+        if (formResetKey > 0) {
+            setFileName('');
+        }
+    }, [formResetKey]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || null;
@@ -47,6 +54,7 @@ const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey }: { id: 
                     onClick={handleButtonClick}
                 />
                 <input
+                    key={formResetKey} // Use key to force re-render on reset
                     type="file"
                     ref={fileInputRef}
                     className="hidden"
@@ -70,6 +78,7 @@ export default function BulkImportPage() {
     const [dialogContent, setDialogContent] = useState<{ status: 'success' | 'error'; title: string; message: string; refNumber?: string }>({ status: 'success', title: '', message: '' });
     const { toast } = useToast();
     const router = useRouter();
+    const [formResetKey, setFormResetKey] = useState(0);
 
     useEffect(() => {
         const accountsString = sessionStorage.getItem('accounts');
@@ -94,8 +103,7 @@ export default function BulkImportPage() {
     const handleCancel = () => {
         setSelectedAccount(null);
         setFiles({ bulkFile: null, chequeInvoiceFile: null });
-        // This is a bit of a hack to reset the uncontrolled file inputs
-        window.location.reload();
+        setFormResetKey(prevKey => prevKey + 1); // Increment key to reset file inputs
     };
     
     const handleUpload = () => {
@@ -180,9 +188,9 @@ export default function BulkImportPage() {
                                 />
                             </div>
                             
-                            <FileInput id="bulk-file" label="Bulk File Upload" onFileSelect={handleFileSelect} acceptedFormats=".csv,.txt" fileKey="bulkFile" />
+                            <FileInput id="bulk-file" label="Bulk File Upload" onFileSelect={handleFileSelect} acceptedFormats=".csv,.txt" fileKey="bulkFile" formResetKey={formResetKey} />
 
-                            <FileInput id="cheque-invoice-file" label="Upload Cheque Invoice File" onFileSelect={handleFileSelect} acceptedFormats=".csv,.txt" fileKey="chequeInvoiceFile" />
+                            <FileInput id="cheque-invoice-file" label="Upload Cheque Invoice File" onFileSelect={handleFileSelect} acceptedFormats=".csv,.txt" fileKey="chequeInvoiceFile" formResetKey={formResetKey} />
 
                             <div className="md:col-span-2">
                                 <p className="text-sm text-muted-foreground">
