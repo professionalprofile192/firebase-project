@@ -267,10 +267,10 @@ export function TradeRequestForm() {
                                         <TableCell>{uploaded.requestType}</TableCell>
                                         <TableCell>{uploaded.productType}</TableCell>
                                         <TableCell className="text-right">
-                                            <Button variant="outline" size="sm" className="mr-2" onClick={() => handleEdit(uploaded.id)}>
+                                            <Button type="button" variant="outline" size="sm" className="mr-2" onClick={() => handleEdit(uploaded.id)}>
                                                 <Edit className="h-4 w-4 mr-1" /> Edit
                                             </Button>
-                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(uploaded.id)}>
+                                            <Button type="button" variant="destructive" size="sm" onClick={() => handleDelete(uploaded.id)}>
                                                 <Trash2 className="h-4 w-4 mr-1" /> Delete
                                             </Button>
                                         </TableCell>
