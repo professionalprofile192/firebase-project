@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Paperclip } from 'lucide-react';
+import { Paperclip, Filter } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { UploadStatusDialog } from '@/components/bulk-import/upload-status-dialog';
 import { useRouter } from 'next/navigation';
@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { BulkFileHistoryTable } from './bulk-file-history-table';
 import type { BulkFile } from '@/app/bulk-import/page';
 import { uploadBulkFile, getBulkFiles } from '@/app/actions';
+import { format } from 'date-fns';
 
 type Account = {
     ACCT_NO: string;
@@ -93,6 +94,10 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
     const [formResetKey, setFormResetKey] = useState(0);
     const [userProfile, setUserProfile] = useState<any>(null);
 
+    const [dateFilter, setDateFilter] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+    const [commentFilter, setCommentFilter] = useState('');
+
     useEffect(() => {
         const userProfileString = sessionStorage.getItem('userProfile');
         if (userProfileString) {
@@ -118,15 +123,7 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
         setFiles({ bulkFile: null, chequeInvoiceFile: null });
         setFormResetKey(prevKey => prevKey + 1);
     };
-
-    const fetchBulkFiles = async () => {
-        if (!userProfile?.userid) return;
-        const bulkFilesData = await getBulkFiles(userProfile.userid);
-        if (bulkFilesData.opstatus === 0) {
-            setBulkFiles(bulkFilesData.NDC_BulkPayments);
-        }
-    }
-
+    
     const handleSuccessfulUpload = (file: File, refNumber: string) => {
         const newFileEntry: BulkFile = {
             fileName: file.name,
@@ -189,6 +186,17 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
         }
     }
 
+    const filteredBulkFiles = bulkFiles.filter(file => {
+        const formattedDate = format(new Date(file.uploadDate), 'dd/MM/yyyy');
+        const statusLabel = file.status === '1' ? 'Success' : file.status === '0' ? 'Failed' : 'In Progress';
+
+        return (
+            (dateFilter === '' || formattedDate.includes(dateFilter)) &&
+            (statusFilter === '' || statusLabel.toLowerCase().includes(statusFilter.toLowerCase())) &&
+            (commentFilter === '' || file.comment.toLowerCase().includes(commentFilter.toLowerCase()))
+        );
+    });
+
     return (
         <DashboardLayout>
             <main className="flex-1 p-4 sm:px-6 sm:py-4 flex flex-col gap-6">
@@ -250,7 +258,32 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
                         </Card>
                     </TabsContent>
                     <TabsContent value="history">
-                        <BulkFileHistoryTable data={bulkFiles} />
+                        <Card>
+                            <CardHeader className="flex flex-row items-center gap-4 p-4 border-b">
+                                 <Filter className="h-5 w-5 text-muted-foreground" />
+                                 <h3 className="text-lg font-semibold">Filters</h3>
+                            </CardHeader>
+                            <CardContent className="p-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                    <Input 
+                                        placeholder="Filter by Upload Date..."
+                                        value={dateFilter}
+                                        onChange={(e) => setDateFilter(e.target.value)}
+                                    />
+                                    <Input 
+                                        placeholder="Filter by Status..."
+                                        value={statusFilter}
+                                        onChange={(e) => setStatusFilter(e.target.value)}
+                                    />
+                                    <Input 
+                                        placeholder="Filter by Comment..."
+                                        value={commentFilter}
+                                        onChange={(e) => setCommentFilter(e.target.value)}
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <BulkFileHistoryTable data={filteredBulkFiles} />
                     </TabsContent>
                 </Tabs>
             </main>
