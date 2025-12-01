@@ -6,6 +6,7 @@ import {
   AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -54,7 +55,7 @@ export function UploadStatusDialog({
                 <AlertTriangle className="h-8 w-8" strokeWidth={2} />
             </div>
           )}
-          <h2 className="text-xl font-bold">{title}</h2>
+          <AlertDialogTitle className="text-xl font-bold">{title}</AlertDialogTitle>
           <p className="text-muted-foreground text-sm">
             {message}
             {status === 'success' && transactionRef && (
