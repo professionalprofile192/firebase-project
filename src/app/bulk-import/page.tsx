@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers';
 import { getAccounts, getBulkFiles } from '../actions';
 import { BulkImportClientPage } from '@/components/bulk-import/bulk-import-client-page';
+import { Suspense } from 'react';
 
 export type BulkFile = {
     fileName: string;
@@ -41,9 +42,11 @@ export default async function BulkImportPage() {
   const { accounts, bulkFiles } = await getBulkImportData();
 
   return (
-    <BulkImportClientPage
-        initialAccounts={accounts}
-        initialBulkFiles={bulkFiles}
-    />
+    <Suspense fallback={<div>Loading...</div>}>
+        <BulkImportClientPage
+            initialAccounts={accounts}
+            initialBulkFiles={bulkFiles}
+        />
+    </Suspense>
   );
 }

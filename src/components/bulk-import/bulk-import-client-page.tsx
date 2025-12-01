@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -11,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Paperclip, Filter } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { UploadStatusDialog } from '@/components/bulk-import/upload-status-dialog';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { BulkFileHistoryTable } from './bulk-file-history-table';
 import type { BulkFile } from '@/app/bulk-import/page';
@@ -83,6 +84,9 @@ const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey, formRese
 
 
 export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: BulkImportClientPageProps) {
+    const searchParams = useSearchParams();
+    const tab = searchParams.get('tab');
+    
     const [accounts, setAccounts] = useState<Account[]>(initialAccounts);
     const [bulkFiles, setBulkFiles] = useState<BulkFile[]>(initialBulkFiles);
     const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
@@ -98,6 +102,7 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
     const [dateFilter, setDateFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [commentFilter, setCommentFilter] = useState('');
+    const [activeTab, setActiveTab] = useState(tab || 'upload');
 
     useEffect(() => {
         const userProfileString = sessionStorage.getItem('userProfile');
@@ -209,111 +214,121 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
         );
     });
 
+    const historyView = (
+        <div>
+            <Card>
+                <CardHeader className="flex flex-row items-center gap-4 p-4 border-b">
+                     <Filter className="h-5 w-5 text-muted-foreground" />
+                     <h3 className="text-lg font-semibold">Filters</h3>
+                </CardHeader>
+                <CardContent className="p-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <Select value={dateFilter} onValueChange={setDateFilter}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Filter by Upload Date..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                {uniqueDates.map(date => (
+                                    <SelectItem key={date} value={date}>{date}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Filter by Status..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                <SelectItem value="Success">Success</SelectItem>
+                                <SelectItem value="Failed">Failed</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Select value={commentFilter} onValueChange={setCommentFilter}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Filter by Comment..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                <SelectItem value="Success">Success</SelectItem>
+                                <SelectItem value="Failed">Failed</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </CardContent>
+            </Card>
+            <BulkFileHistoryTable data={filteredBulkFiles} />
+        </div>
+    );
+
     return (
         <DashboardLayout>
             <main className="flex-1 p-4 sm:px-6 sm:py-4 flex flex-col gap-6">
                 <h1 className="text-2xl font-semibold">Bulk Import</h1>
 
-                <Tabs defaultValue="upload">
-                    <TabsList className="grid w-full max-w-md grid-cols-2">
-                        <TabsTrigger value="upload">Single Bulk Upload</TabsTrigger>
-                        <TabsTrigger value="history">Bulk Import History</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="upload">
-                        <Card className="w-full max-w-4xl mx-auto shadow-md">
-                            <CardContent className="p-6">
-                                <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6" onSubmit={(e) => e.preventDefault()}>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="account-number">Account Number</Label>
-                                        <Select onValueChange={handleAccountChange} value={selectedAccount?.ACCT_NO || ''}>
-                                            <SelectTrigger id="account-number">
-                                                <SelectValue placeholder="Select Account" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {accounts.map(account => (
-                                                    <SelectItem key={account.ACCT_NO} value={account.ACCT_NO}>
-                                                        {account.ACCT_NO}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="account-name">Account Name</Label>
-                                        <Input 
-                                            id="account-name"
-                                            placeholder="Enter Name"
-                                            value={selectedAccount?.ACCT_TITLE || ''}
-                                            disabled
-                                            className="bg-gray-100"
-                                        />
-                                    </div>
-                                    
-                                    <FileInput id="bulk-file" label="Bulk File Upload" onFileSelect={handleFileSelect} acceptedFormats=".csv,.txt" fileKey="bulkFile" formResetKey={formResetKey} />
+                {tab === 'history' ? (
+                    historyView
+                ) : (
+                    <Tabs value={activeTab} onValueChange={setActiveTab}>
+                        <TabsList className="grid w-full max-w-md grid-cols-2">
+                            <TabsTrigger value="upload">Single Bulk Upload</TabsTrigger>
+                            <TabsTrigger value="history">Bulk Import History</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="upload">
+                            <Card className="w-full max-w-4xl mx-auto shadow-md">
+                                <CardContent className="p-6">
+                                    <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6" onSubmit={(e) => e.preventDefault()}>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="account-number">Account Number</Label>
+                                            <Select onValueChange={handleAccountChange} value={selectedAccount?.ACCT_NO || ''}>
+                                                <SelectTrigger id="account-number">
+                                                    <SelectValue placeholder="Select Account" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {accounts.map(account => (
+                                                        <SelectItem key={account.ACCT_NO} value={account.ACCT_NO}>
+                                                            {account.ACCT_NO}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="account-name">Account Name</Label>
+                                            <Input 
+                                                id="account-name"
+                                                placeholder="Enter Name"
+                                                value={selectedAccount?.ACCT_TITLE || ''}
+                                                disabled
+                                                className="bg-gray-100"
+                                            />
+                                        </div>
+                                        
+                                        <FileInput id="bulk-file" label="Bulk File Upload" onFileSelect={handleFileSelect} acceptedFormats=".csv,.txt" fileKey="bulkFile" formResetKey={formResetKey} />
 
-                                    <FileInput id="cheque-invoice-file" label="Upload Cheque Invoice File" onFileSelect={handleFileSelect} acceptedFormats=".csv,.txt" fileKey="chequeInvoiceFile" formResetKey={formResetKey} />
+                                        <FileInput id="cheque-invoice-file" label="Upload Cheque Invoice File" onFileSelect={handleFileSelect} acceptedFormats=".csv,.txt" fileKey="chequeInvoiceFile" formResetKey={formResetKey} />
 
-                                    <div className="md:col-span-2">
-                                        <p className="text-sm text-muted-foreground">
-                                            Note: The file size must be less than 5 MB and the supported formats are .csv and .txt.
-                                        </p>
-                                    </div>
+                                        <div className="md:col-span-2">
+                                            <p className="text-sm text-muted-foreground">
+                                                Note: The file size must be less than 5 MB and the supported formats are .csv and .txt.
+                                            </p>
+                                        </div>
 
-                                    <div className="md:col-span-2 flex items-center gap-4 mt-4">
-                                        <Button type="button" variant="outline" onClick={handleCancel} disabled={isUploading}>Cancel</Button>
-                                        <Button type="button" onClick={handleUpload} disabled={isUploading}>
-                                            {isUploading ? 'Uploading...' : 'Upload'}
-                                        </Button>
-                                    </div>
-                                </form>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-                    <TabsContent value="history">
-                        <Card>
-                            <CardHeader className="flex flex-row items-center gap-4 p-4 border-b">
-                                 <Filter className="h-5 w-5 text-muted-foreground" />
-                                 <h3 className="text-lg font-semibold">Filters</h3>
-                            </CardHeader>
-                            <CardContent className="p-4">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                                    <Select value={dateFilter} onValueChange={setDateFilter}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Filter by Upload Date..." />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">All</SelectItem>
-                                            {uniqueDates.map(date => (
-                                                <SelectItem key={date} value={date}>{date}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Filter by Status..." />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">All</SelectItem>
-                                            <SelectItem value="Success">Success</SelectItem>
-                                            <SelectItem value="Failed">Failed</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <Select value={commentFilter} onValueChange={setCommentFilter}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Filter by Comment..." />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">All</SelectItem>
-                                            <SelectItem value="Success">Success</SelectItem>
-                                            <SelectItem value="Failed">Failed</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <BulkFileHistoryTable data={filteredBulkFiles} />
-                    </TabsContent>
-                </Tabs>
+                                        <div className="md:col-span-2 flex items-center gap-4 mt-4">
+                                            <Button type="button" variant="outline" onClick={handleCancel} disabled={isUploading}>Cancel</Button>
+                                            <Button type="button" onClick={handleUpload} disabled={isUploading}>
+                                                {isUploading ? 'Uploading...' : 'Upload'}
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                        <TabsContent value="history">
+                           {historyView}
+                        </TabsContent>
+                    </Tabs>
+                )}
             </main>
             <UploadStatusDialog 
                 open={dialogOpen}

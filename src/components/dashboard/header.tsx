@@ -125,7 +125,7 @@ const SidebarNav = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             icon: Upload, 
             subItems: [
                 { label: 'Single Bulk Import', href: '/bulk-import' },
-                { label: 'Bulk Import History', href: '#' }
+                { label: 'Bulk Import History', href: '/bulk-import?tab=history' }
             ] 
         },
     ];
