@@ -156,15 +156,28 @@ export function TradeRequestForm() {
                 fileReferenceNumber: response.records[0].file_refid,
             };
 
+            const addFileToList = () => {
+              if(existingId !== null && existingId !== undefined) {
+                   setUploadedFiles(prevFiles => prevFiles.map(f => f.id === existingId ? newFile : f));
+              } else {
+                  setUploadedFiles(prev => [...prev, newFile]);
+              }
+            }
+
             setDialogTitle('Single Bulk Upload');
             setDialogMessage('File has been uploaded and is being validated by the system. Please refer to the Dashboard to view it.');
             setShowSuccessDialog(true);
             
-            if(existingId !== null && existingId !== undefined) {
-                 setUploadedFiles(prevFiles => prevFiles.map(f => f.id === existingId ? newFile : f));
-            } else {
-                setUploadedFiles(prev => [...prev, newFile]);
-            }
+            // This is a new closure to be passed to the dialog's onDone
+            const onDialogDone = () => {
+                addFileToList();
+                setShowSuccessDialog(false);
+            };
+            
+            // We set a temporary handler for the dialog
+            setDialogDoneHandler(() => onDialogDone);
+
+
         } else {
             toast({ variant: 'destructive', title: 'Upload Failed', description: response.message || "Failed to upload file." });
         }
@@ -220,6 +233,13 @@ export function TradeRequestForm() {
         
         setDialogTitle('Single Bulk Upload');
         setDialogMessage('File has been uploaded and is being validated by the system. Please refer to the Dashboard to view it.');
+        
+        const onDialogDone = () => {
+          setShowSuccessDialog(false);
+          handleCancel();
+        };
+        setDialogDoneHandler(() => onDialogDone);
+
         setShowSuccessDialog(true);
       
       } catch (error) {
@@ -229,10 +249,7 @@ export function TradeRequestForm() {
       }
   }
 
-  const handleDone = () => {
-      setShowSuccessDialog(false);
-      handleCancel();
-  }
+  const [dialogDoneHandler, setDialogDoneHandler] = useState(() => () => {});
 
   const getFileName = () => {
       if (editFileId !== null) return "Select a new file...";
@@ -378,7 +395,7 @@ export function TradeRequestForm() {
                     <Button type="button" variant="outline" onClick={handleCancel} disabled={isSubmitting}>
                       Cancel
                     </Button>
-                    <Button type="submit" disabled={isSubmitting}>
+                    <Button type="submit" disabled={isSubmitting || uploadedFiles.length === 0}>
                       {isSubmitting ? 'Submitting...' : 'Submit'}
                     </Button>
                   </div>
@@ -391,7 +408,7 @@ export function TradeRequestForm() {
       <SuccessDialog 
         open={showSuccessDialog}
         onOpenChange={setShowSuccessDialog}
-        onDone={handleDone}
+        onDone={dialogDoneHandler}
         title={dialogTitle}
         message={dialogMessage}
       />
