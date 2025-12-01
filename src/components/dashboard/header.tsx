@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Menu, User, LogOut, Settings, X, Landmark, CheckSquare, CreditCard, ArrowRightLeft, Clock, Briefcase, BarChart, Upload, ChevronDown, ChevronUp, LayoutDashboard } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
   DropdownMenu,
@@ -13,7 +13,7 @@ import {
   DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { LogoutDialog } from '../auth/logout-dialog';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
@@ -29,8 +29,9 @@ type UserProfile = {
 
 const ublLogo = '/ubl_logo.png';
 
-const SidebarNav = () => {
+const SidebarNav = ({ onLinkClick }: { onLinkClick?: () => void }) => {
     const [openSections, setOpenSections] = useState<string[]>([]);
+    const pathname = usePathname();
 
     const toggleSection = (section: string) => {
         setOpenSections(prev => 
@@ -40,12 +41,22 @@ const SidebarNav = () => {
         );
     }
 
+    const handleDashboardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (pathname === '/dashboard') {
+            e.preventDefault();
+            onLinkClick?.();
+        } else {
+            onLinkClick?.();
+        }
+    }
+
     const navItems = [
         {
             id: 'dashboard',
             label: 'Dashboard',
             icon: LayoutDashboard,
             href: '/dashboard',
+            onClick: handleDashboardClick
         },
         { 
             id: 'accounts', 
@@ -139,7 +150,7 @@ const SidebarNav = () => {
                 {navItems.map(item => (
                     <Collapsible key={item.id} open={openSections.includes(item.id)} onOpenChange={() => item.subItems && toggleSection(item.id)} className="border-b">
                         <CollapsibleTrigger asChild>
-                            <Link href={item.href || '#'} className={cn("flex items-center justify-between w-full p-4 text-primary", {
+                            <Link href={item.href || '#'} onClick={item.onClick} className={cn("flex items-center justify-between w-full p-4 text-primary", {
                                 'hover:bg-muted/50': item.subItems || item.href,
                                 'cursor-pointer': item.subItems || item.href,
                             }, !item.subItems && !item.href ? "opacity-50 cursor-not-allowed hover:bg-transparent" : "")}>
@@ -155,9 +166,11 @@ const SidebarNav = () => {
                         {item.subItems && (
                             <CollapsibleContent>
                                 {item.subItems.map(subItem => (
-                                    <Link href={subItem.href} key={subItem.label} className="block py-3 px-12 bg-muted/20 hover:bg-muted/50 text-primary">
-                                        {subItem.label}
-                                    </Link>
+                                     <SheetClose asChild key={subItem.label}>
+                                        <Link href={subItem.href} className="block py-3 px-12 bg-muted/20 hover:bg-muted/50 text-primary">
+                                            {subItem.label}
+                                        </Link>
+                                    </SheetClose>
                                 ))}
                             </CollapsibleContent>
                         )}
@@ -172,6 +185,7 @@ export function Header() {
   const router = useRouter();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   useEffect(() => {
     const profile = sessionStorage.getItem('userProfile');
@@ -255,7 +269,7 @@ export function Header() {
 
         {/* Bottom Row */}
         <div className="flex h-16 items-center border-t px-4 sm:px-6">
-            <Sheet>
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                 <SheetTrigger asChild>
                     <Button
                     variant="outline"
@@ -268,7 +282,7 @@ export function Header() {
                 </SheetTrigger>
                 <SheetContent side="left" className="p-0 w-80">
                     <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                    <SidebarNav />
+                    <SidebarNav onLinkClick={() => setIsSheetOpen(false)}/>
                 </SheetContent>
             </Sheet>
 
