@@ -31,7 +31,6 @@ const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey, formRese
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        // Reset fileName when the formResetKey changes, which indicates a form reset.
         if (formResetKey > 0) {
             setFileName('');
             if (fileInputRef.current) {
@@ -102,7 +101,8 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
             router.push('/dashboard');
         }
         setAccounts(initialAccounts);
-    }, [initialAccounts, router]);
+        setBulkFiles(initialBulkFiles);
+    }, [initialAccounts, initialBulkFiles, router]);
 
     const handleFileSelect = (key: string, file: File | null) => {
         setFiles(prev => ({...prev, [key]: file}));
@@ -229,7 +229,7 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
                                     </div>
 
                                     <div className="md:col-span-2 flex items-center gap-4 mt-4">
-                                        <Button variant="outline" type="button" onClick={handleCancel} disabled={isUploading}>Cancel</Button>
+                                        <Button type="button" variant="outline" onClick={handleCancel} disabled={isUploading}>Cancel</Button>
                                         <Button type="button" onClick={handleUpload} disabled={isUploading}>
                                             {isUploading ? 'Uploading...' : 'Upload'}
                                         </Button>
