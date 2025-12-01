@@ -289,7 +289,7 @@ export async function downloadStatement(params: {
 
         if (fileType === 'pdf') {
             // A valid, minimal PDF file encoded in Base64
-            base64Data = 'JVBERi0xLjQKJfbk/N8KMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovT3V0bGluZXMgMiAwIFIKL1BhZ2VzIDMgMCBSCi9QYWdlTW9kZSAvVXNlT3V0bGluZXMKL1ZpZXdlclByZWZlcmVuY2VzIDw8Ci9GaXQgV2luZG93IHRydWUKPj4KPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL091dGxpbmVzCi9Db3VudCAwCj4+CmVuZG9iagozIDAgb2JqCjw8Ci9UeXBlIC9QYWdlcwovS2lkcyBbNCAwIFJdCi9Db3VudCAxCi9NZWRpYUJveCBbMCAwIDU5NSA4NDJdCj4+CmVuZG9iago0IDAgb2JqCjw8Ci9UeXBlIC9QYWdlCi9QYXJlbnQgMyAwIFIKL1JvdGF0ZSAwCi9Db250ZW50cyA1IDAgUgovUmVzb3VyY2VzIDw8Ci9Gb250IDw8Ci9GMSA2IDAgUgovRmEuIDw8Ci9GMSA2IDAgUgovRmIgIDw8Ci9GMSA2IDAgUgovRmMuIDw8Ci9GMSA2IDAgUgovRmQuIDw8Ci9GMSA2IDAgUgovRmUuIDw8Ci9GMSA2IDAgUgovRmYuIDw8Ci9GMSA2IDAgUgo+Pgo+Pgo+Pgo+PgplbmRvYmoKNSAwIG9iago8PAovTGVuZ3RoIDE0NQo+PgpzdHJlYW0KMSAwIDAgLTEgMCA4NDIgY20KLjYwMCAwIDAgLjYwMCAwIDAgY20KQlQKMCBUZAooQWNjb3VudCBTdGF0ZW1lbnQgZm9yIC0gYWNjb3VudE51bWJlcjogKSBUagplbmRzdHJlYW0KZW5kb2JqCjYgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL1N1YnR5cGUgL1R5cGUxCi9CYXNlRm9udCAvSGVsdmV0aWNhCi9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nCj4+CmVuZG9iagp4cmVmCjAgOAowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA5MyAwMDAwMCBuIAowMDAwMDAwMTQ4IDAwMDAwIG4gCjAwMDAwMDAyMzAgMDAwMDAgbiAKMDAwMDAwMDM3OCAwMDAwMCBuIAowMDAwMDAwNTA5IDAwMDAwIG4gCnRyYWlsZXIKPDwKL1NpemUgOAovUm9vdCAxIDAgUgovSW5mbyA3IDAgUgo+PgpzdGFydHhyZWYKNzE5CiUlRU9GCg==';
+            base64Data = 'JVBERi0xLjQKJfbk/N8KMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovT3V0bGluZXMgMiAwIFIKL1BhZ2VzIDMgMCBSCi9QYWdlTW9kZSAvVXNlT3V0bGluZXMKL1ZpZXdlclByZWZlcmVuY2VzIDw8Ci9GaXQgV2luZG93IHRydWUKPj4KPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL091dGxpbmVzCi9Db3VudCAwCj4+CmVuZG9iagozIDAgb2JqCjw8Ci9UeXBlIC9QYWdlcwovS2lkcyBbNCAwIFJdCi9Db3VudCAxCi9NZWRpYUJveCBbMCAwIDU5NSA4NDJdCj4+CmVuZG9iago0IDAgb2JqCjw8Ci9UeXBlIC9QYWdlCi9QYXJlbnQgMyAwIFIKL1JvdGF0ZSAwCi9Db250ZW50cyA1IDAgUgovUmVzb3VyY2VzIDw8Ci9Gb250IDw8Ci9GMSA2IDAgUgovRmEuIDw8Ci9GMSA2IDAgUgovRmIgIDw8Ci9GMSA2IDAgUgovRmMuIDw8Ci9GMSA2IDAgUgovRmQuIDw8Ci9GMSA2IDAgUgovRmUuIDw8Ci9GMSA2IDAgUgovRmYuIDw8Ci9GMSA2IDAgUgo+Pgo+Pgo+Pgo+PgplbmRvYmoKNSAwIG9iago8PAovTGVuZ3RoIDE0NQo+PgpzdHJlYW0KMSAwIDAgLTEgMCA4NDIgY20KLjYwMCAwIDAgLjYwMCAwIDAgY20KQlQKMCBUZAooQWNjb3VudCBTdGF0ZW1lbnQgZm9yIC0gYWNjb3VudE51bWJlcjogKSBUagplbmRzdHJlYW0KZW5kb2JqCjYgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL1N1YnR5cGUgL1R5cGUxCi9CYXNlRm9udCAvSGVsdmV0aWNhCi9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nCj4+CmVuZG9iagp4cmVmCjAgOAowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA5MyAwMDAwMCBuIAowMDAwMDAwMTQ4IDAwMDAwIG4gCjAwMDAwMDAyMzAgMDAwMDAgbiAKMDAwMDAwMzc4IDAwMDAwIG4gCjAwMDAwMDA1MDkgMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSA4Ci9Sb290IDEgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCj4+CnN0YXJ0eHJlZjo3MTkKJSVFT0YK';
             mimeType = 'application/pdf';
         } else {
             const header = `Account Statement for ${accountNumber} from ${fromDate} to ${toDate}\n\n`;
@@ -322,6 +322,84 @@ export async function downloadStatement(params: {
     } catch (error: any) {
         console.error('Download statement error:', error);
         return { success: false, message: error.message || 'An unexpected error occurred.' };
+    }
+}
+
+export async function getBulkFiles(userId: string) {
+    if (userId === '7884057484') {
+        return {
+            "NDC_BulkPayments": [
+                {
+                    "fileName": "Omni.csv",
+                    "uploadDate": "2025-12-01 10:31:01.0",
+                    "accountName": "NAWAZ ALI",
+                    "fileReferenceNumber": "0081917700012351",
+                    "comment": "file is not in proper format kindly re upload file",
+                    "accountNumber": "060510224211",
+                    "isActive": "0",
+                    "uploadedBy": "7884057484",
+                    "fileType": "CSV",
+                    "status": "0"
+                },
+                {
+                    "fileName": "Bank islami -mnp.csv",
+                    "uploadDate": "2025-11-28 13:06:00.0",
+                    "accountName": "NAWAZ ALI",
+                    "fileReferenceNumber": "0005918007246727",
+                    "comment": "FILE UPLOADED SUCCESS",
+                    "accountNumber": "060510224211",
+                    "isActive": "1",
+                    "uploadedBy": "7884057484",
+                    "fileType": "CSV",
+                    "status": "1"
+                },
+                {
+                    "fileName": "Publishex.2.csv",
+                    "uploadDate": "2025-11-26 15:08:17.0",
+                    "accountName": "NAWAZ ALI",
+                    "fileReferenceNumber": "0059501680341863",
+                    "comment": "FILE UPLOADED SUCCESS",
+                    "accountNumber": "060510224211",
+                    "isActive": "1",
+                    "uploadedBy": "7884057484",
+                    "fileType": "CSV",
+                    "status": "1"
+                },
+                {
+                    "fileName": "Publishex.1.csv",
+                    "uploadDate": "2025-11-26 15:02:02.0",
+                    "accountName": "NAWAZ ALI",
+                    "fileReferenceNumber": "0097644861752175",
+                    "comment": "FILE UPLOADED SUCCESS",
+                    "accountNumber": "060510224211",
+                    "isActive": "1",
+                    "uploadedBy": "7884057484",
+                    "fileType": "CSV",
+                    "status": "1"
+                },
+                {
+                    "fileName": "Publishex.csv",
+                    "uploadDate": "2025-11-26 14:48:13.0",
+                    "accountName": "NAWAZ ALI",
+                    "fileReferenceNumber": "0035374899391518",
+                    "comment": "FILE UPLOADED SUCCESS",
+                    "accountNumber": "060510224211",
+                    "isActive": "1",
+                    "uploadedBy": "7884057484",
+                    "fileType": "CSV",
+                    "status": "1"
+                }
+            ],
+            "opstatus": 0,
+            "httpStatusCode": 200
+        }
+    } else {
+        return {
+            NDC_BulkPayments: [],
+            opstatus: 1,
+            httpStatusCode: 404,
+            message: 'Bulk file history not found'
+        }
     }
 }
     
