@@ -45,7 +45,10 @@ const productTypes = [
 
 const requestTypes = [
     'LC Application',
-    'Proforma Invoice / Order / Intent'
+    'Proforma Invoice / Order / Intent',
+    'Insurance Cover Note / Policy',
+    'Covering Letter',
+    "NOC's / Permits"
 ];
 
 type UploadedFile = {
