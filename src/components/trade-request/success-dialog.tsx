@@ -16,6 +16,7 @@ interface SuccessDialogProps {
   title: string;
   message: string;
   onDone: () => void;
+  referenceId?: string;
 }
 
 export function SuccessDialog({
@@ -24,6 +25,7 @@ export function SuccessDialog({
   title,
   message,
   onDone,
+  referenceId
 }: SuccessDialogProps) {
     
   return (
@@ -36,6 +38,7 @@ export function SuccessDialog({
           <AlertDialogTitle className="text-xl font-bold">{title}</AlertDialogTitle>
           <p className="text-muted-foreground text-sm">
             {message}
+            {referenceId && <strong> {referenceId}</strong>}
           </p>
         </AlertDialogHeader>
         <AlertDialogFooter className="mt-4">

@@ -76,6 +76,7 @@ export function TradeRequestForm() {
   const [isUploading, setIsUploading] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('');
   const [dialogMessage, setDialogMessage] = useState('');
+  const [dialogRefId, setDialogRefId] = useState<string | undefined>();
   const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -166,6 +167,7 @@ export function TradeRequestForm() {
 
             setDialogTitle('Single Bulk Upload');
             setDialogMessage('File has been uploaded and is being validated by the system. Please refer to the Dashboard to view it.');
+            setDialogRefId(undefined); // No ref ID for single upload dialog
             setShowSuccessDialog(true);
             
             // This is a new closure to be passed to the dialog's onDone
@@ -231,8 +233,9 @@ export function TradeRequestForm() {
 
         await Promise.all(promises);
         
-        setDialogTitle('Single Bulk Upload');
-        setDialogMessage('File has been uploaded and is being validated by the system. Please refer to the Dashboard to view it.');
+        setDialogTitle('Success');
+        setDialogMessage(`Request has been sent successfully with file reference id:`);
+        setDialogRefId(uploadedFiles[0].fileReferenceNumber);
         
         const onDialogDone = () => {
           setShowSuccessDialog(false);
@@ -411,6 +414,7 @@ export function TradeRequestForm() {
         onDone={dialogDoneHandler}
         title={dialogTitle}
         message={dialogMessage}
+        referenceId={dialogRefId}
       />
     </>
   );
