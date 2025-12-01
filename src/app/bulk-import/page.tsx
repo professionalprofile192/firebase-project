@@ -61,7 +61,7 @@ const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey, formRese
                     onChange={handleFileChange}
                     accept={acceptedFormats}
                 />
-                <Button variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={handleButtonClick}>
+                <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={handleButtonClick}>
                     <Paperclip className="h-5 w-5 text-primary" />
                 </Button>
             </div>
