@@ -187,6 +187,8 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
         }
     }
 
+    const uniqueDates = [...new Set(bulkFiles.map(file => format(new Date(file.uploadDate), 'dd/MM/yyyy')))];
+
     const filteredBulkFiles = bulkFiles.filter(file => {
         const formattedDate = format(new Date(file.uploadDate), 'dd/MM/yyyy');
         const statusLabel = file.status === '1' ? 'Success' : file.status === '0' ? 'Failed' : 'In Progress';
@@ -201,7 +203,7 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
         }
 
         return (
-            (dateFilter === '' || formattedDate.includes(dateFilter)) &&
+            (dateFilter === '' || dateFilter.toLowerCase() === 'all' || formattedDate.includes(dateFilter)) &&
             (statusFilter === '' || statusFilter.toLowerCase() === 'all' || statusLabel.toLowerCase() === statusFilter.toLowerCase()) &&
             (commentFilter === '' || commentFilter.toLowerCase() === 'all' || commentMatch)
         );
@@ -275,11 +277,17 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
                             </CardHeader>
                             <CardContent className="p-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                                    <Input 
-                                        placeholder="Filter by Upload Date..."
-                                        value={dateFilter}
-                                        onChange={(e) => setDateFilter(e.target.value)}
-                                    />
+                                    <Select value={dateFilter} onValueChange={setDateFilter}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Filter by Upload Date..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All</SelectItem>
+                                            {uniqueDates.map(date => (
+                                                <SelectItem key={date} value={date}>{date}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                     <Select value={statusFilter} onValueChange={setStatusFilter}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Filter by Status..." />
