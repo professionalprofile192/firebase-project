@@ -33,14 +33,14 @@ function ApprovalRow({ approval }: { approval: Approval }) {
   return (
     <>
       <TableRow onClick={toggleRow} className="cursor-pointer">
-        <TableCell className="w-16 text-center">
+        <TableCell className="w-12 text-center">
             {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </TableCell>
-        <TableCell>{approval.referenceNo}</TableCell>
-        <TableCell>{approval.transactionType2}</TableCell>
-        <TableCell>{approval.featureActionId}</TableCell>
-        <TableCell>{approval.requesterName}</TableCell>
-        <TableCell className="text-center">
+        <TableCell className="w-32">{approval.referenceNo}</TableCell>
+        <TableCell className="w-56 whitespace-normal break-words">{approval.transactionType2}</TableCell>
+        <TableCell className="max-w-xs whitespace-normal break-words">{approval.featureActionId}</TableCell>
+        <TableCell className="w-48">{approval.requesterName}</TableCell>
+        <TableCell className="w-20 text-center">
             <Checkbox />
         </TableCell>
       </TableRow>
@@ -69,9 +69,9 @@ function ApprovalRow({ approval }: { approval: Approval }) {
                             </div>
                         </>
                     ) : (
-                        <div className="col-span-2">
+                        <div className="col-span-1">
                             <p className="text-sm font-semibold">Amount</p>
-                            <p className="text-muted-foreground">PKR {approval.amount}</p>
+                            <p className="text-muted-foreground">PKR {approval.amount || 'N/A'}</p>
                         </div>
                     )}
                      <div className="col-span-1 space-y-2">
@@ -80,7 +80,7 @@ function ApprovalRow({ approval }: { approval: Approval }) {
                             <p className="text-muted-foreground">{format(new Date(approval.assignedDate), 'dd/MM/yyyy h:mm a')}</p>
                         </div>
                     </div>
-                    <div className="col-span-1 flex items-center justify-end gap-2">
+                    <div className="col-span-1 md:col-span-2 flex items-center justify-end gap-2">
                         <Button size="sm" variant="outline" className="bg-green-100 text-green-800 border-green-300 hover:bg-green-200">
                             Approve
                         </Button>
@@ -105,12 +105,12 @@ export function ApprovalsTable({ data }: ApprovalsTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-16"></TableHead>
-            <TableHead>Transaction Number</TableHead>
-            <TableHead>Transaction Type</TableHead>
+            <TableHead className="w-12"></TableHead>
+            <TableHead className="w-32">Transaction Number</TableHead>
+            <TableHead className="w-56">Transaction Type</TableHead>
             <TableHead>Request Type</TableHead>
-            <TableHead>Originator</TableHead>
-            <TableHead className="text-center">
+            <TableHead className="w-48">Originator</TableHead>
+            <TableHead className="w-20 text-center">
                 <Checkbox />
             </TableHead>
           </TableRow>
