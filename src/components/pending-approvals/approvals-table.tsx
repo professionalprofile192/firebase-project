@@ -54,8 +54,8 @@ function ApprovalRow({ approval, isOpen, onToggle, onRejectClick }: { approval: 
   const isFundTransfer = approval.featureActionId.includes('FUND_TRANSFER');
   const isBulkTransfer = approval.transactionType === 'BulkFT' || approval.transactionType === 'BulkIBFT' || approval.transactionType === 'BulkRaast';
   
-  const fromAccount = approval.fromAccountNumber || reviewContext?.otherDetails?.fromAccount || 'N/A';
-  const toAccount = approval.toAccountNumber || reviewContext?.otherDetails?.toAccountNumber || 'N/A';
+  const fromAccount = approval.fromAccountNumber || reviewContext?.otherDetails?.fromAccount;
+  const toAccount = approval.toAccountNumber || reviewContext?.otherDetails?.toAccountNumber;
   const amount = approval.amount;
   const fileId = notes?.fileid;
   const fileName = notes?.filename;
@@ -121,7 +121,7 @@ function ApprovalRow({ approval, isOpen, onToggle, onRejectClick }: { approval: 
                                 <p className="text-muted-foreground text-sm">{innerNotes.instVal}</p>
                             </div>
                         )}
-                        {(isFundTransfer && !isBulkTransfer) && (
+                        {(isFundTransfer && !isBulkTransfer && fromAccount) && (
                            <div>
                                 <p className="text-sm font-semibold">Debit Account</p>
                                 <p className="text-muted-foreground text-sm">{fromAccount}</p>
@@ -142,7 +142,7 @@ function ApprovalRow({ approval, isOpen, onToggle, onRejectClick }: { approval: 
                                 <p className="text-muted-foreground text-sm">{notes.nickName}</p>
                            </div>
                         )}
-                        {(isFundTransfer && !isBulkTransfer) && (
+                        {(isFundTransfer && !isBulkTransfer && toAccount) && (
                             <div>
                                 <p className="text-sm font-semibold">Credit Account</p>
                                 <p className="text-muted-foreground text-sm">{toAccount}</p>
