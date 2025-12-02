@@ -10,6 +10,7 @@ import { Search } from 'lucide-react';
 import { ApprovalsHistoryTable } from '@/components/pending-approvals/approvals-history-table';
 import { getPendingApprovals, getApprovalHistory, rejectRequest } from '../actions';
 import { useToast } from '@/hooks/use-toast';
+import { useSearchParams } from 'next/navigation';
 
 export type Approval = {
     approverId: string;
@@ -31,12 +32,9 @@ export type Approval = {
     remarks?: string; // Added for rejection comments
 };
 
-function PendingApprovalsContent({
-    searchParams,
-  }: {
-    searchParams: { tab?: string };
-  }) {
-  const activeTab = searchParams.tab || 'pending';
+function PendingApprovalsContent() {
+  const searchParams = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'pending';
   const [userProfile, setUserProfile] = useState<any>(null);
   const [pendingApprovals, setPendingApprovals] = useState<Approval[]>([]);
   const [approvalHistory, setApprovalHistory] = useState<Approval[]>([]);
@@ -157,14 +155,10 @@ function PendingApprovalsContent({
   );
 }
 
-export default function PendingApprovalsPage({
-    searchParams,
-  }: {
-    searchParams: { tab?: string };
-  }) {
+export default function PendingApprovalsPage() {
   return (
     <Suspense>
-      <PendingApprovalsContent searchParams={searchParams} />
+      <PendingApprovalsContent />
     </Suspense>
   )
 }
