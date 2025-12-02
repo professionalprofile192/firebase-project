@@ -113,7 +113,7 @@ function AccountStatementContent() {
       setDisplayedTransactions(last10);
     } else if (filter === 'last10days') {
       const tenDaysAgo = subDays(new Date(), 10);
-      const last10Days = allTransactions.filter(tx => isAfter(new Date(tx.tranDate), tenDaysAgo));
+      const last10Days = allTransactions.filter(tx => isAfter(parseISO(tx.tranDate), tenDaysAgo));
       setDisplayedTransactions(last10Days);
     } else if (filter === 'all') { // To reset filter
       setDisplayedTransactions(allTransactions);
@@ -122,7 +122,7 @@ function AccountStatementContent() {
 
   const handleDateRangeView = (fromDate: Date, toDate: Date) => {
     const filtered = allTransactions.filter(tx => {
-        const txDate = new Date(tx.tranDate.split(' ')[0]);
+        const txDate = parseISO(tx.tranDate.split(' ')[0]);
         return (isAfter(txDate, fromDate) || isEqual(txDate, fromDate)) && (isBefore(txDate, toDate) || isEqual(txDate, toDate));
     });
     setDisplayedTransactions(filtered);
