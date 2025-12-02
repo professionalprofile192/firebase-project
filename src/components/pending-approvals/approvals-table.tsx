@@ -42,11 +42,11 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
         <TableCell className="w-[15%]">{approval.requesterName}</TableCell>
         <TableCell className="text-right">
             <div className="flex items-center justify-end gap-2">
-                <Button size="sm" variant="outline" className="bg-gray-100 hover:bg-gray-200" onClick={(e) => { e.stopPropagation(); /* approve logic */ }}>
-                    Approve <CheckCircle2 className="h-4 w-4 ml-2 text-green-500" />
+                <Button size="sm" variant="outline" className="bg-green-100 hover:bg-green-200 text-green-800 border-green-200" onClick={(e) => { e.stopPropagation(); /* approve logic */ }}>
+                    Approve <CheckCircle2 className="h-4 w-4 ml-2" />
                 </Button>
-                <Button size="sm" variant="outline" className="bg-gray-100 hover:bg-gray-200" onClick={(e) => { e.stopPropagation(); /* reject logic */ }}>
-                   Reject <XCircle className="h-4 w-4 ml-2 text-red-500" />
+                <Button size="sm" variant="outline" className="bg-red-100 hover:bg-red-200 text-red-800 border-red-200" onClick={(e) => { e.stopPropagation(); /* reject logic */ }}>
+                   Reject <XCircle className="h-4 w-4 ml-2" />
                 </Button>
                 <Button size="sm" variant="outline" className="bg-gray-100 hover:bg-gray-200" onClick={(e) => { e.stopPropagation(); /* view logic */ }}>View</Button>
             </div>
@@ -58,10 +58,10 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
             <div className="bg-muted/50 p-4">
                 <div className="flex w-full">
                     {/* Empty cell for chevron */}
-                    <div className="w-12"></div>
+                    <div className="w-12 flex-shrink-0"></div>
                     
                     {isBillPayment && innerNotes && (
-                      <>
+                      <div className="flex-grow flex">
                         <div className="w-[15%] pr-4">
                             <p className="text-sm font-semibold">Consumer Number</p>
                             <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
@@ -74,11 +74,11 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
                             <p className="text-sm font-semibold">Consumer Name</p>
                             <p className="text-muted-foreground text-sm">{notes.nickName}</p>
                         </div>
-                      </>
+                      </div>
                     )}
 
                     {isFundTransfer && reviewContext && (
-                        <>
+                        <div className="flex-grow flex">
                             <div className="w-[15%] pr-4 space-y-4">
                                 <div>
                                     <p className="text-sm font-semibold">Amount</p>
@@ -97,7 +97,7 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
                                 <p className="text-sm font-semibold">Beneficiary Name</p>
                                 <p className="text-muted-foreground text-sm">{reviewContext.payeeName}</p>
                             </div>
-                        </>
+                        </div>
                     )}
 
                     <div className="w-[15%] pr-4">
