@@ -10,6 +10,7 @@ import { ApprovalsHistoryTable } from '@/components/pending-approvals/approvals-
 import { getPendingApprovals, getApprovalHistory, rejectRequest } from '../actions';
 import { useToast } from '@/hooks/use-toast';
 import { useSearchParams } from 'next/navigation';
+import { CustomAlertDialog } from '@/components/common/custom-alert-dialog';
 
 export type Approval = {
     approverId: string;
@@ -39,7 +40,9 @@ function PendingApprovalsContent() {
   const [approvalHistory, setApprovalHistory] = useState<Approval[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [successAlertMessage, setSuccessAlertMessage] = useState('');
+  
   useEffect(() => {
     async function fetchData() {
         setLoading(true);
@@ -92,11 +95,11 @@ function PendingApprovalsContent() {
         if (response.opstatus === 0 && response.ApprovalMatrix[0].opstatus === 0) {
             const rejectedApproval = { ...approval, status: 'REJECTED', remarks: remarks };
             
-            // Move from pending to history
             setPendingApprovals(prev => prev.filter(appr => appr.referenceNo !== approval.referenceNo));
             setApprovalHistory(prev => [rejectedApproval, ...prev]);
 
-            toast({ title: 'Success', description: response.ApprovalMatrix[0].reqResponse });
+            setSuccessAlertMessage(response.ApprovalMatrix[0].reqResponse);
+            setShowSuccessAlert(true);
             return true;
         } else {
             toast({ variant: 'destructive', title: 'Rejection Failed', description: response.message || "An unknown error occurred." });
@@ -148,6 +151,13 @@ function PendingApprovalsContent() {
           </TabsContent>
         </Tabs>
       </main>
+      <CustomAlertDialog
+        open={showSuccessAlert}
+        onOpenChange={setShowSuccessAlert}
+        title="Success"
+        description={successAlertMessage}
+        onConfirm={() => setShowSuccessAlert(false)}
+      />
     </DashboardLayout>
   );
 }
