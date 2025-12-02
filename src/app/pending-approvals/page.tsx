@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search } from 'lucide-react';
 import { ApprovalsHistoryTable } from '@/components/pending-approvals/approvals-history-table';
-import { getPendingApprovals } from '../actions';
+import { getPendingApprovals, getApprovalHistory } from '../actions';
 
 export type Approval = {
     approverId: string;
@@ -25,10 +25,9 @@ export type Approval = {
     transactionType?: string;
     fromAccountNumber?: string;
     toAccountNumber?: string;
+    status?: string;
 };
 
-// No data as per the screenshot
-const approvalsHistoryData: Approval[] = [];
 
 async function PendingApprovalsData() {
     const cookieStore = cookies();
@@ -44,6 +43,21 @@ async function PendingApprovalsData() {
     }
     
     return <ApprovalsTable data={approvalsData} />;
+}
+
+async function ApprovalsHistoryData() {
+    const cookieStore = cookies();
+    const userProfileCookie = cookieStore.get('userProfile');
+    let approvalsHistoryData: Approval[] = [];
+
+    if (userProfileCookie?.value) {
+        const data = await getApprovalHistory('5939522605');
+        if (data.opstatus === 0) {
+            approvalsHistoryData = data.ApprovalMatrix;
+        }
+    }
+
+    return <ApprovalsHistoryTable data={approvalsHistoryData} />;
 }
 
 function PendingApprovalsContent({
@@ -77,7 +91,9 @@ function PendingApprovalsContent({
             </Suspense>
           </TabsContent>
           <TabsContent value="history">
-            <ApprovalsHistoryTable data={approvalsHistoryData} />
+             <Suspense fallback={<p>Loading history...</p>}>
+                <ApprovalsHistoryData />
+            </Suspense>
           </TabsContent>
         </Tabs>
       </main>
@@ -96,3 +112,5 @@ export default function PendingApprovalsPage({
     </Suspense>
   )
 }
+
+    
