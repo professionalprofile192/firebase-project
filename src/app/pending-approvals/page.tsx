@@ -34,7 +34,7 @@ export type Approval = {
 
 function PendingApprovalsContent() {
   const searchParams = useSearchParams();
-  const activeTab = searchParams.get('tab') || 'pending';
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'pending');
   const [userProfile, setUserProfile] = useState<any>(null);
   const [pendingApprovals, setPendingApprovals] = useState<Approval[]>([]);
   const [approvalHistory, setApprovalHistory] = useState<Approval[]>([]);
@@ -44,10 +44,10 @@ function PendingApprovalsContent() {
   useEffect(() => {
     async function fetchData() {
         setLoading(true);
-        const userProfileCookie = document.cookie.split('; ').find(row => row.startsWith('userProfile='));
+        const userProfileString = sessionStorage.getItem('userProfile');
 
-        if (userProfileCookie) {
-            const profile = JSON.parse(decodeURIComponent(userProfileCookie.split('=')[1]));
+        if (userProfileString) {
+            const profile = JSON.parse(userProfileString);
             setUserProfile(profile);
 
             try {
@@ -134,7 +134,7 @@ function PendingApprovalsContent() {
             />
         </div>
 
-        <Tabs defaultValue={activeTab}>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="pending">Pending Approvals</TabsTrigger>
             <TabsTrigger value="history">Approvals History</TabsTrigger>
