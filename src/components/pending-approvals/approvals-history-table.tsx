@@ -17,6 +17,7 @@ import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react'
 import { format } from 'date-fns';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 interface ApprovalsHistoryTableProps {
   data: Approval[];
@@ -78,7 +79,9 @@ function HistoryRow({ approval, isOpen, onToggle }: { approval: Approval, isOpen
             </Badge>
         </TableCell>
         <TableCell className="text-right">
-            <Button size="sm" variant="outline" className="bg-gray-100 hover:bg-gray-200" onClick={(e) => { e.stopPropagation(); /* view logic */ }}>View</Button>
+            <Link href={{ pathname: `/pending-approvals/${approval.referenceNo}`, query: { approval: JSON.stringify(approval) } }}>
+                <Button size="sm" variant="outline" className="bg-gray-100 hover:bg-gray-200">View</Button>
+            </Link>
         </TableCell>
       </TableRow>
       {isOpen && (
@@ -91,16 +94,16 @@ function HistoryRow({ approval, isOpen, onToggle }: { approval: Approval, isOpen
                     
                     {/* Column 1: Transaction Number */}
                     <div className="w-[15%] pr-4 space-y-4">
-                        {isBillPayment && innerNotes && (
+                        {isBillPayment && innerNotes?.consumerNo && (
                             <div>
                                 <p className="text-sm font-semibold">Consumer Number</p>
                                 <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
                             </div>
                         )}
-                        {isFundTransfer && !isBulkTransfer && (
+                        {(isFundTransfer && approval.amount) && (
                              <div>
                                 <p className="text-sm font-semibold">Amount</p>
-                                <p className="text-muted-foreground text-sm">PKR {approval.amount || 'N/A'}</p>
+                                <p className="text-muted-foreground text-sm">PKR {approval.amount}</p>
                             </div>
                         )}
                         {isBulkTransfer && notes?.fileid && (
@@ -113,13 +116,13 @@ function HistoryRow({ approval, isOpen, onToggle }: { approval: Approval, isOpen
                     
                     {/* Column 2: Transaction Type */}
                      <div className="w-[25%] pr-4 space-y-4">
-                        {isBillPayment && innerNotes && (
+                        {isBillPayment && innerNotes?.instVal && (
                             <div>
                                 <p className="text-sm font-semibold">Biller Institution</p>
                                 <p className="text-muted-foreground text-sm">{innerNotes.instVal}</p>
                             </div>
                         )}
-                        {isFundTransfer && !isBulkTransfer && (
+                        {(isFundTransfer && !isBulkTransfer) && (
                             <div>
                                 <p className="text-sm font-semibold">Debit Account</p>
                                 <p className="text-muted-foreground text-sm">{fromAccount}</p>
@@ -135,13 +138,13 @@ function HistoryRow({ approval, isOpen, onToggle }: { approval: Approval, isOpen
 
                     {/* Column 3: Request Type */}
                      <div className="w-[25%] pr-4 space-y-4">
-                         {isBillPayment && notes && (
+                         {isBillPayment && notes?.nickName && (
                            <div>
                                 <p className="text-sm font-semibold">Consumer Name</p>
                                 <p className="text-muted-foreground text-sm">{notes.nickName}</p>
                            </div>
                         )}
-                         {isFundTransfer && !isBulkTransfer && reviewContext && (
+                         {(isFundTransfer && !isBulkTransfer) && (
                             <div>
                                 <p className="text-sm font-semibold">Credit Account</p>
                                 <p className="text-muted-foreground text-sm">{toAccount}</p>

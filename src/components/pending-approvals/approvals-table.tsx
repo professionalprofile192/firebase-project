@@ -15,7 +15,7 @@ import type { Approval } from '@/app/pending-approvals/page';
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, CheckCircle2, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 interface ApprovalsTableProps {
   data: Approval[];
@@ -68,7 +68,9 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
                 <Button size="sm" variant="outline" className="bg-red-100 hover:bg-red-200 text-red-800 border-red-200" onClick={(e) => { e.stopPropagation(); /* reject logic */ }}>
                    Reject <XCircle className="h-4 w-4 ml-2" />
                 </Button>
-                <Button size="sm" variant="outline" className="bg-gray-100 hover:bg-gray-200" onClick={(e) => { e.stopPropagation(); /* view logic */ }}>View</Button>
+                 <Link href={{ pathname: `/pending-approvals/${approval.referenceNo}`, query: { approval: JSON.stringify(approval) } }}>
+                    <Button size="sm" variant="outline" className="bg-gray-100 hover:bg-gray-200">View</Button>
+                </Link>
             </div>
         </TableCell>
       </TableRow>
@@ -80,16 +82,16 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
                     {/* Empty cell for chevron */}
                     <div className="w-12 flex-shrink-0"></div>
                     <div className="w-[15%] pr-4 space-y-4">
-                        {isBillPayment && innerNotes && (
+                        {isBillPayment && innerNotes?.consumerNo && (
                             <div>
                                 <p className="text-sm font-semibold">Consumer Number</p>
                                 <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
                             </div>
                         )}
-                         {(isFundTransfer && !isBulkTransfer) && (
+                         {(isFundTransfer && approval.amount) && (
                             <div>
                                 <p className="text-sm font-semibold">Amount</p>
-                                <p className="text-muted-foreground text-sm">PKR {approval.amount || 'N/A'}</p>
+                                <p className="text-muted-foreground text-sm">PKR {approval.amount}</p>
                             </div>
                         )}
                         {isBulkTransfer && notes?.fileid && (
@@ -100,7 +102,7 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
                         )}
                     </div>
                     <div className="w-[25%] pr-4 space-y-4">
-                        {isBillPayment && innerNotes && (
+                        {isBillPayment && innerNotes?.instVal && (
                              <div>
                                 <p className="text-sm font-semibold">Biller Institution</p>
                                 <p className="text-muted-foreground text-sm">{innerNotes.instVal}</p>
@@ -120,7 +122,7 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
                         )}
                     </div>
                      <div className="w-[25%] pr-4 space-y-4">
-                        {isBillPayment && notes && (
+                        {isBillPayment && notes?.nickName && (
                            <div>
                                 <p className="text-sm font-semibold">Consumer Name</p>
                                 <p className="text-muted-foreground text-sm">{notes.nickName}</p>
