@@ -7,16 +7,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableFooter,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import type { Approval } from '@/app/pending-approvals/page';
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, CheckCircle2, XCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, CheckCircle2, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface ApprovalsTableProps {
   data: Approval[];
 }
+
+const ITEMS_PER_PAGE = 8;
 
 function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpen: boolean, onToggle: () => void }) {
   
@@ -36,7 +40,7 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
         <TableCell className="w-12 text-center">
             {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </TableCell>
-        <TableCell className="font-medium w-[15%] whitespace-nowrap">{approval.referenceNo}</TableCell>
+        <TableCell className="font-medium whitespace-nowrap">{approval.referenceNo}</TableCell>
         <TableCell className="w-[25%] break-words">{approval.transactionType2}</TableCell>
         <TableCell className="w-[25%] break-words">{approval.featureActionId}</TableCell>
         <TableCell className="w-[15%]">{approval.requesterName}</TableCell>
@@ -61,7 +65,7 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
                     <div className="w-12 flex-shrink-0"></div>
                     
                     {isBillPayment && innerNotes && (
-                      <div className="flex-grow flex">
+                      <div className="flex-grow flex items-start">
                         <div className="w-[15%] pr-4">
                             <p className="text-sm font-semibold">Consumer Number</p>
                             <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
@@ -119,10 +123,24 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
 
 export function ApprovalsTable({ data }: ApprovalsTableProps) {
   const [openApprovalId, setOpenApprovalId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentData = data.slice(startIndex, endIndex);
 
   const handleRowToggle = (referenceNo: string) => {
     setOpenApprovalId(prevId => (prevId === referenceNo ? null : referenceNo));
   };
+  
+  const handlePreviousPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  }
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  }
 
   return (
     <div className="rounded-lg border bg-card text-card-foreground shadow-sm mt-4">
@@ -138,8 +156,8 @@ export function ApprovalsTable({ data }: ApprovalsTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.length > 0 ? (
-            data.map((approval) => (
+          {currentData.length > 0 ? (
+            currentData.map((approval) => (
               <ApprovalRow 
                 key={approval.referenceNo} 
                 approval={approval}
@@ -155,6 +173,35 @@ export function ApprovalsTable({ data }: ApprovalsTableProps) {
             </TableRow>
           )}
         </TableBody>
+        {data.length > 0 && (
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={6}>
+                <div className="flex items-center justify-center p-2">
+                   <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                  >
+                     <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="text-sm text-muted-foreground mx-4">
+                    {startIndex + 1} - {Math.min(endIndex, data.length)} of {data.length} Transactions
+                  </span>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          </TableFooter>
+        )}
       </Table>
     </div>
   );
