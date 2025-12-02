@@ -1,33 +1,57 @@
-'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { cookies } from 'next/headers';
+import { Suspense } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { ApprovalsTable } from '@/components/pending-approvals/approvals-table';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
 import { ApprovalsHistoryTable } from '@/components/pending-approvals/approvals-history-table';
+import { getPendingApprovals } from '../actions';
 
 export type Approval = {
-  transactionNumber: string;
-  transactionType: string;
-  requestType: string;
-  originator: string;
+    approverId: string;
+    contractId: string;
+    referenceNo: string;
+    featureActionId: string;
+    assignedDate: string;
+    sentBy: string;
+    requesterName: string;
+    transactionType2: string;
+    notes2?: string;
+    notes?: string;
+    typeId: string;
+    amount?: string;
+    transactionType?: string;
+    fromAccountNumber?: string;
+    toAccountNumber?: string;
 };
 
 // No data as per the screenshot
-const approvalsData: Approval[] = [];
 const approvalsHistoryData: Approval[] = [];
 
-function PendingApprovalsContent() {
-  const searchParams = useSearchParams();
-  const tab = searchParams.get('tab');
-  const [activeTab, setActiveTab] = useState(tab || 'pending');
+async function PendingApprovalsData() {
+    const cookieStore = cookies();
+    const userProfileCookie = cookieStore.get('userProfile');
+    let approvalsData: Approval[] = [];
 
-  useEffect(() => {
-    setActiveTab(tab || 'pending');
-  }, [tab]);
+    if (userProfileCookie?.value) {
+        // Using a hardcoded ID for now as per the service details provided
+        const data = await getPendingApprovals('5939522605');
+        if (data.opstatus === 0) {
+            approvalsData = data.ApprovalMatrix;
+        }
+    }
+    
+    return <ApprovalsTable data={approvalsData} />;
+}
+
+function PendingApprovalsContent({
+    searchParams,
+  }: {
+    searchParams: { tab?: string };
+  }) {
+  const activeTab = searchParams.tab || 'pending';
 
   return (
     <DashboardLayout>
@@ -42,13 +66,15 @@ function PendingApprovalsContent() {
             />
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs defaultValue={activeTab}>
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="pending">Pending Approvals</TabsTrigger>
             <TabsTrigger value="history">Approvals History</TabsTrigger>
           </TabsList>
           <TabsContent value="pending">
-            <ApprovalsTable data={approvalsData} />
+            <Suspense fallback={<p>Loading approvals...</p>}>
+                <PendingApprovalsData />
+            </Suspense>
           </TabsContent>
           <TabsContent value="history">
             <ApprovalsHistoryTable data={approvalsHistoryData} />
@@ -59,10 +85,14 @@ function PendingApprovalsContent() {
   );
 }
 
-export default function PendingApprovalsPage() {
+export default function PendingApprovalsPage({
+    searchParams,
+  }: {
+    searchParams: { tab?: string };
+  }) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <PendingApprovalsContent />
+    <Suspense>
+      <PendingApprovalsContent searchParams={searchParams} />
     </Suspense>
   )
 }

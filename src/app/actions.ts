@@ -541,3 +541,63 @@ export async function getTradeRequestHistory(userId: string) {
         }
     }
 }
+
+export async function getPendingApprovals(userId: string) {
+    if (userId === '5939522605') {
+        return {
+            "ApprovalMatrix": [
+                {
+                    "approverId": "5939522605",
+                    "contractId": "1960646668",
+                    "referenceNo": "5881",
+                    "featureActionId": "BILL_PAY_CREATE_PAYEES",
+                    "assignedDate": "2025-12-01 16:52:26.0",
+                    "sentBy": "7905211902",
+                    "requesterName": "Humna Saeed",
+                    "transactionType2": "Bill Payment Service",
+                    "notes2": "{\"isWiredRecepient\":\"false\",\"zipCode\":\"432156\",\"country\":\"Pakistan\",\"notes\":\"{\\\"typeKey\\\":\\\"ONE_BILL\\\",\\\"instKey\\\":\\\"ONEBILLINVOICE\\\",\\\"typeVal\\\":\\\"1 Bill\\\",\\\"instVal\\\":\\\"Invoice/Voucher\\\",\\\"billerAccountNo\\\":\\\"256185056\\\",\\\"billerBrCode\\\":\\\"1888\\\",\\\"billerBankIMD\\\":\\\"588974\\\",\\\"billerBranchName\\\":\\\"UBL CBS\\\",\\\"billerBankName\\\":\\\"UBL\\\",\\\"billerCurrency\\\":\\\"PKR\\\",\\\"categoryKey\\\":\\\"4\\\",\\\"categoryVal\\\":\\\"Travels\\\",\\\"enquiryID\\\":\\\"982654105\\\",\\\"dueDate\\\":\\\"2025-12-01\\\",\\\"lateSurcharge\\\":\\\"-9000000\\\",\\\"actualAmount\\\":\\\"9000000\\\",\\\"partialPaymentAllowed\\\":\\\"false\\\",\\\"consumerNo\\\":\\\"1364762032170397\\\",\\\"contractId\\\":\\\"1960646668\\\",\\\"coreCustomerId\\\":\\\"20269367\\\",\\\"billAmount\\\":\\\"9000000\\\",\\\"billStatus\\\":\\\"Paid\\\"}\",\"isAutoPayEnabled\":\"false\",\"nickName\":\"1bill\",\"companyName\":\"Invoice/Voucher\",\"transitDays\":\"3\",\"accountNumber\":\"1364762032170397\",\"billermaster_id\":\"1\",\"softDelete\":\"true\",\"response\":\"1\",\"isSTP\":\"1\",\"name\":\"1bill\",\"addressLine1\":\"$addressLine1\",\"addressLine2\":\"Pakistan\",\"isManuallyAdded\":\"false\",\"eBillEnable\":\"0\",\"Id\":\"00126006\",\"User_Id\":\"7905211902\",\"email\":\"$email\",\"isInsert\":\"1\",\"nameOnBill\":\"1 Bill\"}",
+                    "typeId": "NON_MONETARY"
+                },
+                {
+                    "approverId": "5939522605",
+                    "contractId": "1960646668",
+                    "referenceNo": "23300",
+                    "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE",
+                    "amount": "1.00",
+                    "assignedDate": "2025-08-12 23:11:19.0",
+                    "sentBy": "8528902206",
+                    "transactionType": "ExternalTransfer",
+                    "fromAccountNumber": "060510224211",
+                    "toAccountNumber": "PK18MEZN0001050105856769",
+                    "notes": "{\"reviewContext\":{\"reviewDetails\":true,\"transferSuccess\":false,\"beneDetails\":{\"id\":\"00948206\",\"notes\":\"{\\\"catergoryId\\\":\\\"4\\\",\\\"shelf\\\":\\\"Travels\\\",\\\"branchCode\\\":\\\"0000\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"hassan\",\"accountType\":\"EXTERNAL_ACCOUNT\",\"bankName\":\"Meezan Bank Limited\",\"accountNumber\":\"PK18MEZN0001050105856769\",\"routingNumber\":\"627873\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"false\",\"phoneNumber\":\"03343498426\",\"email\":\"mehmood.ayoub@systemsltd.com\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"initialView\":\"makeTransfer\"},\"otherDetails\":{\"amount\":\"1.00\",\"fromAccount\":\"060510224211\",\"purpose\":\"Fund Transfer\",\"fromAccountName\":\"NAWAZ ALI\",\"toAccountName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"toAccountNumber\":\"PK18MEZN0001050105856769\",\"currency\":\"PKR\"}},\"selectedAccount\":{\"depositType\":\"S\",\"GLCode\":\"31100400\",\"accountTitle\":\"NAWAZ ALI\",\"accountType\":\"100\",\"accountCurrency\":\"PKR\",\"accountNumber\":\"060510224211\",\"BlockedAmount\":\"0\",\"availableBalance\":\"63970.74\",\"accountStatus\":\"A\",\"categoryType\":\"01\",\"branchCode\":\"0605\",\"bankName\":\"United Bank Limited\",\"branchName\":\"UBL CBS\",\"AcctOpenDate\":\"11.04.2007\",\"DCCFlag\":\"Y\",\"cnic\":\"4110385560469\",\"contactno\":\"03013577447\",\"fromIban\":\"PK87UNIL0112060510224211\"},\"transferContext\":{\"id\":\"00948206\",\"notes\":\"{\\\"catergoryId\\\":\\\"4\\\",\\\"shelf\\\":\\\"Travels\\\",\\\"branchCode\\\":\\\"0000\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"hassan\",\"accountType\":\"EXTERNAL_ACCOUNT\",\"bankName\":\"Meezan Bank Limited\",\"accountNumber\":\"PK18MEZN0001050105856769\",\"routingNumber\":\"627873\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"false\",\"phoneNumber\":\"03343498426\",\"email\":\"mehmood.ayoub@systemsltd.com\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"initialView\":\"makeTransfer\"},\"fromAccountName\":\"NAWAZ ALI\",\"payeeName\":\"MUHAMMAD HASSAN SIDDIQUI\"}",
+                    "transactionReferenceId": "5959986530222080",
+                    "transactionData": "{\"stan\":\"206157\"}",
+                    "requesterName": "Idrees Maker",
+                    "transactionType2": "Interbank Account to Account Fund Transfer",
+                    "typeId": "MONETARY"
+                },
+                {
+                    "approverId": "5939522605",
+                    "contractId": "1960646668",
+                    "referenceNo": "1181",
+                    "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE_RECEPIENT",
+                    "assignedDate": "2025-09-15 12:24:28.0",
+                    "sentBy": "3943220338",
+                    "requesterName": "Mehmood Sanjrani",
+                    "transactionType2": "Intra Bank Fund Transfer",
+                    "notes2": "{\"notes\":\"{\\\"catergoryId\\\":\\\"5\\\",\\\"shelf\\\":\\\"Tax Payments\\\",\\\"branchCode\\\":\\\"2919\\\",\\\"bankIMD\\\":\\\"588974\\\"}\",\"isVerified\":\"false\",\"nickName\":\"HOME 360 STORE PRIVATE LIMITED\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"UBL\",\"accountNumber\":\"291964542\",\"routingNumber\":\"588974\",\"isInternationalAccount\":\"false\",\"softDelete\":\"true\",\"beneficiaryName\":\"HOME 360 STORE PRIVATE LIMITED\",\"response\":\"1\",\"isSTP\":\"1\",\"isSameBankAccount\":\"true\",\"Id\":\"00434026\",\"User_id\":\"3943220338\",\"isInsert\":\"1\",\"cId\":\"1960646668\"}",
+                    "typeId": "NON_MONETARY"
+                }
+            ],
+            "opstatus": 0,
+            "httpStatusCode": 200
+        }
+    } else {
+        return {
+            ApprovalMatrix: [],
+            opstatus: 1,
+            httpStatusCode: 404,
+            message: 'Pending approvals not found'
+        }
+    }
+}
