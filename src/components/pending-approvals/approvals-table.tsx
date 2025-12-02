@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -35,10 +34,10 @@ function ApprovalRow({ approval }: { approval: Approval }) {
         <TableCell className="w-12 text-center" onClick={toggleRow} style={{ cursor: 'pointer' }}>
             {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </TableCell>
-        <TableCell>{approval.referenceNo}</TableCell>
-        <TableCell>{approval.transactionType2}</TableCell>
-        <TableCell>{approval.featureActionId}</TableCell>
-        <TableCell>{approval.requesterName}</TableCell>
+        <TableCell className="w-1/6 whitespace-nowrap">{approval.referenceNo}</TableCell>
+        <TableCell className="w-2/6">{approval.transactionType2}</TableCell>
+        <TableCell className="w-2/6">{approval.featureActionId}</TableCell>
+        <TableCell className="w-1/6">{approval.requesterName}</TableCell>
         <TableCell className="text-right">
             <div className="flex items-center justify-end gap-2">
                 <Button size="sm" variant="outline" className="bg-gray-100 hover:bg-gray-200">
@@ -55,38 +54,56 @@ function ApprovalRow({ approval }: { approval: Approval }) {
         <TableRow>
           <TableCell colSpan={6} className="p-0">
             <div className="bg-muted/50 p-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-                    {isBillPayment && innerNotes ? (
-                        <>
-                            <div className="col-span-1 space-y-2">
+                <div className="flex w-full">
+                    {/* Empty cell for chevron */}
+                    <div className="w-12"></div>
+                    
+                    {/* Aligns with Transaction Number */}
+                    <div className="w-1/6 space-y-2 pr-4">
+                        {isBillPayment && innerNotes ? (
+                             <>
                                 <div>
                                     <p className="text-sm font-semibold">Consumer Number</p>
-                                    <p className="text-muted-foreground">{innerNotes.consumerNo}</p>
+                                    <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-semibold">Consumer Name</p>
-                                    <p className="text-muted-foreground">{notes.nickName}</p>
+                                    <p className="text-muted-foreground text-sm">{notes.nickName}</p>
                                 </div>
+                            </>
+                        ) : (
+                             <div>
+                                <p className="text-sm font-semibold">Amount</p>
+                                <p className="text-muted-foreground text-sm">PKR {approval.amount || 'N/A'}</p>
                             </div>
-                            <div className="col-span-1 space-y-2">
-                                <div>
-                                    <p className="text-sm font-semibold">Biller Institution</p>
-                                    <p className="text-muted-foreground">{innerNotes.instVal}</p>
-                                </div>
-                            </div>
-                        </>
-                    ) : (
-                        <div className="col-span-1">
-                            <p className="text-sm font-semibold">Amount</p>
-                            <p className="text-muted-foreground">PKR {approval.amount || 'N/A'}</p>
-                        </div>
-                    )}
-                     <div className="col-span-1 space-y-2">
-                        <div>
+                        )}
+                    </div>
+
+                    {/* Aligns with Transaction Type */}
+                    <div className="w-2/6 space-y-2 pr-4">
+                       {isBillPayment && innerNotes && (
+                           <div>
+                               <p className="text-sm font-semibold">Biller Institution</p>
+                               <p className="text-muted-foreground text-sm">{innerNotes.instVal}</p>
+                           </div>
+                       )}
+                    </div>
+                    
+                    {/* Aligns with Request Type */}
+                    <div className="w-2/6 space-y-2 pr-4">
+                        {/* Placeholder for future details under this column */}
+                    </div>
+
+                    {/* Aligns with Originator */}
+                    <div className="w-1/6 space-y-2 pr-4">
+                         <div>
                             <p className="text-sm font-semibold">Date Submitted</p>
-                            <p className="text-muted-foreground">{format(new Date(approval.assignedDate), 'dd/MM/yyyy h:mm a')}</p>
+                            <p className="text-muted-foreground text-sm">{format(new Date(approval.assignedDate), 'dd/MM/yyyy h:mm a')}</p>
                         </div>
                     </div>
+
+                    {/* Aligns with Actions - empty */}
+                    <div className="flex-1"></div>
                 </div>
             </div>
           </TableCell>
@@ -104,10 +121,10 @@ export function ApprovalsTable({ data }: ApprovalsTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead className="w-12"></TableHead>
-            <TableHead className="whitespace-nowrap">Transaction Number</TableHead>
-            <TableHead>Transaction Type</TableHead>
-            <TableHead>Request Type</TableHead>
-            <TableHead>Originator</TableHead>
+            <TableHead className="w-1/6 whitespace-nowrap">Transaction Number</TableHead>
+            <TableHead className="w-2/6">Transaction Type</TableHead>
+            <TableHead className="w-2/6">Request Type</TableHead>
+            <TableHead className="w-1/6">Originator</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
