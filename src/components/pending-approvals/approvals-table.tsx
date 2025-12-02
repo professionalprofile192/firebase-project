@@ -65,18 +65,22 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
                     <div className="w-12 flex-shrink-0"></div>
                     
                     {isBillPayment && innerNotes && (
-                      <div className="flex-grow flex items-start">
-                        <div className="w-[15%] pr-4">
+                      <div className="flex flex-1 items-start">
+                        <div className="w-[15%] whitespace-nowrap pr-4">
                             <p className="text-sm font-semibold">Consumer Number</p>
                             <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
                         </div>
-                        <div className="w-[25%] pr-4">
+                        <div className="w-[25%] break-words pr-4">
                             <p className="text-sm font-semibold">Biller Institution</p>
                             <p className="text-muted-foreground text-sm">{innerNotes.instVal}</p>
                         </div>
-                         <div className="w-[25%] pr-4">
+                         <div className="w-[25%] break-words pr-4">
                             <p className="text-sm font-semibold">Consumer Name</p>
                             <p className="text-muted-foreground text-sm">{notes.nickName}</p>
+                        </div>
+                         <div className="w-[15%] pr-4">
+                            <p className="text-sm font-semibold">Date Submitted</p>
+                            <p className="text-muted-foreground text-sm">{format(new Date(approval.assignedDate), 'dd/MM/yyyy h:mm a')}</p>
                         </div>
                       </div>
                     )}
@@ -101,15 +105,12 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
                                 <p className="text-sm font-semibold">Beneficiary Name</p>
                                 <p className="text-muted-foreground text-sm">{reviewContext.payeeName}</p>
                             </div>
+                            <div className="w-[15%] pr-4">
+                                <p className="text-sm font-semibold">Date Submitted</p>
+                                <p className="text-muted-foreground text-sm">{format(new Date(approval.assignedDate), 'dd/MM/yyyy h:mm a')}</p>
+                            </div>
                         </div>
                     )}
-
-                    <div className="w-[15%] pr-4">
-                        <div>
-                            <p className="text-sm font-semibold">Date Submitted</p>
-                            <p className="text-muted-foreground text-sm">{format(new Date(approval.assignedDate), 'dd/MM/yyyy h:mm a')}</p>
-                        </div>
-                    </div>
                     <div className="flex-1"></div>
                 </div>
             </div>
