@@ -243,8 +243,8 @@ export function TradeRequestForm() {
 
         await Promise.all(promises);
 
-        // Store submitted files in session storage
-        const existingHistory = JSON.parse(sessionStorage.getItem('tradeRequestHistory') || '[]');
+        // Store submitted files in local storage
+        const existingHistory = JSON.parse(localStorage.getItem('tradeRequestHistory') || '[]');
         const newHistoryItems = uploadedFiles.map(f => ({
             file_refid: f.fileReferenceNumber,
             product_type: f.productType,
@@ -253,7 +253,7 @@ export function TradeRequestForm() {
             currency: f.currency,
             status: 'Open', // Default status for new submissions
         }));
-        sessionStorage.setItem('tradeRequestHistory', JSON.stringify([...newHistoryItems, ...existingHistory]));
+        localStorage.setItem('tradeRequestHistory', JSON.stringify([...newHistoryItems, ...existingHistory]));
         
         setDialogTitle('Success');
         setDialogMessage(`Request has been sent successfully with file reference id:`);

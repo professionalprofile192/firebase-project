@@ -55,12 +55,12 @@ export default function TradeRequestHistoryPage() {
                     });
                 }
                 
-                // Get newly submitted items from session storage
-                const sessionHistoryString = sessionStorage.getItem('tradeRequestHistory');
-                const sessionHistory: TradeHistoryItem[] = sessionHistoryString ? JSON.parse(sessionHistoryString) : [];
+                // Get newly submitted items from local storage
+                const localHistoryString = localStorage.getItem('tradeRequestHistory');
+                const localHistory: TradeHistoryItem[] = localHistoryString ? JSON.parse(localHistoryString) : [];
                 
                 // Combine and set the history, showing newest items first
-                setHistory([...sessionHistory, ...serverHistory]);
+                setHistory([...localHistory, ...serverHistory]);
 
             } catch (error) {
                 console.error("Failed to parse user profile or fetch trade history", error);
