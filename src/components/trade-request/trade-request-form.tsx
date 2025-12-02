@@ -59,6 +59,8 @@ type UploadedFile = {
     requestType: string;
     productType: string;
     fileReferenceNumber: string;
+    currency: string;
+    amount: string;
 }
 
 export function TradeRequestForm() {
@@ -78,6 +80,8 @@ export function TradeRequestForm() {
   const [dialogMessage, setDialogMessage] = useState('');
   const [dialogRefId, setDialogRefId] = useState<string | undefined>();
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [dialogDoneHandler, setDialogDoneHandler] = useState(() => () => {});
+
 
   useEffect(() => {
     const profile = sessionStorage.getItem('userProfile');
@@ -98,6 +102,8 @@ export function TradeRequestForm() {
                     file: selectedFile,
                     requestType: originalFile.requestType,
                     productType: originalFile.productType,
+                    currency: originalFile.currency,
+                    amount: originalFile.amount,
                 };
                 handleUpload(newFileToUpload, editFileId);
             }
@@ -116,16 +122,18 @@ export function TradeRequestForm() {
     fileInputRef.current?.click();
   };
 
-  const handleUpload = async (fileToUpload?: {file: File, requestType: string, productType: string}, existingId?: number | null) => {
+  const handleUpload = async (fileToUpload?: {file: File, requestType: string, productType: string, currency: string, amount: string}, existingId?: number | null) => {
     const currentFile = fileToUpload?.file || file;
     const currentRequestType = fileToUpload?.requestType || requestType;
     const currentProductType = fileToUpload?.productType || productType;
+    const currentCurrency = fileToUpload?.currency || currency;
+    const currentAmount = fileToUpload?.amount || amount;
 
-    if (!currentFile || !currentRequestType || !currentProductType) {
+    if (!currentFile || !currentRequestType || !currentProductType || !currentCurrency || !currentAmount) {
         toast({
             variant: 'destructive',
             title: "Missing Information",
-            description: "Please select a product type, request type, and a file to upload."
+            description: "Please fill all fields and select a file to upload."
         });
         return;
     }
@@ -155,6 +163,8 @@ export function TradeRequestForm() {
                 requestType: currentRequestType,
                 productType: currentProductType,
                 fileReferenceNumber: response.records[0].file_refid,
+                currency: currentCurrency,
+                amount: currentAmount,
             };
 
             const addFileToList = () => {
@@ -164,7 +174,7 @@ export function TradeRequestForm() {
                   setUploadedFiles(prev => [...prev, newFile]);
               }
             }
-
+            
             setDialogTitle('Single Bulk Upload');
             setDialogMessage('File has been uploaded and is being validated by the system. Please refer to the Dashboard to view it.');
             setDialogRefId(undefined); // No ref ID for single upload dialog
@@ -232,6 +242,18 @@ export function TradeRequestForm() {
         }));
 
         await Promise.all(promises);
+
+        // Store submitted files in session storage
+        const existingHistory = JSON.parse(sessionStorage.getItem('tradeRequestHistory') || '[]');
+        const newHistoryItems = uploadedFiles.map(f => ({
+            file_refid: f.fileReferenceNumber,
+            product_type: f.productType,
+            request_type: f.requestType,
+            file_name: f.file.name,
+            currency: f.currency,
+            status: 'Open', // Default status for new submissions
+        }));
+        sessionStorage.setItem('tradeRequestHistory', JSON.stringify([...newHistoryItems, ...existingHistory]));
         
         setDialogTitle('Success');
         setDialogMessage(`Request has been sent successfully with file reference id:`);
@@ -251,8 +273,6 @@ export function TradeRequestForm() {
         setIsSubmitting(false);
       }
   }
-
-  const [dialogDoneHandler, setDialogDoneHandler] = useState(() => () => {});
 
   const getFileName = () => {
       if (editFileId !== null) return "Select a new file...";
@@ -333,6 +353,7 @@ export function TradeRequestForm() {
                         onClick={handleAttachmentClick}
                       />
                       <input
+                        key={editFileId}
                         type="file"
                         ref={fileInputRef}
                         className="hidden"
