@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useCallback, Suspense } from 'react';
@@ -112,8 +111,11 @@ function AccountStatementContent() {
       const last10 = allTransactions.slice(0, 10);
       setDisplayedTransactions(last10);
     } else if (filter === 'last10days') {
-      const tenDaysAgo = subDays(new Date(), 10);
-      const last10Days = allTransactions.filter(tx => isAfter(parseISO(tx.tranDate), tenDaysAgo));
+      const tenDaysAgo = startOfDay(subDays(new Date(), 10));
+      const last10Days = allTransactions.filter(tx => {
+        const txDate = startOfDay(parseISO(tx.tranDate));
+        return isAfter(txDate, tenDaysAgo);
+      });
       setDisplayedTransactions(last10Days);
     } else if (filter === 'all') { // To reset filter
       setDisplayedTransactions(allTransactions);
@@ -121,12 +123,12 @@ function AccountStatementContent() {
   };
 
   const handleDateRangeView = (fromDate: Date, toDate: Date) => {
-    const from = format(fromDate, 'yyyy-MM-dd');
-    const to = format(toDate, 'yyyy-MM-dd');
+    const from = startOfDay(fromDate);
+    const to = endOfDay(toDate);
 
     const filtered = allTransactions.filter(tx => {
-        const txDate = format(parseISO(tx.tranDate), 'yyyy-MM-dd');
-        return txDate >= from && txDate <= to;
+        const txDate = parseISO(tx.tranDate);
+        return !isBefore(txDate, from) && !isAfter(txDate, to);
     });
     setDisplayedTransactions(filtered);
   };
