@@ -35,10 +35,10 @@ function ApprovalRow({ approval }: { approval: Approval }) {
         <TableCell className="w-12 text-center" onClick={toggleRow} style={{ cursor: 'pointer' }}>
             {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </TableCell>
-        <TableCell className="w-32">{approval.referenceNo}</TableCell>
-        <TableCell className="w-56 whitespace-normal break-words">{approval.transactionType2}</TableCell>
-        <TableCell className="max-w-xs whitespace-normal break-words">{approval.featureActionId}</TableCell>
-        <TableCell className="w-48">{approval.requesterName}</TableCell>
+        <TableCell>{approval.referenceNo}</TableCell>
+        <TableCell>{approval.transactionType2}</TableCell>
+        <TableCell>{approval.featureActionId}</TableCell>
+        <TableCell>{approval.requesterName}</TableCell>
         <TableCell className="text-right">
             <div className="flex items-center justify-end gap-2">
                 <Button size="sm" variant="outline" className="bg-gray-100 hover:bg-gray-200">
@@ -104,10 +104,10 @@ export function ApprovalsTable({ data }: ApprovalsTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead className="w-12"></TableHead>
-            <TableHead className="w-32">Transaction Number</TableHead>
-            <TableHead className="w-56">Transaction Type</TableHead>
+            <TableHead className="whitespace-nowrap">Transaction Number</TableHead>
+            <TableHead>Transaction Type</TableHead>
             <TableHead>Request Type</TableHead>
-            <TableHead className="w-48">Originator</TableHead>
+            <TableHead>Originator</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
