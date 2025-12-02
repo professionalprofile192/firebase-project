@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -56,27 +55,8 @@ function PendingApprovalsContent() {
                     getApprovalHistory('5939522605')
                 ]);
 
-                let currentPending = pendingData.opstatus === 0 ? pendingData.ApprovalMatrix : [];
-                let currentHistory = historyData.opstatus === 0 ? historyData.ApprovalMatrix : [];
-                
-                // Retrieve locally rejected items from localStorage
-                const rejectedItemsString = localStorage.getItem('rejectedApprovals');
-                const locallyRejectedItems: Approval[] = rejectedItemsString ? JSON.parse(rejectedItemsString) : [];
-
-                if (locallyRejectedItems.length > 0) {
-                  const rejectedRefNos = new Set(locallyRejectedItems.map(item => item.referenceNo));
-                  
-                  // Filter out locally rejected items from the fetched pending list
-                  currentPending = currentPending.filter(item => !rejectedRefNos.has(item.referenceNo));
-
-                  // Add locally rejected items to the history list if they are not already there
-                  const historyRefNos = new Set(currentHistory.map(item => item.referenceNo));
-                  const itemsToAdd = locallyRejectedItems.filter(item => !historyRefNos.has(item.referenceNo));
-                  currentHistory = [...itemsToAdd, ...currentHistory];
-                }
-
-                setPendingApprovals(currentPending);
-                setApprovalHistory(currentHistory);
+                setPendingApprovals(pendingData.opstatus === 0 ? pendingData.ApprovalMatrix : []);
+                setApprovalHistory(historyData.opstatus === 0 ? historyData.ApprovalMatrix : []);
 
             } catch (error) {
                 console.error("Failed to fetch approvals data", error);
@@ -115,11 +95,6 @@ function PendingApprovalsContent() {
             // Move from pending to history
             setPendingApprovals(prev => prev.filter(appr => appr.referenceNo !== approval.referenceNo));
             setApprovalHistory(prev => [rejectedApproval, ...prev]);
-
-            // Persist to localStorage
-            const rejectedItemsString = localStorage.getItem('rejectedApprovals');
-            const locallyRejectedItems: Approval[] = rejectedItemsString ? JSON.parse(rejectedItemsString) : [];
-            localStorage.setItem('rejectedApprovals', JSON.stringify([rejectedApproval, ...locallyRejectedItems]));
 
             toast({ title: 'Success', description: response.ApprovalMatrix[0].reqResponse });
             return true;
