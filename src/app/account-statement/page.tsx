@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { getRecentTransactions } from '../actions';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -35,7 +35,7 @@ export type Transaction = {
     runBal: string;
 };
 
-export default function AccountStatementPage() {
+function AccountStatementContent() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
@@ -190,4 +190,12 @@ export default function AccountStatementPage() {
       </main>
     </DashboardLayout>
   );
+}
+
+export default function AccountStatementPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <AccountStatementContent />
+        </Suspense>
+    );
 }
