@@ -1,4 +1,5 @@
 
+
 'use server';
 
 // This is a placeholder for the actual API call.
@@ -890,4 +891,32 @@ export async function getApprovalHistory(userId: string) {
     }
 }
 
+
+export async function rejectRequest(payload: {
+    accountNo: number;
+    approverId: string;
+    contractId: string;
+    referenceNo: string;
+    rejectorId: string;
+    remarks: string;
+}) {
+    // This is a mock service. In a real scenario, you'd post this to your backend.
+    const { approverId, referenceNo, remarks } = payload;
+    
+    if (approverId === '5939522605' && referenceNo && remarks) {
+        return {
+            "ApprovalMatrix": [
+                {
+                    "httpStatusCode": 200,
+                    "opstatus": 0,
+                    "reqResponse": "REQUEST REJECTED SUCCESSFULLY"
+                }
+            ],
+            "opstatus": 0,
+            "httpStatusCode": 200
+        };
+    } else {
+        return { opstatus: 1, httpStatusCode: 400, message: "Invalid payload provided for rejectRequest" };
+    }
+}
     

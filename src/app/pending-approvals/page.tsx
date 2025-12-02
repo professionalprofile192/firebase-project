@@ -33,8 +33,9 @@ async function PendingApprovalsData() {
     const cookieStore = cookies();
     const userProfileCookie = cookieStore.get('userProfile');
     let approvalsData: Approval[] = [];
-
+    let userProfile = null;
     if (userProfileCookie?.value) {
+        userProfile = JSON.parse(userProfileCookie.value);
         // Using a hardcoded ID for now as per the service details provided
         const data = await getPendingApprovals('5939522605');
         if (data.opstatus === 0) {
@@ -42,7 +43,7 @@ async function PendingApprovalsData() {
         }
     }
     
-    return <ApprovalsTable data={approvalsData} />;
+    return <ApprovalsTable data={approvalsData} userProfile={userProfile} />;
 }
 
 async function ApprovalsHistoryData() {
