@@ -10,10 +10,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import type { Approval } from '@/app/pending-approvals/page';
 import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, CheckCircle2, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface ApprovalsTableProps {
@@ -32,23 +31,31 @@ function ApprovalRow({ approval }: { approval: Approval }) {
 
   return (
     <>
-      <TableRow onClick={toggleRow} className="cursor-pointer">
-        <TableCell className="w-12 text-center">
+      <TableRow>
+        <TableCell className="w-12 text-center" onClick={toggleRow} style={{ cursor: 'pointer' }}>
             {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </TableCell>
         <TableCell className="w-32">{approval.referenceNo}</TableCell>
         <TableCell className="w-56 whitespace-normal break-words">{approval.transactionType2}</TableCell>
         <TableCell className="max-w-xs whitespace-normal break-words">{approval.featureActionId}</TableCell>
         <TableCell className="w-48">{approval.requesterName}</TableCell>
-        <TableCell className="w-20 text-center">
-            <Checkbox />
+        <TableCell className="text-right">
+            <div className="flex items-center justify-end gap-2">
+                <Button size="sm" variant="outline" className="bg-gray-100 hover:bg-gray-200">
+                    Approve <CheckCircle2 className="h-4 w-4 ml-2 text-green-500" />
+                </Button>
+                <Button size="sm" variant="outline" className="bg-gray-100 hover:bg-gray-200">
+                   Reject <XCircle className="h-4 w-4 ml-2 text-red-500" />
+                </Button>
+                <Button size="sm" variant="outline" className="bg-gray-100 hover:bg-gray-200">View</Button>
+            </div>
         </TableCell>
       </TableRow>
       {isOpen && (
         <TableRow>
           <TableCell colSpan={6} className="p-0">
             <div className="bg-muted/50 p-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                     {isBillPayment && innerNotes ? (
                         <>
                             <div className="col-span-1 space-y-2">
@@ -80,15 +87,6 @@ function ApprovalRow({ approval }: { approval: Approval }) {
                             <p className="text-muted-foreground">{format(new Date(approval.assignedDate), 'dd/MM/yyyy h:mm a')}</p>
                         </div>
                     </div>
-                    <div className="col-span-1 md:col-span-2 flex items-center justify-end gap-2">
-                        <Button size="sm" variant="outline" className="bg-green-100 text-green-800 border-green-300 hover:bg-green-200">
-                            Approve
-                        </Button>
-                        <Button size="sm" variant="outline" className="bg-red-100 text-red-800 border-red-300 hover:bg-red-200">
-                           Reject
-                        </Button>
-                        <Button size="sm" variant="outline">View</Button>
-                    </div>
                 </div>
             </div>
           </TableCell>
@@ -110,9 +108,7 @@ export function ApprovalsTable({ data }: ApprovalsTableProps) {
             <TableHead className="w-56">Transaction Type</TableHead>
             <TableHead>Request Type</TableHead>
             <TableHead className="w-48">Originator</TableHead>
-            <TableHead className="w-20 text-center">
-                <Checkbox />
-            </TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
