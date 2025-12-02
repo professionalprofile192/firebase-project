@@ -41,14 +41,14 @@ function ApprovalReviewContent() {
     }
     
     const confirmReject = async (remarks: string) => {
-        if (!userProfile) {
-            toast({ variant: 'destructive', title: 'Error', description: 'User profile not found.' });
+        if (!userProfile || !approval) {
+            toast({ variant: 'destructive', title: 'Error', description: 'User profile or approval details not found.' });
             return;
         }
 
         const payload = {
             accountNo: 0,
-            approverId: userProfile.userid,
+            approverId: approval.approverId,
             contractId: approval.contractId,
             referenceNo: approval.referenceNo,
             rejectorId: userProfile.userid,

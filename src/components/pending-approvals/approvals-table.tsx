@@ -88,7 +88,7 @@ function ApprovalRow({ approval, isOpen, onToggle, onRejectClick }: { approval: 
       {isOpen && (
         <TableRow>
           <TableCell colSpan={6} className="p-0">
-            <div className="bg-muted/50 p-4">
+             <div className="bg-muted/50 p-4">
                 <div className="flex w-full">
                     {/* Empty cell for chevron */}
                     <div className="w-12 flex-shrink-0"></div>
@@ -100,7 +100,7 @@ function ApprovalRow({ approval, isOpen, onToggle, onRejectClick }: { approval: 
                                 <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
                             </div>
                         )}
-                        {(isFundTransfer && amount) && (
+                        {(amount) && (
                             <div>
                                 <p className="text-sm font-semibold">Amount</p>
                                 <p className="text-muted-foreground text-sm">PKR {amount}</p>
@@ -121,7 +121,7 @@ function ApprovalRow({ approval, isOpen, onToggle, onRejectClick }: { approval: 
                                 <p className="text-muted-foreground text-sm">{innerNotes.instVal}</p>
                             </div>
                         )}
-                        {(isFundTransfer && !isBulkTransfer && fromAccount) && (
+                        {(fromAccount) && (
                            <div>
                                 <p className="text-sm font-semibold">Debit Account</p>
                                 <p className="text-muted-foreground text-sm">{fromAccount}</p>
@@ -142,7 +142,7 @@ function ApprovalRow({ approval, isOpen, onToggle, onRejectClick }: { approval: 
                                 <p className="text-muted-foreground text-sm">{notes.nickName}</p>
                            </div>
                         )}
-                        {(isFundTransfer && !isBulkTransfer && toAccount) && (
+                        {(toAccount) && (
                             <div>
                                 <p className="text-sm font-semibold">Credit Account</p>
                                 <p className="text-muted-foreground text-sm">{toAccount}</p>
@@ -215,7 +215,7 @@ export function ApprovalsTable({ data, userProfile }: ApprovalsTableProps) {
     
     const payload = {
         accountNo: 0, 
-        approverId: userProfile.userid,
+        approverId: selectedApproval.approverId,
         contractId: selectedApproval.contractId,
         referenceNo: selectedApproval.referenceNo,
         rejectorId: userProfile.userid,
