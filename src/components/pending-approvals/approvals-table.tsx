@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -24,27 +25,42 @@ const ITEMS_PER_PAGE = 8;
 
 function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpen: boolean, onToggle: () => void }) {
   
-  const notes = approval.notes2 ? JSON.parse(approval.notes2) : (approval.notes ? JSON.parse(approval.notes) : null);
-  const innerNotes = notes?.notes ? JSON.parse(notes.notes) : null;
+  let notes = null;
+  try {
+    notes = approval.notes2 ? JSON.parse(approval.notes2) : (approval.notes ? JSON.parse(approval.notes) : null);
+  } catch (e) {
+    // Notes are not a valid JSON
+  }
+
+  let innerNotes = null;
+  if (notes?.notes) {
+    try {
+      innerNotes = JSON.parse(notes.notes);
+    } catch (e) {
+      // notes.notes is not a valid JSON
+    }
+  }
+
   const reviewContext = notes?.reviewContext;
   
   const isBillPayment = approval.featureActionId === 'BILL_PAY_CREATE_PAYEES';
   const isFundTransfer = approval.featureActionId.includes('FUND_TRANSFER');
+  const isBulkTransfer = approval.transactionType === 'BulkFT' || approval.transactionType === 'BulkIBFT' || approval.transactionType === 'BulkRaast';
   
-  const fromAccount = isFundTransfer ? approval.fromAccountNumber : (innerNotes?.fromAccount || 'N/A');
-  const toAccount = isFundTransfer ? approval.toAccountNumber : (innerNotes?.toAccount || 'N/A');
+  const fromAccount = approval.fromAccountNumber || reviewContext?.otherDetails?.fromAccount || 'N/A';
+  const toAccount = approval.toAccountNumber || reviewContext?.otherDetails?.toAccountNumber || 'N/A';
 
   return (
     <>
-      <TableRow onClick={onToggle} className="cursor-pointer">
-        <TableCell className="w-12 text-center">
+      <TableRow>
+        <TableCell onClick={onToggle} className="cursor-pointer w-12 text-center">
             {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </TableCell>
-        <TableCell className="font-medium whitespace-nowrap">{approval.referenceNo}</TableCell>
+        <TableCell className="font-medium whitespace-nowrap w-[15%]">{approval.referenceNo}</TableCell>
         <TableCell className="w-[25%] break-words">{approval.transactionType2}</TableCell>
         <TableCell className="w-[25%] break-words">{approval.featureActionId}</TableCell>
         <TableCell className="w-[15%]">{approval.requesterName}</TableCell>
-        <TableCell className="text-right">
+        <TableCell className="text-right flex-1">
             <div className="flex items-center justify-end gap-2">
                 <Button size="sm" variant="outline" className="bg-green-100 hover:bg-green-200 text-green-800 border-green-200" onClick={(e) => { e.stopPropagation(); /* approve logic */ }}>
                     Approve <CheckCircle2 className="h-4 w-4 ml-2" />
@@ -63,54 +79,72 @@ function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpe
                 <div className="flex w-full">
                     {/* Empty cell for chevron */}
                     <div className="w-12 flex-shrink-0"></div>
-                    
-                    {isBillPayment && innerNotes && (
-                      <div className="flex flex-1 items-start">
-                        <div className="w-[15%] whitespace-nowrap pr-4">
-                            <p className="text-sm font-semibold">Consumer Number</p>
-                            <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
-                        </div>
-                        <div className="w-[25%] break-words pr-4">
-                            <p className="text-sm font-semibold">Biller Institution</p>
-                            <p className="text-muted-foreground text-sm">{innerNotes.instVal}</p>
-                        </div>
-                         <div className="w-[25%] break-words pr-4">
-                            <p className="text-sm font-semibold">Consumer Name</p>
-                            <p className="text-muted-foreground text-sm">{notes.nickName}</p>
-                        </div>
-                         <div className="w-[15%] pr-4">
+                    <div className="w-[15%] pr-4 space-y-4">
+                        {isBillPayment && innerNotes && (
+                            <div>
+                                <p className="text-sm font-semibold">Consumer Number</p>
+                                <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
+                            </div>
+                        )}
+                         {(isFundTransfer && !isBulkTransfer) && (
+                            <div>
+                                <p className="text-sm font-semibold">Amount</p>
+                                <p className="text-muted-foreground text-sm">PKR {approval.amount || 'N/A'}</p>
+                            </div>
+                        )}
+                        {isBulkTransfer && notes?.fileid && (
+                             <div>
+                                <p className="text-sm font-semibold">File Reference Number</p>
+                                <p className="text-muted-foreground text-sm">{notes.fileid}</p>
+                            </div>
+                        )}
+                    </div>
+                    <div className="w-[25%] pr-4 space-y-4">
+                        {isBillPayment && innerNotes && (
+                             <div>
+                                <p className="text-sm font-semibold">Biller Institution</p>
+                                <p className="text-muted-foreground text-sm">{innerNotes.instVal}</p>
+                            </div>
+                        )}
+                         {(isFundTransfer && !isBulkTransfer) && (
+                           <div>
+                                <p className="text-sm font-semibold">Debit Account</p>
+                                <p className="text-muted-foreground text-sm">{fromAccount}</p>
+                            </div>
+                        )}
+                         {isBulkTransfer && notes?.filename && (
+                            <div>
+                                <p className="text-sm font-semibold">File Name</p>
+                                <p className="text-muted-foreground text-sm">{notes.filename}</p>
+                            </div>
+                        )}
+                    </div>
+                     <div className="w-[25%] pr-4 space-y-4">
+                        {isBillPayment && notes && (
+                           <div>
+                                <p className="text-sm font-semibold">Consumer Name</p>
+                                <p className="text-muted-foreground text-sm">{notes.nickName}</p>
+                           </div>
+                        )}
+                         {(isFundTransfer && !isBulkTransfer) && (
+                            <div>
+                                <p className="text-sm font-semibold">Credit Account</p>
+                                <p className="text-muted-foreground text-sm">{toAccount}</p>
+                            </div>
+                        )}
+                        {isBulkTransfer && notes?.fromAccountName && (
+                            <div>
+                                <p className="text-sm font-semibold">Account Title</p>
+                                <p className="text-muted-foreground text-sm">{notes.fromAccountName}</p>
+                            </div>
+                        )}
+                     </div>
+                     <div className="w-[15%] pr-4 space-y-4">
+                        <div>
                             <p className="text-sm font-semibold">Date Submitted</p>
                             <p className="text-muted-foreground text-sm">{format(new Date(approval.assignedDate), 'dd/MM/yyyy h:mm a')}</p>
                         </div>
-                      </div>
-                    )}
-
-                    {isFundTransfer && reviewContext && (
-                        <div className="flex-grow flex">
-                            <div className="w-[15%] pr-4 space-y-4">
-                                <div>
-                                    <p className="text-sm font-semibold">Amount</p>
-                                    <p className="text-muted-foreground text-sm">PKR {approval.amount || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-semibold">From Account</p>
-                                    <p className="text-muted-foreground text-sm">{fromAccount}</p>
-                                </div>
-                            </div>
-                             <div className="w-[25%] pr-4">
-                                <p className="text-sm font-semibold">To Account</p>
-                                <p className="text-muted-foreground text-sm">{toAccount}</p>
-                            </div>
-                            <div className="w-[25%] pr-4">
-                                <p className="text-sm font-semibold">Beneficiary Name</p>
-                                <p className="text-muted-foreground text-sm">{reviewContext.payeeName}</p>
-                            </div>
-                            <div className="w-[15%] pr-4">
-                                <p className="text-sm font-semibold">Date Submitted</p>
-                                <p className="text-muted-foreground text-sm">{format(new Date(approval.assignedDate), 'dd/MM/yyyy h:mm a')}</p>
-                            </div>
-                        </div>
-                    )}
+                    </div>
                     <div className="flex-1"></div>
                 </div>
             </div>
@@ -136,10 +170,12 @@ export function ApprovalsTable({ data }: ApprovalsTableProps) {
   };
   
   const handlePreviousPage = () => {
+    setOpenApprovalId(null);
     setCurrentPage(prev => Math.max(prev - 1, 1));
   }
 
   const handleNextPage = () => {
+    setOpenApprovalId(null);
     setCurrentPage(prev => Math.min(prev + 1, totalPages));
   }
 
@@ -153,7 +189,7 @@ export function ApprovalsTable({ data }: ApprovalsTableProps) {
             <TableHead className="w-[25%]">Transaction Type</TableHead>
             <TableHead className="w-[25%]">Request Type</TableHead>
             <TableHead className="w-[15%]">Originator</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-right flex-1">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
