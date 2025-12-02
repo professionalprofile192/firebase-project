@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { X } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface RejectDialogProps {
   open: boolean;
@@ -23,8 +24,17 @@ interface RejectDialogProps {
 
 export function RejectDialog({ open, onOpenChange, onConfirm }: RejectDialogProps) {
   const [comment, setComment] = useState('');
+  const { toast } = useToast();
 
   const handleConfirm = () => {
+    if (!comment.trim()) {
+      toast({
+        variant: 'destructive',
+        title: 'Validation Error',
+        description: 'Please enter comment to process.',
+      });
+      return;
+    }
     onConfirm(comment);
     setComment('');
   };
