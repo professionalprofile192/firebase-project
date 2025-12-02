@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { Button } from '@/components/ui/button';
@@ -19,14 +19,20 @@ function ApprovalReviewContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const approvalString = searchParams.get('approval');
-    const userProfileString = sessionStorage.getItem('userProfile');
 
     const [approval, setApproval] = useState<Approval | null>(approvalString ? JSON.parse(approvalString) : null);
-    const [userProfile, setUserProfile] = useState<any>(userProfileString ? JSON.parse(userProfileString) : null);
+    const [userProfile, setUserProfile] = useState<any>(null);
     const [showRejectDialog, setShowRejectDialog] = useState(false);
     const [showSuccessAlert, setShowSuccessAlert] = useState(false);
     const [successAlertMessage, setSuccessAlertMessage] = useState('');
     const { toast } = useToast();
+
+    useEffect(() => {
+        const userProfileString = sessionStorage.getItem('userProfile');
+        if (userProfileString) {
+            setUserProfile(JSON.parse(userProfileString));
+        }
+    }, []);
 
     if (!approval) {
         return (
