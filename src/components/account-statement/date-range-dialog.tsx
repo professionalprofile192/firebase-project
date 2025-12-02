@@ -24,6 +24,8 @@ export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNum
   const [fromDate, setFromDate] = useState<Date | undefined>();
   const [toDate, setToDate] = useState<Date | undefined>();
   const [isDownloading, setIsDownloading] = useState(false);
+  const [fromPopoverOpen, setFromPopoverOpen] = useState(false);
+  const [toPopoverOpen, setToPopoverOpen] = useState(false);
   const { toast } = useToast();
 
   const handleAction = async () => {
@@ -95,7 +97,7 @@ export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNum
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="from-date">From</Label>
-            <Popover>
+            <Popover open={fromPopoverOpen} onOpenChange={setFromPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
                   id="from-date"
@@ -116,7 +118,10 @@ export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNum
                   toYear={new Date().getFullYear()}
                   mode="single"
                   selected={fromDate}
-                  onSelect={setFromDate}
+                  onSelect={(date) => {
+                    setFromDate(date);
+                    setFromPopoverOpen(false);
+                  }}
                   disabled={(date) => date > new Date()}
                   initialFocus
                 />
@@ -125,7 +130,7 @@ export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNum
           </div>
           <div className="grid gap-2">
             <Label htmlFor="to-date">To</Label>
-            <Popover>
+            <Popover open={toPopoverOpen} onOpenChange={setToPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
                   id="to-date"
@@ -146,7 +151,10 @@ export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNum
                   toYear={new Date().getFullYear()}
                   mode="single"
                   selected={toDate}
-                  onSelect={setToDate}
+                  onSelect={(date) => {
+                    setToDate(date);
+                    setToPopoverOpen(false);
+                  }}
                   disabled={(date) => date > new Date() || (fromDate && date < fromDate)}
                   initialFocus
                 />
