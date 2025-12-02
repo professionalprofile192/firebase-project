@@ -18,8 +18,7 @@ interface ApprovalsTableProps {
   data: Approval[];
 }
 
-function ApprovalRow({ approval }: { approval: Approval }) {
-  const [isOpen, setIsOpen] = useState(false);
+function ApprovalRow({ approval, isOpen, onToggle }: { approval: Approval, isOpen: boolean, onToggle: () => void }) {
   
   const notes = approval.notes2 ? JSON.parse(approval.notes2) : (approval.notes ? JSON.parse(approval.notes) : null);
   const innerNotes = notes?.notes ? JSON.parse(notes.notes) : null;
@@ -27,15 +26,13 @@ function ApprovalRow({ approval }: { approval: Approval }) {
   
   const isBillPayment = approval.featureActionId === 'BILL_PAY_CREATE_PAYEES';
   const isFundTransfer = approval.featureActionId.includes('FUND_TRANSFER');
-
-  const toggleRow = () => setIsOpen(!isOpen);
   
   const fromAccount = isFundTransfer ? approval.fromAccountNumber : (innerNotes?.fromAccount || 'N/A');
   const toAccount = isFundTransfer ? approval.toAccountNumber : (innerNotes?.toAccount || 'N/A');
 
   return (
     <>
-      <TableRow onClick={toggleRow} className="cursor-pointer">
+      <TableRow onClick={onToggle} className="cursor-pointer">
         <TableCell className="w-12 text-center">
             {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </TableCell>
@@ -63,55 +60,46 @@ function ApprovalRow({ approval }: { approval: Approval }) {
                     {/* Empty cell for chevron */}
                     <div className="w-12"></div>
                     
-                    <div className="w-[15%] pr-4">
-                        {isBillPayment && innerNotes && (
-                            <div>
-                                <p className="text-sm font-semibold">Consumer Number</p>
-                                <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
-                            </div>
-                        )}
-                         {isFundTransfer && reviewContext && (
-                            <div className="space-y-4">
+                    {isBillPayment && innerNotes && (
+                      <>
+                        <div className="w-[15%] pr-4">
+                            <p className="text-sm font-semibold">Consumer Number</p>
+                            <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
+                        </div>
+                        <div className="w-[25%] pr-4">
+                            <p className="text-sm font-semibold">Biller Institution</p>
+                            <p className="text-muted-foreground text-sm">{innerNotes.instVal}</p>
+                        </div>
+                         <div className="w-[25%] pr-4">
+                            <p className="text-sm font-semibold">Consumer Name</p>
+                            <p className="text-muted-foreground text-sm">{notes.nickName}</p>
+                        </div>
+                      </>
+                    )}
+
+                    {isFundTransfer && reviewContext && (
+                        <>
+                            <div className="w-[15%] pr-4 space-y-4">
                                 <div>
                                     <p className="text-sm font-semibold">Amount</p>
                                     <p className="text-muted-foreground text-sm">PKR {approval.amount || 'N/A'}</p>
                                 </div>
                                 <div>
-                                <p className="text-sm font-semibold">From Account</p>
-                                <p className="text-muted-foreground text-sm">{fromAccount}</p>
+                                    <p className="text-sm font-semibold">From Account</p>
+                                    <p className="text-muted-foreground text-sm">{fromAccount}</p>
+                                </div>
                             </div>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="w-[25%] pr-4">
-                         {isBillPayment && innerNotes && (
-                            <div>
-                                <p className="text-sm font-semibold">Biller Institution</p>
-                                <p className="text-muted-foreground text-sm">{innerNotes.instVal}</p>
-                            </div>
-                         )}
-                         {isFundTransfer && reviewContext && (
-                            <div>
+                             <div className="w-[25%] pr-4">
                                 <p className="text-sm font-semibold">To Account</p>
                                 <p className="text-muted-foreground text-sm">{toAccount}</p>
                             </div>
-                         )}
-                    </div>
-                    <div className="w-[25%] pr-4">
-                         {isBillPayment && innerNotes && (
-                            <div>
-                                <p className="text-sm font-semibold">Consumer Name</p>
-                                <p className="text-muted-foreground text-sm">{notes.nickName}</p>
-                            </div>
-                         )}
-                         {isFundTransfer && reviewContext && (
-                             <div>
+                            <div className="w-[25%] pr-4">
                                 <p className="text-sm font-semibold">Beneficiary Name</p>
                                 <p className="text-muted-foreground text-sm">{reviewContext.payeeName}</p>
                             </div>
-                         )}
-                    </div>
+                        </>
+                    )}
+
                     <div className="w-[15%] pr-4">
                         <div>
                             <p className="text-sm font-semibold">Date Submitted</p>
@@ -130,6 +118,12 @@ function ApprovalRow({ approval }: { approval: Approval }) {
 
 
 export function ApprovalsTable({ data }: ApprovalsTableProps) {
+  const [openApprovalId, setOpenApprovalId] = useState<string | null>(null);
+
+  const handleRowToggle = (referenceNo: string) => {
+    setOpenApprovalId(prevId => (prevId === referenceNo ? null : referenceNo));
+  };
+
   return (
     <div className="rounded-lg border bg-card text-card-foreground shadow-sm mt-4">
       <Table>
@@ -146,7 +140,12 @@ export function ApprovalsTable({ data }: ApprovalsTableProps) {
         <TableBody>
           {data.length > 0 ? (
             data.map((approval) => (
-              <ApprovalRow key={approval.referenceNo} approval={approval} />
+              <ApprovalRow 
+                key={approval.referenceNo} 
+                approval={approval}
+                isOpen={openApprovalId === approval.referenceNo}
+                onToggle={() => handleRowToggle(approval.referenceNo)}
+              />
             ))
           ) : (
             <TableRow>
