@@ -52,15 +52,6 @@ export function RejectDialog({ open, onOpenChange, onConfirm }: RejectDialogProp
           <DialogDescription>
             Are you sure you want to reject the request?
           </DialogDescription>
-           <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-4 top-4 h-7 w-7 rounded-full"
-            onClick={handleClose}
-          >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </Button>
         </DialogHeader>
         <div className="py-4">
           <Label htmlFor="comment">Comment</Label>
