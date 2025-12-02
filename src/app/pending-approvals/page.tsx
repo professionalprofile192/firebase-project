@@ -1,13 +1,15 @@
 
-import { cookies } from 'next/headers';
-import { Suspense } from 'react';
+'use client';
+
+import { Suspense, useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { ApprovalsTable } from '@/components/pending-approvals/approvals-table';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search } from 'lucide-react';
 import { ApprovalsHistoryTable } from '@/components/pending-approvals/approvals-history-table';
-import { getPendingApprovals, getApprovalHistory } from '../actions';
+import { getPendingApprovals, getApprovalHistory, rejectRequest } from '../actions';
+import { useToast } from '@/hooks/use-toast';
 
 export type Approval = {
     approverId: string;
@@ -26,40 +28,8 @@ export type Approval = {
     fromAccountNumber?: string;
     toAccountNumber?: string;
     status?: string;
+    remarks?: string; // Added for rejection comments
 };
-
-
-async function PendingApprovalsData() {
-    const cookieStore = cookies();
-    const userProfileCookie = cookieStore.get('userProfile');
-    let approvalsData: Approval[] = [];
-    let userProfile = null;
-    if (userProfileCookie?.value) {
-        userProfile = JSON.parse(userProfileCookie.value);
-        // Using a hardcoded ID for now as per the service details provided
-        const data = await getPendingApprovals('5939522605');
-        if (data.opstatus === 0) {
-            approvalsData = data.ApprovalMatrix;
-        }
-    }
-    
-    return <ApprovalsTable data={approvalsData} userProfile={userProfile} />;
-}
-
-async function ApprovalsHistoryData() {
-    const cookieStore = cookies();
-    const userProfileCookie = cookieStore.get('userProfile');
-    let approvalsHistoryData: Approval[] = [];
-
-    if (userProfileCookie?.value) {
-        const data = await getApprovalHistory('5939522605');
-        if (data.opstatus === 0) {
-            approvalsHistoryData = data.ApprovalMatrix;
-        }
-    }
-
-    return <ApprovalsHistoryTable data={approvalsHistoryData} />;
-}
 
 function PendingApprovalsContent({
     searchParams,
@@ -67,6 +37,91 @@ function PendingApprovalsContent({
     searchParams: { tab?: string };
   }) {
   const activeTab = searchParams.tab || 'pending';
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [pendingApprovals, setPendingApprovals] = useState<Approval[]>([]);
+  const [approvalHistory, setApprovalHistory] = useState<Approval[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    async function fetchData() {
+        setLoading(true);
+        const userProfileCookie = document.cookie.split('; ').find(row => row.startsWith('userProfile='));
+
+        if (userProfileCookie) {
+            const profile = JSON.parse(decodeURIComponent(userProfileCookie.split('=')[1]));
+            setUserProfile(profile);
+
+            try {
+                const [pendingData, historyData] = await Promise.all([
+                    getPendingApprovals('5939522605'),
+                    getApprovalHistory('5939522605')
+                ]);
+
+                if (pendingData.opstatus === 0) {
+                    setPendingApprovals(pendingData.ApprovalMatrix);
+                }
+
+                if (historyData.opstatus === 0) {
+                    setApprovalHistory(historyData.ApprovalMatrix);
+                }
+            } catch (error) {
+                console.error("Failed to fetch approvals data", error);
+                toast({ variant: 'destructive', title: 'Error', description: 'Could not load approvals data.' });
+            } finally {
+                setLoading(false);
+            }
+        } else {
+            setLoading(false);
+        }
+    }
+    fetchData();
+  }, [toast]);
+  
+
+  const handleReject = async (approval: Approval, remarks: string): Promise<boolean> => {
+    if (!userProfile) {
+        toast({ variant: 'destructive', title: 'Error', description: 'User profile not found.' });
+        return false;
+    }
+
+    const payload = {
+        accountNo: 0, 
+        approverId: approval.approverId,
+        contractId: approval.contractId,
+        referenceNo: approval.referenceNo,
+        rejectorId: userProfile.userid,
+        remarks: remarks
+    };
+    
+    try {
+        const response = await rejectRequest(payload);
+        if (response.opstatus === 0 && response.ApprovalMatrix[0].opstatus === 0) {
+            const rejectedApproval = { ...approval, status: 'REJECTED', remarks: remarks };
+            setPendingApprovals(prev => prev.filter(appr => appr.referenceNo !== approval.referenceNo));
+            setApprovalHistory(prev => [rejectedApproval, ...prev]);
+
+            toast({ title: 'Success', description: response.ApprovalMatrix[0].reqResponse });
+            return true;
+        } else {
+            toast({ variant: 'destructive', title: 'Rejection Failed', description: response.message || "An unknown error occurred." });
+            return false;
+        }
+    } catch (error) {
+        toast({ variant: 'destructive', title: 'Error', description: 'An unexpected error occurred during rejection.' });
+        return false;
+    }
+  }
+
+  if (loading) {
+    return (
+        <DashboardLayout>
+            <main className="flex-1 p-4 sm:px-6 sm:py-4">
+                <p>Loading data...</p>
+            </main>
+        </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -87,14 +142,14 @@ function PendingApprovalsContent({
             <TabsTrigger value="history">Approvals History</TabsTrigger>
           </TabsList>
           <TabsContent value="pending">
-            <Suspense fallback={<p>Loading approvals...</p>}>
-                <PendingApprovalsData />
-            </Suspense>
+             <ApprovalsTable 
+                data={pendingApprovals} 
+                userProfile={userProfile} 
+                onReject={handleReject} 
+              />
           </TabsContent>
           <TabsContent value="history">
-             <Suspense fallback={<p>Loading history...</p>}>
-                <ApprovalsHistoryData />
-            </Suspense>
+             <ApprovalsHistoryTable data={approvalHistory} />
           </TabsContent>
         </Tabs>
       </main>
@@ -113,5 +168,3 @@ export default function PendingApprovalsPage({
     </Suspense>
   )
 }
-
-    

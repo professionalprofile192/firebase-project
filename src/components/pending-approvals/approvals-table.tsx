@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -19,13 +18,13 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import { RejectDialog } from './reject-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { rejectRequest } from '@/app/actions';
 import { CustomAlertDialog } from '../common/custom-alert-dialog';
 
 
 interface ApprovalsTableProps {
   data: Approval[];
   userProfile: any;
+  onReject: (approval: Approval, remarks: string) => Promise<boolean>;
 }
 
 const ITEMS_PER_PAGE = 8;
@@ -51,9 +50,6 @@ function ApprovalRow({ approval, isOpen, onToggle, onRejectClick }: { approval: 
   const reviewContext = notes?.reviewContext;
   
   const isBillPayment = approval.featureActionId === 'BILL_PAY_CREATE_PAYEES';
-  const isFundTransfer = approval.featureActionId.includes('FUND_TRANSFER');
-  const isBulkTransfer = approval.transactionType === 'BulkFT' || approval.transactionType === 'BulkIBFT' || approval.transactionType === 'BulkRaast';
-  
   const fromAccount = approval.fromAccountNumber || reviewContext?.otherDetails?.fromAccount;
   const toAccount = approval.toAccountNumber || reviewContext?.otherDetails?.toAccountNumber;
   const amount = approval.amount;
@@ -173,20 +169,17 @@ function ApprovalRow({ approval, isOpen, onToggle, onRejectClick }: { approval: 
 }
 
 
-export function ApprovalsTable({ data, userProfile }: ApprovalsTableProps) {
+export function ApprovalsTable({ data, userProfile, onReject }: ApprovalsTableProps) {
   const [openApprovalId, setOpenApprovalId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [approvals, setApprovals] = useState(data);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [selectedApproval, setSelectedApproval] = useState<Approval | null>(null);
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [successAlertMessage, setSuccessAlertMessage] = useState('');
   const { toast } = useToast();
 
-  const totalPages = Math.ceil(approvals.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentData = approvals.slice(startIndex, endIndex);
+  const currentData = data.slice(startIndex, endIndex);
 
   const handleRowToggle = (referenceNo: string) => {
     setOpenApprovalId(prevId => (prevId === referenceNo ? null : referenceNo));
@@ -208,33 +201,14 @@ export function ApprovalsTable({ data, userProfile }: ApprovalsTableProps) {
   }
 
   const handleConfirmReject = async (remarks: string) => {
-    if (!selectedApproval || !userProfile) {
-        toast({ variant: 'destructive', title: 'Error', description: 'No approval selected or user profile not found.' });
+    if (!selectedApproval) {
+        toast({ variant: 'destructive', title: 'Error', description: 'No approval selected.' });
         return;
     }
-    
-    const payload = {
-        accountNo: 0, 
-        approverId: selectedApproval.approverId,
-        contractId: selectedApproval.contractId,
-        referenceNo: selectedApproval.referenceNo,
-        rejectorId: userProfile.userid,
-        remarks: remarks
-    };
-
-    try {
-        const response = await rejectRequest(payload);
-        setShowRejectDialog(false);
-        if (response.opstatus === 0 && response.ApprovalMatrix[0].opstatus === 0) {
-            setApprovals(prev => prev.filter(appr => appr.referenceNo !== selectedApproval.referenceNo));
-            setSuccessAlertMessage(response.ApprovalMatrix[0].reqResponse);
-            setShowSuccessAlert(true);
-        } else {
-            toast({ variant: 'destructive', title: 'Rejection Failed', description: response.message || "An unknown error occurred." });
-        }
-    } catch (error) {
-        setShowRejectDialog(false);
-        toast({ variant: 'destructive', title: 'Error', description: 'An unexpected error occurred during rejection.' });
+    const success = await onReject(selectedApproval, remarks);
+    if (success) {
+      setShowRejectDialog(false);
+      setSelectedApproval(null);
     }
   }
 
@@ -272,7 +246,7 @@ export function ApprovalsTable({ data, userProfile }: ApprovalsTableProps) {
               </TableRow>
             )}
           </TableBody>
-          {approvals.length > 0 && (
+          {data.length > 0 && (
             <TableFooter>
               <TableRow>
                 <TableCell colSpan={6}>
@@ -286,7 +260,7 @@ export function ApprovalsTable({ data, userProfile }: ApprovalsTableProps) {
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <span className="text-sm text-muted-foreground mx-4">
-                      {startIndex + 1} - {Math.min(endIndex, approvals.length)} of {approvals.length} Transactions
+                      {startIndex + 1} - {Math.min(endIndex, data.length)} of {data.length} Transactions
                     </span>
                     <Button 
                       variant="ghost" 
@@ -307,13 +281,6 @@ export function ApprovalsTable({ data, userProfile }: ApprovalsTableProps) {
         open={showRejectDialog}
         onOpenChange={setShowRejectDialog}
         onConfirm={handleConfirmReject}
-      />
-      <CustomAlertDialog
-        open={showSuccessAlert}
-        onOpenChange={setShowSuccessAlert}
-        title="Success"
-        description={successAlertMessage}
-        onConfirm={() => setShowSuccessAlert(false)}
       />
     </>
   );
