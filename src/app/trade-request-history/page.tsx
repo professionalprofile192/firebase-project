@@ -25,9 +25,9 @@ export type TradeHistoryItem = {
 export default function TradeRequestHistoryPage() {
     const [history, setHistory] = useState<TradeHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [productTypeFilter, setProductTypeFilter] = useState('');
-    const [requestTypeFilter, setRequestTypeFilter] = useState('');
-    const [statusFilter, setStatusFilter] = useState('');
+    const [productTypeFilter, setProductTypeFilter] = useState('all');
+    const [requestTypeFilter, setRequestTypeFilter] = useState('all');
+    const [statusFilter, setStatusFilter] = useState('all');
 
     useEffect(() => {
         async function fetchHistory() {
@@ -79,9 +79,9 @@ export default function TradeRequestHistoryPage() {
 
     const filteredHistory = history.filter(item => {
         return (
-            (productTypeFilter === '' || item.product_type === productTypeFilter) &&
-            (requestTypeFilter === '' || item.request_type === requestTypeFilter) &&
-            (statusFilter === '' || item.status === statusFilter)
+            (productTypeFilter === 'all' || item.product_type === productTypeFilter) &&
+            (requestTypeFilter === 'all' || item.request_type === requestTypeFilter) &&
+            (statusFilter === 'all' || item.status === statusFilter)
         );
     });
 
@@ -110,7 +110,7 @@ export default function TradeRequestHistoryPage() {
                                     <SelectValue placeholder="Filter by Product Type" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">All Product Types</SelectItem>
+                                    <SelectItem value="all">All Product Types</SelectItem>
                                     {productTypes.map(type => (
                                         <SelectItem key={type} value={type}>{type}</SelectItem>
                                     ))}
@@ -121,7 +121,7 @@ export default function TradeRequestHistoryPage() {
                                     <SelectValue placeholder="Filter by Request Type" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">All Request Types</SelectItem>
+                                    <SelectItem value="all">All Request Types</SelectItem>
                                     {requestTypes.map(type => (
                                         <SelectItem key={type} value={type}>{type}</SelectItem>
                                     ))}
@@ -132,7 +132,7 @@ export default function TradeRequestHistoryPage() {
                                     <SelectValue placeholder="Filter by Status" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">All Statuses</SelectItem>
+                                    <SelectItem value="all">All Statuses</SelectItem>
                                     {statuses.map(status => (
                                         <SelectItem key={status} value={status}>{status}</SelectItem>
                                     ))}
