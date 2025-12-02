@@ -4,6 +4,14 @@ import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { getTradeRequestHistory } from '../actions';
 import { TradeRequestHistoryTable } from '@/components/trade-request-history/trade-request-history-table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
 
 export type TradeHistoryItem = {
     file_refid: string;
@@ -17,6 +25,9 @@ export type TradeHistoryItem = {
 export default function TradeRequestHistoryPage() {
     const [history, setHistory] = useState<TradeHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [productTypeFilter, setProductTypeFilter] = useState('');
+    const [requestTypeFilter, setRequestTypeFilter] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
 
     useEffect(() => {
         async function fetchHistory() {
@@ -62,6 +73,18 @@ export default function TradeRequestHistoryPage() {
         fetchHistory();
     }, []);
 
+    const productTypes = [...new Set(history.map(item => item.product_type))];
+    const requestTypes = [...new Set(history.map(item => item.request_type))];
+    const statuses = [...new Set(history.map(item => item.status))];
+
+    const filteredHistory = history.filter(item => {
+        return (
+            (productTypeFilter === '' || item.product_type === productTypeFilter) &&
+            (requestTypeFilter === '' || item.request_type === requestTypeFilter) &&
+            (statusFilter === '' || item.status === statusFilter)
+        );
+    });
+
     if (loading) {
         return (
             <DashboardLayout>
@@ -79,7 +102,46 @@ export default function TradeRequestHistoryPage() {
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-semibold">Trade Request History</h1>
                 </div>
-                <TradeRequestHistoryTable data={history} />
+                <Card>
+                    <CardContent className="p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                             <Select value={productTypeFilter} onValueChange={setProductTypeFilter}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Filter by Product Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="">All Product Types</SelectItem>
+                                    {productTypes.map(type => (
+                                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                             <Select value={requestTypeFilter} onValueChange={setRequestTypeFilter}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Filter by Request Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="">All Request Types</SelectItem>
+                                    {requestTypes.map(type => (
+                                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                             <Select value={statusFilter} onValueChange={setStatusFilter}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Filter by Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="">All Statuses</SelectItem>
+                                    {statuses.map(status => (
+                                        <SelectItem key={status} value={status}>{status}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </CardContent>
+                </Card>
+                <TradeRequestHistoryTable data={filteredHistory} />
             </main>
         </DashboardLayout>
     );
