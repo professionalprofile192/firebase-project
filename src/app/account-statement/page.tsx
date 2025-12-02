@@ -11,7 +11,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { AccountDetails } from '@/components/account-statement/account-details';
 import { TransactionsList } from '@/components/account-statement/transactions-list';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
-import { subDays, isAfter } from 'date-fns';
+import { subDays, isAfter, isBefore, isEqual, parseISO } from 'date-fns';
 
 type Account = {
     responseCode: string;
@@ -120,6 +120,14 @@ function AccountStatementContent() {
     }
   };
 
+  const handleDateRangeView = (fromDate: Date, toDate: Date) => {
+    const filtered = allTransactions.filter(tx => {
+        const txDate = new Date(tx.tranDate.split(' ')[0]);
+        return (isAfter(txDate, fromDate) || isEqual(txDate, fromDate)) && (isBefore(txDate, toDate) || isEqual(txDate, toDate));
+    });
+    setDisplayedTransactions(filtered);
+  };
+
 
   const formatCurrency = (amount: string) => {
     return `PKR ${new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(amount))}`;
@@ -185,6 +193,7 @@ function AccountStatementContent() {
                 loading={transactionsLoading}
                 onViewChange={handleViewFilterChange} 
                 accountNumber={selectedAccount?.ACCT_NO}
+                onDateRangeSelect={handleDateRangeView}
             />
         </div>
       </main>

@@ -18,9 +18,10 @@ interface DateRangeDialogProps {
   mode: 'view' | 'download';
   fileType?: string;
   accountNumber?: string;
+  onDateRangeSelect?: (fromDate: Date, toDate: Date) => void;
 }
 
-export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNumber }: DateRangeDialogProps) {
+export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNumber, onDateRangeSelect }: DateRangeDialogProps) {
   const [fromDate, setFromDate] = useState<Date | undefined>();
   const [toDate, setToDate] = useState<Date | undefined>();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -29,12 +30,17 @@ export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNum
   const { toast } = useToast();
 
   const handleAction = async () => {
+    if (!fromDate || !toDate) {
+      toast({ variant: 'destructive', title: 'Missing Date Range', description: 'Please select both a "From" and "To" date.' });
+      return;
+    }
+    
     if (mode === 'download') {
-        if (!fileType || !fromDate || !toDate || !accountNumber) {
+        if (!fileType || !accountNumber) {
             toast({
                 variant: 'destructive',
                 title: 'Missing information',
-                description: 'Please select a file type, date range, and account.',
+                description: 'Please select a file type and account.',
             });
             return;
         }
@@ -75,9 +81,8 @@ export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNum
             setIsDownloading(false);
         }
 
-    } else {
-        // Logic to handle viewing transactions for the selected date range
-        console.log('Mode:', mode, 'From:', fromDate, 'To:', toDate);
+    } else if (mode === 'view' && onDateRangeSelect) {
+        onDateRangeSelect(fromDate, toDate);
         onOpenChange(false);
     }
   };

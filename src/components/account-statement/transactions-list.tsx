@@ -15,9 +15,10 @@ interface TransactionsListProps {
     loading?: boolean;
     onViewChange?: (value: string) => void;
     accountNumber?: string;
+    onDateRangeSelect?: (fromDate: Date, toDate: Date) => void;
 }
 
-export function TransactionsList({ transactions, loading, onViewChange, accountNumber }: TransactionsListProps) {
+export function TransactionsList({ transactions, loading, onViewChange, accountNumber, onDateRangeSelect }: TransactionsListProps) {
     const isMobile = useIsMobile();
     const [showDateRangeDialog, setShowDateRangeDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'view' | 'download'>('view');
@@ -98,6 +99,7 @@ export function TransactionsList({ transactions, loading, onViewChange, accountN
                 mode={dialogMode}
                 fileType={downloadValue}
                 accountNumber={accountNumber}
+                onDateRangeSelect={onDateRangeSelect}
             />
         </>
     )
