@@ -11,7 +11,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { AccountDetails } from '@/components/account-statement/account-details';
 import { TransactionsList } from '@/components/account-statement/transactions-list';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
-import { subDays, isAfter, isBefore, isEqual, parseISO } from 'date-fns';
+import { subDays, isAfter, isBefore, isEqual, parseISO, startOfDay, endOfDay } from 'date-fns';
 
 type Account = {
     responseCode: string;
@@ -121,9 +121,12 @@ function AccountStatementContent() {
   };
 
   const handleDateRangeView = (fromDate: Date, toDate: Date) => {
+    const start = startOfDay(fromDate);
+    const end = endOfDay(toDate);
+
     const filtered = allTransactions.filter(tx => {
-        const txDate = parseISO(tx.tranDate.split(' ')[0]);
-        return (isAfter(txDate, fromDate) || isEqual(txDate, fromDate)) && (isBefore(txDate, toDate) || isEqual(txDate, toDate));
+        const txDate = parseISO(tx.tranDate);
+        return (isAfter(txDate, start) || isEqual(txDate, start)) && (isBefore(txDate, end) || isEqual(txDate, end));
     });
     setDisplayedTransactions(filtered);
   };
