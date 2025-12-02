@@ -26,15 +26,30 @@ const ITEMS_PER_PAGE = 8;
 
 function HistoryRow({ approval, isOpen, onToggle }: { approval: Approval, isOpen: boolean, onToggle: () => void }) {
   
-  const notes = approval.notes2 ? JSON.parse(approval.notes2) : (approval.notes ? JSON.parse(approval.notes) : null);
-  const innerNotes = notes?.notes ? JSON.parse(notes.notes) : null;
+  let notes = null;
+  try {
+    notes = approval.notes2 ? JSON.parse(approval.notes2) : (approval.notes ? JSON.parse(approval.notes) : null);
+  } catch (e) {
+    // Notes are not a valid JSON
+  }
+
+  let innerNotes = null;
+  if (notes?.notes) {
+    try {
+      innerNotes = JSON.parse(notes.notes);
+    } catch (e) {
+      // notes.notes is not a valid JSON
+    }
+  }
+
   const reviewContext = notes?.reviewContext;
   
   const isBillPayment = approval.featureActionId === 'BILL_PAY_CREATE_PAYEES';
   const isFundTransfer = approval.featureActionId.includes('FUND_TRANSFER');
-  
-  const fromAccount = isFundTransfer ? approval.fromAccountNumber : (innerNotes?.fromAccount || 'N/A');
-  const toAccount = isFundTransfer ? approval.toAccountNumber : (innerNotes?.toAccount || 'N/A');
+  const isBulkTransfer = approval.transactionType === 'BulkFT' || approval.transactionType === 'BulkIBFT' || approval.transactionType === 'BulkRaast';
+
+  const fromAccount = approval.fromAccountNumber || reviewContext?.otherDetails?.fromAccount || 'N/A';
+  const toAccount = approval.toAccountNumber || reviewContext?.otherDetails?.toAccountNumber || 'N/A';
 
   const getStatusVariant = (status?: string) => {
     switch(status) {
@@ -73,51 +88,79 @@ function HistoryRow({ approval, isOpen, onToggle }: { approval: Approval, isOpen
                 <div className="flex w-full">
                     {/* Empty cell for chevron */}
                     <div className="w-12 flex-shrink-0"></div>
-                    <div className="w-[15%] pr-4">
+                    
+                    {/* Column 1: Transaction Number */}
+                    <div className="w-[15%] pr-4 space-y-4">
                         {isBillPayment && innerNotes && (
-                            <>
+                            <div>
                                 <p className="text-sm font-semibold">Consumer Number</p>
                                 <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
-                            </>
+                            </div>
                         )}
-                         {isFundTransfer && (
-                            <>
+                        {isFundTransfer && !isBulkTransfer && (
+                             <div>
                                 <p className="text-sm font-semibold">Amount</p>
                                 <p className="text-muted-foreground text-sm">PKR {approval.amount || 'N/A'}</p>
-                            </>
+                            </div>
+                        )}
+                        {isBulkTransfer && notes?.fileid && (
+                             <div>
+                                <p className="text-sm font-semibold">File Reference Number</p>
+                                <p className="text-muted-foreground text-sm">{notes.fileid}</p>
+                            </div>
                         )}
                     </div>
-                     <div className="w-[25%] pr-4">
+                    
+                    {/* Column 2: Transaction Type */}
+                     <div className="w-[25%] pr-4 space-y-4">
                         {isBillPayment && innerNotes && (
-                            <>
+                            <div>
                                 <p className="text-sm font-semibold">Biller Institution</p>
                                 <p className="text-muted-foreground text-sm">{innerNotes.instVal}</p>
-                            </>
+                            </div>
                         )}
-                        {isFundTransfer && (
-                            <>
+                        {isFundTransfer && !isBulkTransfer && (
+                            <div>
                                 <p className="text-sm font-semibold">Debit Account</p>
                                 <p className="text-muted-foreground text-sm">{fromAccount}</p>
-                            </>
+                            </div>
+                        )}
+                        {isBulkTransfer && notes?.filename && (
+                            <div>
+                                <p className="text-sm font-semibold">File Name</p>
+                                <p className="text-muted-foreground text-sm">{notes.filename}</p>
+                            </div>
                         )}
                      </div>
-                     <div className="w-[25%] pr-4">
-                        {isBillPayment && notes && (
-                           <>
+
+                    {/* Column 3: Request Type */}
+                     <div className="w-[25%] pr-4 space-y-4">
+                         {isBillPayment && notes && (
+                           <div>
                                 <p className="text-sm font-semibold">Consumer Name</p>
                                 <p className="text-muted-foreground text-sm">{notes.nickName}</p>
-                           </>
+                           </div>
                         )}
-                         {isFundTransfer && reviewContext && (
-                            <>
+                         {isFundTransfer && !isBulkTransfer && reviewContext && (
+                            <div>
                                 <p className="text-sm font-semibold">Credit Account</p>
                                 <p className="text-muted-foreground text-sm">{toAccount}</p>
-                            </>
+                            </div>
+                        )}
+                        {isBulkTransfer && notes?.fromAccountName && (
+                            <div>
+                                <p className="text-sm font-semibold">Account Title</p>
+                                <p className="text-muted-foreground text-sm">{notes.fromAccountName}</p>
+                            </div>
                         )}
                      </div>
-                     <div className="w-[15%] pr-4">
-                        <p className="text-sm font-semibold">Date Submitted</p>
-                        <p className="text-muted-foreground text-sm">{format(new Date(approval.assignedDate), 'dd/MM/yyyy h:mm a')}</p>
+
+                    {/* Column 4: Originator */}
+                     <div className="w-[15%] pr-4 space-y-4">
+                        <div>
+                            <p className="text-sm font-semibold">Date Submitted</p>
+                            <p className="text-muted-foreground text-sm">{format(new Date(approval.assignedDate), 'dd/MM/yyyy h:mm a')}</p>
+                        </div>
                     </div>
                     <div className="flex-1"></div>
                 </div>
@@ -215,5 +258,3 @@ export function ApprovalsHistoryTable({ data }: ApprovalsHistoryTableProps) {
     </div>
   );
 }
-
-    
