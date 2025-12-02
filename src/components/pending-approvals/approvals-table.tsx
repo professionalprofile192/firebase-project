@@ -63,58 +63,60 @@ function ApprovalRow({ approval }: { approval: Approval }) {
                     {/* Empty cell for chevron */}
                     <div className="w-12"></div>
                     
-                    <div className="w-[15%] space-y-4 pr-4">
-                        {isBillPayment && innerNotes ? (
-                             <div>
-                                <p className="text-sm font-semibold">Consumer Number</p>
-                                <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
+                    {isBillPayment && innerNotes && (
+                        <>
+                            <div className="w-[15%] pr-4">
+                                <div>
+                                    <p className="text-sm font-semibold">Consumer Number</p>
+                                    <p className="text-muted-foreground text-sm">{innerNotes.consumerNo}</p>
+                                </div>
                             </div>
-                        ) : (
-                             <div>
-                                <p className="text-sm font-semibold">Amount</p>
-                                <p className="text-muted-foreground text-sm">PKR {approval.amount || 'N/A'}</p>
+                            <div className="w-[25%] pr-4">
+                                <div>
+                                    <p className="text-sm font-semibold">Biller Institution</p>
+                                    <p className="text-muted-foreground text-sm">{innerNotes.instVal}</p>
+                                </div>
                             </div>
-                        )}
-                         {isFundTransfer && reviewContext && (
-                            <div>
-                               <p className="text-sm font-semibold">From Account</p>
-                               <p className="text-muted-foreground text-sm">{fromAccount}</p>
-                           </div>
-                        )}
-                    </div>
-
-                    <div className="w-[25%] space-y-4 pr-4">
-                       {isBillPayment && innerNotes && (
-                           <div className="flex gap-8">
-                               <div>
-                                   <p className="text-sm font-semibold">Biller Institution</p>
-                                   <p className="text-muted-foreground text-sm">{innerNotes.instVal}</p>
-                               </div>
+                             <div className="w-[25%] pr-4">
                                 <div>
                                     <p className="text-sm font-semibold">Consumer Name</p>
                                     <p className="text-muted-foreground text-sm">{notes.nickName}</p>
                                 </div>
-                           </div>
-                       )}
-                       {isFundTransfer && reviewContext && (
-                             <div>
-                                <p className="text-sm font-semibold">To Account</p>
-                                <p className="text-muted-foreground text-sm">{toAccount}</p>
                             </div>
-                        )}
-                    </div>
-                    
-                    <div className="w-[25%] space-y-4 pr-4">
-                         {isFundTransfer && reviewContext && (
-                             <div>
-                                <p className="text-sm font-semibold">Beneficiary Name</p>
-                                <p className="text-muted-foreground text-sm">{reviewContext.payeeName}</p>
+                        </>
+                    )}
+
+                    {isFundTransfer && reviewContext && (
+                         <>
+                            <div className="w-[15%] space-y-4 pr-4">
+                                <div>
+                                    <p className="text-sm font-semibold">Amount</p>
+                                    <p className="text-muted-foreground text-sm">PKR {approval.amount || 'N/A'}</p>
+                                </div>
+                                <div>
+                                <p className="text-sm font-semibold">From Account</p>
+                                <p className="text-muted-foreground text-sm">{fromAccount}</p>
                             </div>
-                        )}
-                    </div>
+                            </div>
+
+                            <div className="w-[25%] space-y-4 pr-4">
+                                <div>
+                                    <p className="text-sm font-semibold">To Account</p>
+                                    <p className="text-muted-foreground text-sm">{toAccount}</p>
+                                </div>
+                            </div>
+                            
+                            <div className="w-[25%] space-y-4 pr-4">
+                                <div>
+                                    <p className="text-sm font-semibold">Beneficiary Name</p>
+                                    <p className="text-muted-foreground text-sm">{reviewContext.payeeName}</p>
+                                </div>
+                            </div>
+                        </>
+                    )}
 
                     <div className="w-[15%] space-y-4 pr-4">
-                         <div>
+                            <div>
                             <p className="text-sm font-semibold">Date Submitted</p>
                             <p className="text-muted-foreground text-sm">{format(new Date(approval.assignedDate), 'dd/MM/yyyy h:mm a')}</p>
                         </div>
