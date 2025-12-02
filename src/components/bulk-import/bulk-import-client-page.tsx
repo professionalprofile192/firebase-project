@@ -269,7 +269,7 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
                 {tab === 'history' ? (
                     historyView
                 ) : (
-                    <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col items-center">
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col">
                         <TabsList className="grid w-full max-w-md grid-cols-2">
                             <TabsTrigger value="upload">Single Bulk Upload</TabsTrigger>
                             <TabsTrigger value="history">Bulk Import History</TabsTrigger>
