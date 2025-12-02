@@ -46,11 +46,11 @@ const productTypes = [
 ];
 
 const requestTypes = [
-    'LC Application',
-    'Proforma Invoice / Order / Intent',
-    'Insurance Cover Note / Policy',
-    'Covering Letter',
-    "NOC's / Permits"
+    "LC Application",
+    "Proforma Invoice / Order / Intent",
+    "Insurance Cover Note / Policy",
+    "Covering Letter",
+    "NOC's / Permits",
 ];
 
 type UploadedFile = {
@@ -281,7 +281,7 @@ export function TradeRequestForm() {
 
   return (
     <>
-      <Card className="w-full max-w-4xl mx-auto shadow-md">
+      <Card className="w-full max-w-4xl shadow-md">
         <CardContent className="p-6">
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
