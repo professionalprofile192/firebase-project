@@ -275,7 +275,7 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
                             <TabsTrigger value="history">Bulk Import History</TabsTrigger>
                         </TabsList>
                         <TabsContent value="upload" className="w-full">
-                            <Card className="w-full max-w-4xl mx-auto shadow-md">
+                            <Card className="w-full max-w-4xl shadow-md">
                                 <CardContent className="p-6">
                                     <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6" onSubmit={(e) => e.preventDefault()}>
                                         <div className="space-y-2">
