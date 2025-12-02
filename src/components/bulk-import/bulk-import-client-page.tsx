@@ -269,12 +269,12 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
                 {tab === 'history' ? (
                     historyView
                 ) : (
-                    <Tabs value={activeTab} onValueChange={setActiveTab}>
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col items-center">
                         <TabsList className="grid w-full max-w-md grid-cols-2">
                             <TabsTrigger value="upload">Single Bulk Upload</TabsTrigger>
                             <TabsTrigger value="history">Bulk Import History</TabsTrigger>
                         </TabsList>
-                        <TabsContent value="upload">
+                        <TabsContent value="upload" className="w-full">
                             <Card className="w-full max-w-4xl mx-auto shadow-md">
                                 <CardContent className="p-6">
                                     <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6" onSubmit={(e) => e.preventDefault()}>
@@ -324,7 +324,7 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
                                 </CardContent>
                             </Card>
                         </TabsContent>
-                        <TabsContent value="history">
+                        <TabsContent value="history" className="w-full">
                            {historyView}
                         </TabsContent>
                     </Tabs>
