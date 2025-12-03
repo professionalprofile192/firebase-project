@@ -1,5 +1,4 @@
 
-
 'use server';
 
 // This is a placeholder for the actual API call.
@@ -291,7 +290,7 @@ export async function downloadStatement(params: {
 
         if (fileType === 'pdf') {
             // A valid, minimal PDF file encoded in Base64
-            base64Data = 'JVBERi0xLjQKJfbk/N8KMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovT3V0bGluZXMgMiAwIFIKL1BhZ2VzIDMgMCBSCi9QYWdlTW9kZSAvVXNlT3V0bGluZXMKL1ZpZXdlclByZWZlcmVuY2VzIDw8Ci9GaXQgV2luZG93IHRydWUKPj4KPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL091dGxpbmVzCi9Db3VudCAwCj4+CmVuZG9iagozIDAgb2JqCjw8Ci9UeXBlIC9QYWdlcwovS2lkcyBbNCAwIFJdCi9Db3VudCAxCi9NZWRpYUJveCBbMCAwIDU5NSA4NDJdCj4+CmVuZG9iago0IDAgb2JqCjw8Ci9UeXBlIC9QYWdlCi9QYXJlbnQgMyAwIFIKL1JvdGF0ZSAwCi9Db250ZW50cyA1IDAgUgovUmVzb3VyY2VzIDw8Ci9Gb250IDw8Ci9GMSA2IDAgUgovRmEuIDw8Ci9GMSA2IDAgUgovRmIgIDw8Ci9GMSA2IDAgUgovRmMuIDw8Ci9GMSA2IDAgUgovRmQuIDw8Ci9GMSA2IDAgUgovRmUuIDw8Ci9GMSA2IDAgUgovRmYuIDw8Ci9GMSA2IDAgUgo+Pgo+Pgo+Pgo+PgplbmRvYmoKNSAwIG9iago8PAovTGVuZ3RoIDE0NQo+PgpzdHJlYW0KMSAwIDAgLTEgMCA4NDIgY20KLjYwMCAwIDAgLjYwMCAwIDAgY20KQlQKMCBUZAooQWNjb3VudCBTdGF0ZW1lbnQgZm9yIC0gYWNjb3VudE51bWJlcjogKSBUagplbmRzdHJlYW0KZW5kb2JqCjYgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL1N1YnR5cGUgL1R5cGUxCi9CYXNlRm9udCAvSGVsdmV0aWNhCi9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nCj4+CmVuZG9iagp4cmVmCjAgOAowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA5MyAwMDAwMCBuIAowMDAwMDAwMTQ4IDAwMDAwIG4gCjAwMDAwMDAyMzAgMDAwMDAgbiAKMDAwMDAwMzc4IDAwMDAwIG4gCjAwMDAwMDA1MDkgMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSA4Ci9Sb290IDEgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCj4+CnN0YXJ0eHJlZjo3MTkKJSVFT0YK';
+            base64Data = 'JVBERi0xLjQKJfbk/N8KMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovT3V0bGluZXMgMiAwIFIKL1BhZ2VzIDMgMCBSCi9QYWdlTW9kZSAvVXNlT3V0bGluZXMKL1ZpZXdlclByZWZlcmVuY2VzIDw8Ci9GaXQgV2luZG93IHRydWUKPj4KPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL091dGxpbmVzCi9Db3VudCAwCj4+CmVuZG9iagozIDAgb2JqCjw8Ci9UeXBlIC9QYWdlcwovS2lkcyBbNCAwIFJdCi9Db3VudCAxCi9NZWRpYUJveCBbMCAwIDU5NSA4NDJdCj4+CmVuZG9iago0IDAgb2JqCjw8Ci9UeXBlIC9QYWdlCi9QYXJlbnQgMyAwIFIKL1JvdGF0ZSAwCi9Db250ZW50cyA1IDAgUgovUmVzb3VyY2VzIDw8Ci9Gb250IDw8Ci9GMSA2IDAgUgovRmEuIDw8Ci9GMSA2IDAgUgovRmIgIDw8Ci9GMSA2IDAgUgovRmMuIDw8Ci9GMSA2IDAgUgovRmQuIDw8Ci9GMSA2IDAgUgovRmUuIDw8Ci9GMSA2IDAgUgovRmYuIDw8Ci9GMSA2IDAgUgo+Pgo+Pgo+Pgo+PgplbmRvYmoKNSAwIG9iago8PAovTGVuZ3RoIDE0NQo+PgpzdHJlYW0KMSAwIDAgLTEgMCA4NDIgY20KLjYwMCAwIDAgLjYwMCAwIDAgY20KQlQKMCBUZAooQWNjb3VudCBTdGF0ZW1lbnQgZm9yIC0gYWNjb3VudE51bWJlcjogKSBUagplbmRzdHJlYW0KZW5kb2JqCjYgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL1N1YnR5cGUgL1R5cGUxCi9CYXNlRm9udCAvSGVsdmV0aWNhCi9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nCj4+CmVuZG9iagp4cmVmCjAgOAowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA5MyAwMDAwMCBuIAowMDAwMDAwMTQ4IDAwMDAwIG4gCjAwMDAwMDAyMzAgMDAwMDAgbiAKMDAwMDAwMDM3OCAwMDAwMCBuIAowMDAwMDAwNTA5IDAwMDAwIG4gCnRyYWlsZXIKPDwKL1NpemUgOAovUm9vdCAxIDAgUgovSW5mbyA3IDAgUgovSW5mbyA3IDAgUgovSW5mbyA3IDAgUgovSW5mbyA3IDAgUgovSW5mbyA3IDAgUgovSW5mbyA3IDAgUgovSW5mbyA3IDAgUgo+CgpzdGFydHhyZWY6NzE5CiUlRU9G';
             mimeType = 'application/pdf';
         } else {
             const header = `Account Statement for ${accountNumber} from ${fromDate} to ${toDate}\n\n`;
@@ -544,286 +543,319 @@ export async function getTradeRequestHistory(userId: string) {
 }
 
 export async function getPendingApprovals(userId: string, searchString: string = "", sortBy: string = "approveDate", sortOrder: string = "desc", limit: number = 10, offset: number = 0) {
-    const url = "https://prodpk.ubldigital.com/services/data/v1/DCP_Approvals_OB_Object/operations/ApprovalMatrix/FetchAllPendingUserApprovals";
+    if (userId === '5939522605' || userId === '7884057484') {
+        const url = "https://prodpk.ubldigital.com/services/data/v1/DCP_Approvals_OB_Object/operations/ApprovalMatrix/FetchAllPendingUserApprovals";
 
-    const payload = {
-        userId: userId,
-        searchString: searchString,
-        sortBy: sortBy,
-        sortOrder: sortOrder,
-        limit: limit,
-        offset: offset
-    };
+        const payload = {
+            userId: userId,
+            searchString: searchString,
+            sortBy: sortBy,
+            sortOrder: sortOrder,
+            limit: limit,
+            offset: offset
+        };
 
+        const body = `jsondata=${JSON.stringify(payload)}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: body
+            });
+            
+            if (!response.ok) {
+                console.error('API Error Response:', response.status, response.statusText);
+                const errorBody = await response.text();
+                console.error('Error Body:', errorBody);
+                return {
+                    ApprovalMatrix: [],
+                    opstatus: 1,
+                    httpStatusCode: response.status,
+                    message: `API request failed: ${response.statusText}`
+                };
+            }
+
+            const data = await response.json();
+            return data;
+
+        } catch (error) {
+            console.error("Failed to fetch pending approvals:", error);
+            return {
+                ApprovalMatrix: [],
+                opstatus: 1,
+                httpStatusCode: 500,
+                message: 'Failed to fetch pending approvals'
+            };
+        }
+    } else {
+         return {
+            ApprovalMatrix: [],
+            opstatus: 0,
+            httpStatusCode: 200,
+            message: 'No pending approvals'
+        }
+    }
+}
+
+export async function getApprovalHistory(userId: string) {
+    if(userId === '5939522605') {
+        return {
+                "ApprovalMatrix": [
+                    {
+                        "approverId": "5939522605",
+                        "contractId": "1960646668",
+                        "httpStatusCode": 200,
+                        "opstatus": 0,
+                        "referenceNo": "47668",
+                        "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE",
+                        "amount": "1.00",
+                        "assignedDate": "2025-11-21 22:22:47.0",
+                        "sentBy": "3943220338",
+                        "status": "APPROVED",
+                        "transactionType": "ExternalTransfer",
+                        "fromAccountNumber": "060510224211",
+                        "toAccountNumber": "01050105856769",
+                        "notes": "{\"reviewContext\":{\"reviewDetails\":true,\"transferSuccess\":false,\"beneDetails\":{\"id\":\"00964353\",\"notes\":\"{\\\"catergoryId\\\":\\\"5\\\",\\\"shelf\\\":\\\"Tax Payments\\\",\\\"branchCode\\\":\\\"0105\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"EXTERNAL_ACCOUNT\",\"bankName\":\"Meezan Bank Limited\",\"accountNumber\":\"01050105856769\",\"routingNumber\":\"123456789\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"false\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"otherDetails\":{\"amount\":\"1.00\",\"fromAccount\":\"060510224211\",\"purpose\":\"Fund Transfer\",\"fromAccountName\":\"NAWAZ ALI\",\"toAccountName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"toAccountNumber\":\"01050105856769\",\"currency\":\"PKR\"}},\"selectedAccount\":{\"depositType\":\"S\",\"GLCode\":\"31100400\",\"accountTitle\":\"NAWAZ ALI\",\"accountType\":\"100\",\"accountCurrency\":\"PKR\",\"accountNumber\":\"060510224211\",\"BlockedAmount\":\"0\",\"availableBalance\":\"1502645.5\",\"accountStatus\":\"A\",\"categoryType\":\"01\",\"branchCode\":\"0605\",\"bankName\":\"United Bank Limited\",\"branchName\":\"UBL CBS\",\"AcctOpenDate\":\"11.04.2007\",\"DCCFlag\":\"Y\",\"cnic\":\"4110385560469\",\"contactno\":\"03013577447\",\"fromIban\":\"PK87UNIL0112060510224211\"},\"transferContext\":{\"id\":\"00964353\",\"notes\":\"{\\\"catergoryId\\\":\\\"5\\\",\\\"shelf\\\":\\\"Tax Payments\\\",\\\"branchCode\\\":\\\"0105\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"EXTERNAL_ACCOUNT\",\"bankName\":\"Meezan Bank Limited\",\"accountNumber\":\"01050105856769\",\"routingNumber\":\"123456789\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"false\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"fromAccountName\":\"NAWAZ ALI\",\"payeeName\":\"MUHAMMAD HASSAN SIDDIQUI\"}",
+                        "transactionReferenceId": "8210184066909956",
+                        "transactionData": "{\"stan\":\"486213\"}",
+                        "requesterName": "Mehmood Sanjrani",
+                        "transactionType2": "Interbank Account to Account Fund Transfer",
+                        "typeId": "MONETARY"
+                    },
+                    {
+                        "approverId": "5939522605",
+                        "contractId": "1960646668",
+                        "httpStatusCode": 200,
+                        "opstatus": 0,
+                        "referenceNo": "5231",
+                        "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE_RECEPIENT",
+                        "assignedDate": "2025-11-21 23:36:14.0",
+                        "sentBy": "3943220338",
+                        "status": "REJECTED",
+                        "requesterName": "Mehmood Sanjrani",
+                        "transactionType2": "Intra Bank Fund Transfer",
+                        "notes2": "{\"notes\":\"{\\\"catergoryId\\\":\\\"4\\\",\\\"shelf\\\":\\\"Travels\\\",\\\"branchCode\\\":\\\"3319\\\",\\\"bankIMD\\\":\\\"588974\\\"}\",\"isVerified\":\"false\",\"nickName\":\"HASSAN\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"UBL\",\"accountNumber\":\"331997792\",\"createdOn\":\"2025-11-21 23:36:14.0\",\"routingNumber\":\"588974\",\"phoneNumber\":\"03122715025\",\"isInternationalAccount\":\"false\",\"softDelete\":\"true\",\"beneficiaryName\":\"MUHAMMAD HASAAN SIDDIQUI\",\"response\":\"1\",\"isSTP\":\"1\",\"isSameBankAccount\":\"true\",\"Id\":\"00983105\",\"User_id\":\"3943220338\",\"isInsert\":\"1\",\"cId\":\"1960646668\"}",
+                        "typeId": "NON_MONETARY"
+                    },
+                    {
+                        "approverId": "5939522605",
+                        "contractId": "1960646668",
+                        "httpStatusCode": 200,
+                        "opstatus": 0,
+                        "referenceNo": "50913",
+                        "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE",
+                        "amount": "1.00",
+                        "assignedDate": "2025-11-29 02:51:06.0",
+                        "sentBy": "3943220338",
+                        "status": "APPROVED",
+                        "transactionType": "BulkFT",
+                        "fromAccountNumber": "060510224211",
+                        "toAccountNumber": "",
+                        "notes": "{\"fromAccountName\":\"NAWAZ ALI\",\"fromBranchCode\":\"0605\",\"fileid\":\"0048557389899874\",\"filename\":\"nov_02\"}",
+                        "transactionReferenceId": "7643666660631890",
+                        "transactionData": "{\"stan\":\"358561\"}",
+                        "requesterName": "Mehmood Sanjrani",
+                        "transactionType2": "Intra Bank Fund Transfer",
+                        "typeId": "MONETARY"
+                    },
+                    {
+                        "approverId": "5939522605",
+                        "contractId": "1960646668",
+                        "httpStatusCode": 200,
+                        "opstatus": 0,
+                        "referenceNo": "50914",
+                        "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE",
+                        "amount": "1.00",
+                        "assignedDate": "2025-11-29 02:51:33.0",
+                        "sentBy": "3943220338",
+                        "status": "APPROVED",
+                        "transactionType": "BulkIBFT",
+                        "fromAccountNumber": "060510224211",
+                        "toAccountNumber": "",
+                        "notes": "{\"fromAccountName\":\"NAWAZ ALI\",\"fromBranchCode\":\"0605\",\"fileid\":\"0048557389899874\",\"filename\":\"nov_02\"}",
+                        "transactionReferenceId": "7643666934754670",
+                        "transactionData": "{\"stan\":\"937758\"}",
+                        "requesterName": "Mehmood Sanjrani",
+                        "transactionType2": "Interbank Account to Account Fund Transfer",
+                        "typeId": "MONETARY"
+                    },
+                    {
+                        "approverId": "5939522605",
+                        "contractId": "1960646668",
+                        "httpStatusCode": 200,
+                        "opstatus": 0,
+                        "referenceNo": "50915",
+                        "featureActionId": "RAAST_TRANSACTION_CREATE",
+                        "amount": "1.00",
+                        "assignedDate": "2025-11-29 02:53:07.0",
+                        "sentBy": "3943220338",
+                        "status": "APPROVED",
+                        "transactionType": "BulkRaast",
+                        "fromAccountNumber": "060510224211",
+                        "toAccountNumber": "",
+                        "notes": "{\"fromAccountName\":\"NAWAZ ALI\",\"fromBranchCode\":\"0605\",\"fileid\":\"0048557389899874\",\"filename\":\"nov_02\",\"fromAccIdentificationVal\":\"4110385560469\"}",
+                        "transactionReferenceId": "7643667875793050",
+                        "transactionData": "{\"stan\":\"827474\"}",
+                        "requesterName": "Mehmood Sanjrani",
+                        "transactionType2": "Raast Transfer",
+                        "typeId": "MONETARY"
+                    },
+                    {
+                        "approverId": "5939522605",
+                        "contractId": "1960646668",
+                        "httpStatusCode": 200,
+                        "opstatus": 0,
+                        "referenceNo": "50911",
+                        "featureActionId": "RAAST_TRANSACTION_CREATE",
+                        "amount": "2.00",
+                        "assignedDate": "2025-11-29 01:50:09.0",
+                        "sentBy": "3943220338",
+                        "status": "APPROVED",
+                        "transactionType": "BulkRaast",
+                        "fromAccountNumber": "060510224211",
+                        "toAccountNumber": "",
+                        "notes": "{\"fromAccountName\":\"NAWAZ ALI\",\"fromBranchCode\":\"0605\",\"fileid\":\"0012413468344393\",\"filename\":\"Prod_file_3k_01\",\"fromAccIdentificationVal\":\"4110385560469\"}",
+                        "transactionReferenceId": "7643630095973440",
+                        "transactionData": "{\"stan\":\"288366\"}",
+                        "requesterName": "Mehmood Sanjrani",
+                        "transactionType2": "Raast Transfer",
+                        "typeId": "MONETARY"
+                    },
+                    {
+                        "approverId": "5939522605",
+                        "contractId": "1960646668",
+                        "httpStatusCode": 200,
+                        "opstatus": 0,
+                        "referenceNo": "50910",
+                        "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE",
+                        "amount": "2.00",
+                        "assignedDate": "2025-11-29 01:49:20.0",
+                        "sentBy": "3943220338",
+                        "status": "APPROVED",
+                        "transactionType": "BulkFT",
+                        "fromAccountNumber": "060510224211",
+                        "toAccountNumber": "",
+                        "notes": "{\"fromAccountName\":\"NAWAZ ALI\",\"fromBranchCode\":\"0605\",\"fileid\":\"0012413468344393\",\"filename\":\"Prod_file_3k_01\"}",
+                        "transactionReferenceId": "7643629605995580",
+                        "transactionData": "{\"stan\":\"644223\"}",
+                        "requesterName": "Mehmood Sanjrani",
+                        "transactionType2": "Intra Bank Fund Transfer",
+                        "typeId": "MONETARY"
+                    },
+                    {
+                        "approverId": "5939522605",
+                        "contractId": "1960646668",
+                        "httpStatusCode": 200,
+                        "opstatus": 0,
+                        "referenceNo": "50912",
+                        "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE",
+                        "amount": "1.00",
+                        "assignedDate": "2025-11-29 01:54:34.0",
+                        "sentBy": "3943220338",
+                        "status": "APPROVED",
+                        "transactionType": "ExternalTransfer",
+                        "fromAccountNumber": "060510224211",
+                        "toAccountNumber": "01050105856769",
+                        "notes": "{\"reviewContext\":{\"reviewDetails\":true,\"transferSuccess\":false,\"beneDetails\":{\"id\":\"00964353\",\"notes\":\"{\\\"catergoryId\\\":\\\"5\\\",\\\"shelf\\\":\\\"Tax Payments\\\",\\\"branchCode\\\":\\\"0105\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"EXTERNAL_ACCOUNT\",\"bankName\":\"Meezan Bank Limited\",\"accountNumber\":\"01050105856769\",\"routingNumber\":\"123456789\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"false\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"otherDetails\":{\"amount\":\"1.00\",\"fromAccount\":\"060510224211\",\"purpose\":\"Fund Transfer\",\"fromAccountName\":\"NAWAZ ALI\",\"toAccountName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"toAccountNumber\":\"01050105856769\",\"currency\":\"PKR\"}},\"selectedAccount\":{\"depositType\":\"S\",\"GLCode\":\"31100400\",\"accountTitle\":\"NAWAZ ALI\",\"accountType\":\"100\",\"accountCurrency\":\"PKR\",\"accountNumber\":\"060510224211\",\"BlockedAmount\":\"0\",\"availableBalance\":\"1590841.33\",\"accountStatus\":\"A\",\"categoryType\":\"01\",\"branchCode\":\"0605\",\"bankName\":\"United Bank Limited\",\"branchName\":\"UBL CBS\",\"AcctOpenDate\":\"11.04.2007\",\"DCCFlag\":\"Y\",\"cnic\":\"4110385560469\",\"contactno\":\"03013577447\",\"fromIban\":\"PK87UNIL0112060510224211\"},\"transferContext\":{\"id\":\"00964353\",\"notes\":\"{\\\"catergoryId\\\":\\\"5\\\",\\\"shelf\\\":\\\"Tax Payments\\\",\\\"branchCode\\\":\\\"0105\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"EXTERNAL_ACCOUNT\",\"bankName\":\"Meezan Bank Limited\",\"accountNumber\":\"01050105856769\",\"routingNumber\":\"123456789\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"false\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"fromAccountName\":\"NAWAZ ALI\",\"payeeName\":\"MUHAMMAD HASSAN SIDDIQUI\"}",
+                        "transactionReferenceId": "4909468072766220",
+                        "transactionData": "{\"stan\":\"392600\"}",
+                        "requesterName": "Mehmood Sanjrani",
+                        "transactionType2": "Interbank Account to Account Fund Transfer",
+                        "typeId": "MONETARY"
+                    },
+                    {
+                        "approverId": "5939522605",
+                        "contractId": "1960646668",
+                        "httpStatusCode": 200,
+                        "opstatus": 0,
+                        "referenceNo": "50909",
+                        "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE",
+                        "amount": "1.00",
+                        "assignedDate": "2025-11-29 01:48:18.0",
+                        "sentBy": "3943220338",
+                        "status": "APPROVED",
+                        "transactionType": "InternalTransfer",
+                        "fromAccountNumber": "060510224211",
+                        "toAccountNumber": "PK08UNIL0109000331997792",
+                        "notes": "{\"reviewContext\":{\"reviewDetails\":true,\"transferSuccess\":false,\"beneDetails\":{\"id\":\"00653852\",\"notes\":\"{\\\"catergoryId\\\":\\\"3\\\",\\\"shelf\\\":\\\"Salary Payments\\\",\\\"branchCode\\\":\\\"pk08\\\",\\\"bankIMD\\\":\\\"588974\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASAAN SIDDIQUI\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"UBL\",\"accountNumber\":\"PK08UNIL0109000331997792\",\"routingNumber\":\"588974\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASAAN SIDDIQUI\",\"isSameBankAccount\":\"true\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"otherDetails\":{\"amount\":\"1.00\",\"fromAccount\":\"060510224211\",\"purpose\":\"Fund Transfer\",\"fromAccountName\":\"NAWAZ ALI\",\"toAccountName\":\"MUHAMMAD HASAAN SIDDIQUI\",\"toAccountNumber\":\"PK08UNIL0109000331997792\",\"currency\":\"PKR\"}},\"selectedAccount\":{\"depositType\":\"S\",\"GLCode\":\"31100400\",\"accountTitle\":\"NAWAZ ALI\",\"accountType\":\"100\",\"accountCurrency\":\"PKR\",\"accountNumber\":\"060510224211\",\"BlockedAmount\":\"0\",\"availableBalance\":\"1590841.33\",\"accountStatus\":\"A\",\"categoryType\":\"01\",\"branchCode\":\"0605\",\"bankName\":\"United Bank Limited\",\"branchName\":\"UBL CBS\",\"AcctOpenDate\":\"11.04.2007\",\"DCCFlag\":\"Y\",\"cnic\":\"4110385560469\",\"contactno\":\"03013577447\",\"fromIban\":\"PK87UNIL0112060510224211\"},\"transferContext\":{\"id\":\"00653852\",\"notes\":\"{\\\"catergoryId\\\":\\\"3\\\",\\\"shelf\\\":\\\"Salary Payments\\\",\\\"branchCode\\\":\\\"pk08\\\",\\\"bankIMD\\\":\\\"588974\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASAAN SIDDIQUI\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"UBL\",\"accountNumber\":\"PK08UNIL0109000331997792\",\"routingNumber\":\"588974\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASAAN SIDDIQUI\",\"isSameBankAccount\":\"true\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"fromAccountName\":\"NAWAZ ALI\",\"payeeName\":\"MUHAMMAD HASAAN SIDDIQUI\"}",
+                        "transactionReferenceId": "4057746037756640",
+                        "transactionData": "{\"stan\":\"350590\"}",
+                        "requesterName": "Mehmood Sanjrani",
+                        "transactionType2": "Intra Bank Fund Transfer",
+                        "typeId": "MONETARY"
+                    },
+                    {
+                        "approverId": "5939522605",
+                        "contractId": "1960646668",
+                        "httpStatusCode": 200,
+                        "opstatus": 0,
+                        "referenceNo": "50908",
+                        "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE",
+                        "amount": "1.00",
+                        "assignedDate": "2025-11-29 01:45:45.0",
+                        "sentBy": "3943220338",
+                        "status": "REJECTED",
+                        "transactionType": "InternalTransfer",
+                        "fromAccountNumber": "060510224211",
+                        "toAccountNumber": "03343498426",
+                        "notes": "{\"reviewContext\":{\"reviewDetails\":true,\"transferSuccess\":false,\"beneDetails\":{\"id\":\"00975050\",\"notes\":\"{\\\"catergoryId\\\":\\\"3\\\",\\\"shelf\\\":\\\"Salary Payments\\\",\\\"branchCode\\\":\\\"627873\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"Raast\",\"accountNumber\":\"03343498426\",\"routingNumber\":\"627873\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"true\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"otherDetails\":{\"amount\":\"1.00\",\"fromAccount\":\"060510224211\",\"purpose\":\"Fund Transfer\",\"fromAccountName\":\"NAWAZ ALI\",\"toAccountName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"toAccountNumber\":\"03343498426\",\"currency\":\"PKR\"}},\"selectedAccount\":{\"depositType\":\"S\",\"GLCode\":\"31100400\",\"accountTitle\":\"NAWAZ ALI\",\"accountType\":\"100\",\"accountCurrency\":\"PKR\",\"accountNumber\":\"060510224211\",\"BlockedAmount\":\"0\",\"availableBalance\":\"1590841.33\",\"accountStatus\":\"A\",\"categoryType\":\"01\",\"branchCode\":\"0605\",\"bankName\":\"United Bank Limited\",\"branchName\":\"UBL CBS\",\"AcctOpenDate\":\"11.04.2007\",\"DCCFlag\":\"Y\",\"cnic\":\"4110385560469\",\"contactno\":\"03013577447\",\"fromIban\":\"PK87UNIL0112060510224211\"},\"transferContext\":{\"id\":\"00975050\",\"notes\":\"{\\\"catergoryId\\\":\\\"3\\\",\\\"shelf\\\":\\\"Salary Payments\\\",\\\"branchCode\\\":\\\"627873\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"Raast\",\"accountNumber\":\"03343498426\",\"routingNumber\":\"627873\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"true\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"fromAccountName\":\"NAWAZ ALI\",\"payeeName\":\"MUHAMMAD HASSAN SIDDIQUI\"}",
+                        "transactionReferenceId": "6350453500398942",
+                        "transactionData": "{\"stan\":\"901577\"}",
+                        "requesterName": "Mehmood Sanjrani",
+                        "transactionType2": "Intra Bank Fund Transfer",
+                        "typeId": "MONETARY"
+                    }
+                ],
+                "opstatus": 0,
+                "httpStatusCode": 200
+            }
+    } else {
+         return {
+            ApprovalMatrix: [],
+            opstatus: 1,
+            httpStatusCode: 404,
+            message: 'Approval history not found'
+        }
+    }
+}
+
+export async function rejectRequest(payload: {
+    contractId: string,
+    referenceNo: string,
+    approverId: string,
+    rejectorId: string,
+    remarks: string,
+    accountNo: number,
+}) {
+    const url = "https://prodpk.ubldigital.com/services/data/v1/DCP_Approvals_OB_Object/operations/ApprovalMatrix/RejectRequest";
     const body = `jsondata=${JSON.stringify(payload)}`;
 
     try {
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: body
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body,
         });
-        
+
         if (!response.ok) {
-            console.error('API Error Response:', response.status, response.statusText);
-            const errorBody = await response.text();
-            console.error('Error Body:', errorBody);
-            return {
-                ApprovalMatrix: [],
+             return {
                 opstatus: 1,
                 httpStatusCode: response.status,
                 message: `API request failed: ${response.statusText}`
             };
         }
-
-        const data = await response.json();
-        return data;
-
+        return await response.json();
     } catch (error) {
-        console.error("Failed to fetch pending approvals:", error);
+        console.error("Failed to reject request:", error);
         return {
-            ApprovalMatrix: [],
             opstatus: 1,
             httpStatusCode: 500,
-            message: 'Failed to fetch pending approvals'
+            message: 'Failed to reject request'
         };
     }
 }
 
-export async function getApprovalHistory(userId: string) {
-    return {
-            "ApprovalMatrix": [
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "httpStatusCode": 200,
-                    "opstatus": 0,
-                    "referenceNo": "47668",
-                    "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE",
-                    "amount": "1.00",
-                    "assignedDate": "2025-11-21 22:22:47.0",
-                    "sentBy": "3943220338",
-                    "status": "APPROVED",
-                    "transactionType": "ExternalTransfer",
-                    "fromAccountNumber": "060510224211",
-                    "toAccountNumber": "01050105856769",
-                    "notes": "{\"reviewContext\":{\"reviewDetails\":true,\"transferSuccess\":false,\"beneDetails\":{\"id\":\"00964353\",\"notes\":\"{\\\"catergoryId\\\":\\\"5\\\",\\\"shelf\\\":\\\"Tax Payments\\\",\\\"branchCode\\\":\\\"0105\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"EXTERNAL_ACCOUNT\",\"bankName\":\"Meezan Bank Limited\",\"accountNumber\":\"01050105856769\",\"routingNumber\":\"123456789\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"false\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"otherDetails\":{\"amount\":\"1.00\",\"fromAccount\":\"060510224211\",\"purpose\":\"Fund Transfer\",\"fromAccountName\":\"NAWAZ ALI\",\"toAccountName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"toAccountNumber\":\"01050105856769\",\"currency\":\"PKR\"}},\"selectedAccount\":{\"depositType\":\"S\",\"GLCode\":\"31100400\",\"accountTitle\":\"NAWAZ ALI\",\"accountType\":\"100\",\"accountCurrency\":\"PKR\",\"accountNumber\":\"060510224211\",\"BlockedAmount\":\"0\",\"availableBalance\":\"1502645.5\",\"accountStatus\":\"A\",\"categoryType\":\"01\",\"branchCode\":\"0605\",\"bankName\":\"United Bank Limited\",\"branchName\":\"UBL CBS\",\"AcctOpenDate\":\"11.04.2007\",\"DCCFlag\":\"Y\",\"cnic\":\"4110385560469\",\"contactno\":\"03013577447\",\"fromIban\":\"PK87UNIL0112060510224211\"},\"transferContext\":{\"id\":\"00964353\",\"notes\":\"{\\\"catergoryId\\\":\\\"5\\\",\\\"shelf\\\":\\\"Tax Payments\\\",\\\"branchCode\\\":\\\"0105\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"EXTERNAL_ACCOUNT\",\"bankName\":\"Meezan Bank Limited\",\"accountNumber\":\"01050105856769\",\"routingNumber\":\"123456789\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"false\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"fromAccountName\":\"NAWAZ ALI\",\"payeeName\":\"MUHAMMAD HASSAN SIDDIQUI\"}",
-                    "transactionReferenceId": "8210184066909956",
-                    "transactionData": "{\"stan\":\"486213\"}",
-                    "requesterName": "Mehmood Sanjrani",
-                    "transactionType2": "Interbank Account to Account Fund Transfer",
-                    "typeId": "MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "httpStatusCode": 200,
-                    "opstatus": 0,
-                    "referenceNo": "5231",
-                    "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE_RECEPIENT",
-                    "assignedDate": "2025-11-21 23:36:14.0",
-                    "sentBy": "3943220338",
-                    "status": "REJECTED",
-                    "requesterName": "Mehmood Sanjrani",
-                    "transactionType2": "Intra Bank Fund Transfer",
-                    "notes2": "{\"notes\":\"{\\\"catergoryId\\\":\\\"4\\\",\\\"shelf\\\":\\\"Travels\\\",\\\"branchCode\\\":\\\"3319\\\",\\\"bankIMD\\\":\\\"588974\\\"}\",\"isVerified\":\"false\",\"nickName\":\"HASSAN\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"UBL\",\"accountNumber\":\"331997792\",\"createdOn\":\"2025-11-21 23:36:14.0\",\"routingNumber\":\"588974\",\"phoneNumber\":\"03122715025\",\"isInternationalAccount\":\"false\",\"softDelete\":\"true\",\"beneficiaryName\":\"MUHAMMAD HASAAN SIDDIQUI\",\"response\":\"1\",\"isSTP\":\"1\",\"isSameBankAccount\":\"true\",\"Id\":\"00983105\",\"User_id\":\"3943220338\",\"isInsert\":\"1\",\"cId\":\"1960646668\"}",
-                    "typeId": "NON_MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "httpStatusCode": 200,
-                    "opstatus": 0,
-                    "referenceNo": "50913",
-                    "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE",
-                    "amount": "1.00",
-                    "assignedDate": "2025-11-29 02:51:06.0",
-                    "sentBy": "3943220338",
-                    "status": "APPROVED",
-                    "transactionType": "BulkFT",
-                    "fromAccountNumber": "060510224211",
-                    "toAccountNumber": "",
-                    "notes": "{\"fromAccountName\":\"NAWAZ ALI\",\"fromBranchCode\":\"0605\",\"fileid\":\"0048557389899874\",\"filename\":\"nov_02\"}",
-                    "transactionReferenceId": "7643666660631890",
-                    "transactionData": "{\"stan\":\"358561\"}",
-                    "requesterName": "Mehmood Sanjrani",
-                    "transactionType2": "Intra Bank Fund Transfer",
-                    "typeId": "MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "httpStatusCode": 200,
-                    "opstatus": 0,
-                    "referenceNo": "50914",
-                    "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE",
-                    "amount": "1.00",
-                    "assignedDate": "2025-11-29 02:51:33.0",
-                    "sentBy": "3943220338",
-                    "status": "APPROVED",
-                    "transactionType": "BulkIBFT",
-                    "fromAccountNumber": "060510224211",
-                    "toAccountNumber": "",
-                    "notes": "{\"fromAccountName\":\"NAWAZ ALI\",\"fromBranchCode\":\"0605\",\"fileid\":\"0048557389899874\",\"filename\":\"nov_02\"}",
-                    "transactionReferenceId": "7643666934754670",
-                    "transactionData": "{\"stan\":\"937758\"}",
-                    "requesterName": "Mehmood Sanjrani",
-                    "transactionType2": "Interbank Account to Account Fund Transfer",
-                    "typeId": "MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "httpStatusCode": 200,
-                    "opstatus": 0,
-                    "referenceNo": "50915",
-                    "featureActionId": "RAAST_TRANSACTION_CREATE",
-                    "amount": "1.00",
-                    "assignedDate": "2025-11-29 02:53:07.0",
-                    "sentBy": "3943220338",
-                    "status": "APPROVED",
-                    "transactionType": "BulkRaast",
-                    "fromAccountNumber": "060510224211",
-                    "toAccountNumber": "",
-                    "notes": "{\"fromAccountName\":\"NAWAZ ALI\",\"fromBranchCode\":\"0605\",\"fileid\":\"0048557389899874\",\"filename\":\"nov_02\",\"fromAccIdentificationVal\":\"4110385560469\"}",
-                    "transactionReferenceId": "7643667875793050",
-                    "transactionData": "{\"stan\":\"827474\"}",
-                    "requesterName": "Mehmood Sanjrani",
-                    "transactionType2": "Raast Transfer",
-                    "typeId": "MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "httpStatusCode": 200,
-                    "opstatus": 0,
-                    "referenceNo": "50911",
-                    "featureActionId": "RAAST_TRANSACTION_CREATE",
-                    "amount": "2.00",
-                    "assignedDate": "2025-11-29 01:50:09.0",
-                    "sentBy": "3943220338",
-                    "status": "APPROVED",
-                    "transactionType": "BulkRaast",
-                    "fromAccountNumber": "060510224211",
-                    "toAccountNumber": "",
-                    "notes": "{\"fromAccountName\":\"NAWAZ ALI\",\"fromBranchCode\":\"0605\",\"fileid\":\"0012413468344393\",\"filename\":\"Prod_file_3k_01\",\"fromAccIdentificationVal\":\"4110385560469\"}",
-                    "transactionReferenceId": "7643630095973440",
-                    "transactionData": "{\"stan\":\"288366\"}",
-                    "requesterName": "Mehmood Sanjrani",
-                    "transactionType2": "Raast Transfer",
-                    "typeId": "MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "httpStatusCode": 200,
-                    "opstatus": 0,
-                    "referenceNo": "50910",
-                    "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE",
-                    "amount": "2.00",
-                    "assignedDate": "2025-11-29 01:49:20.0",
-                    "sentBy": "3943220338",
-                    "status": "APPROVED",
-                    "transactionType": "BulkFT",
-                    "fromAccountNumber": "060510224211",
-                    "toAccountNumber": "",
-                    "notes": "{\"fromAccountName\":\"NAWAZ ALI\",\"fromBranchCode\":\"0605\",\"fileid\":\"0012413468344393\",\"filename\":\"Prod_file_3k_01\"}",
-                    "transactionReferenceId": "7643629605995580",
-                    "transactionData": "{\"stan\":\"644223\"}",
-                    "requesterName": "Mehmood Sanjrani",
-                    "transactionType2": "Intra Bank Fund Transfer",
-                    "typeId": "MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "httpStatusCode": 200,
-                    "opstatus": 0,
-                    "referenceNo": "50912",
-                    "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE",
-                    "amount": "1.00",
-                    "assignedDate": "2025-11-29 01:54:34.0",
-                    "sentBy": "3943220338",
-                    "status": "APPROVED",
-                    "transactionType": "ExternalTransfer",
-                    "fromAccountNumber": "060510224211",
-                    "toAccountNumber": "01050105856769",
-                    "notes": "{\"reviewContext\":{\"reviewDetails\":true,\"transferSuccess\":false,\"beneDetails\":{\"id\":\"00964353\",\"notes\":\"{\\\"catergoryId\\\":\\\"5\\\",\\\"shelf\\\":\\\"Tax Payments\\\",\\\"branchCode\\\":\\\"0105\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"EXTERNAL_ACCOUNT\",\"bankName\":\"Meezan Bank Limited\",\"accountNumber\":\"01050105856769\",\"routingNumber\":\"123456789\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"false\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"otherDetails\":{\"amount\":\"1.00\",\"fromAccount\":\"060510224211\",\"purpose\":\"Fund Transfer\",\"fromAccountName\":\"NAWAZ ALI\",\"toAccountName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"toAccountNumber\":\"01050105856769\",\"currency\":\"PKR\"}},\"selectedAccount\":{\"depositType\":\"S\",\"GLCode\":\"31100400\",\"accountTitle\":\"NAWAZ ALI\",\"accountType\":\"100\",\"accountCurrency\":\"PKR\",\"accountNumber\":\"060510224211\",\"BlockedAmount\":\"0\",\"availableBalance\":\"1590841.33\",\"accountStatus\":\"A\",\"categoryType\":\"01\",\"branchCode\":\"0605\",\"bankName\":\"United Bank Limited\",\"branchName\":\"UBL CBS\",\"AcctOpenDate\":\"11.04.2007\",\"DCCFlag\":\"Y\",\"cnic\":\"4110385560469\",\"contactno\":\"03013577447\",\"fromIban\":\"PK87UNIL0112060510224211\"},\"transferContext\":{\"id\":\"00964353\",\"notes\":\"{\\\"catergoryId\\\":\\\"5\\\",\\\"shelf\\\":\\\"Tax Payments\\\",\\\"branchCode\\\":\\\"0105\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"EXTERNAL_ACCOUNT\",\"bankName\":\"Meezan Bank Limited\",\"accountNumber\":\"01050105856769\",\"routingNumber\":\"123456789\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"false\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"fromAccountName\":\"NAWAZ ALI\",\"payeeName\":\"MUHAMMAD HASSAN SIDDIQUI\"}",
-                    "transactionReferenceId": "4909468072766220",
-                    "transactionData": "{\"stan\":\"392600\"}",
-                    "requesterName": "Mehmood Sanjrani",
-                    "transactionType2": "Interbank Account to Account Fund Transfer",
-                    "typeId": "MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "httpStatusCode": 200,
-                    "opstatus": 0,
-                    "referenceNo": "50909",
-                    "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE",
-                    "amount": "1.00",
-                    "assignedDate": "2025-11-29 01:48:18.0",
-                    "sentBy": "3943220338",
-                    "status": "APPROVED",
-                    "transactionType": "InternalTransfer",
-                    "fromAccountNumber": "060510224211",
-                    "toAccountNumber": "PK08UNIL0109000331997792",
-                    "notes": "{\"reviewContext\":{\"reviewDetails\":true,\"transferSuccess\":false,\"beneDetails\":{\"id\":\"00653852\",\"notes\":\"{\\\"catergoryId\\\":\\\"3\\\",\\\"shelf\\\":\\\"Salary Payments\\\",\\\"branchCode\\\":\\\"pk08\\\",\\\"bankIMD\\\":\\\"588974\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASAAN SIDDIQUI\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"UBL\",\"accountNumber\":\"PK08UNIL0109000331997792\",\"routingNumber\":\"588974\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASAAN SIDDIQUI\",\"isSameBankAccount\":\"true\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"otherDetails\":{\"amount\":\"1.00\",\"fromAccount\":\"060510224211\",\"purpose\":\"Fund Transfer\",\"fromAccountName\":\"NAWAZ ALI\",\"toAccountName\":\"MUHAMMAD HASAAN SIDDIQUI\",\"toAccountNumber\":\"PK08UNIL0109000331997792\",\"currency\":\"PKR\"}},\"selectedAccount\":{\"depositType\":\"S\",\"GLCode\":\"31100400\",\"accountTitle\":\"NAWAZ ALI\",\"accountType\":\"100\",\"accountCurrency\":\"PKR\",\"accountNumber\":\"060510224211\",\"BlockedAmount\":\"0\",\"availableBalance\":\"1590841.33\",\"accountStatus\":\"A\",\"categoryType\":\"01\",\"branchCode\":\"0605\",\"bankName\":\"United Bank Limited\",\"branchName\":\"UBL CBS\",\"AcctOpenDate\":\"11.04.2007\",\"DCCFlag\":\"Y\",\"cnic\":\"4110385560469\",\"contactno\":\"03013577447\",\"fromIban\":\"PK87UNIL0112060510224211\"},\"transferContext\":{\"id\":\"00653852\",\"notes\":\"{\\\"catergoryId\\\":\\\"3\\\",\\\"shelf\\\":\\\"Salary Payments\\\",\\\"branchCode\\\":\\\"pk08\\\",\\\"bankIMD\\\":\\\"588974\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASAAN SIDDIQUI\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"UBL\",\"accountNumber\":\"PK08UNIL0109000331997792\",\"routingNumber\":\"588974\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASAAN SIDDIQUI\",\"isSameBankAccount\":\"true\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"fromAccountName\":\"NAWAZ ALI\",\"payeeName\":\"MUHAMMAD HASAAN SIDDIQUI\"}",
-                    "transactionReferenceId": "4057746037756640",
-                    "transactionData": "{\"stan\":\"350590\"}",
-                    "requesterName": "Mehmood Sanjrani",
-                    "transactionType2": "Intra Bank Fund Transfer",
-                    "typeId": "MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "httpStatusCode": 200,
-                    "opstatus": 0,
-                    "referenceNo": "50908",
-                    "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE",
-                    "amount": "1.00",
-                    "assignedDate": "2025-11-29 01:45:45.0",
-                    "sentBy": "3943220338",
-                    "status": "REJECTED",
-                    "transactionType": "InternalTransfer",
-                    "fromAccountNumber": "060510224211",
-                    "toAccountNumber": "03343498426",
-                    "notes": "{\"reviewContext\":{\"reviewDetails\":true,\"transferSuccess\":false,\"beneDetails\":{\"id\":\"00975050\",\"notes\":\"{\\\"catergoryId\\\":\\\"3\\\",\\\"shelf\\\":\\\"Salary Payments\\\",\\\"branchCode\\\":\\\"627873\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"Raast\",\"accountNumber\":\"03343498426\",\"routingNumber\":\"627873\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"true\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"otherDetails\":{\"amount\":\"1.00\",\"fromAccount\":\"060510224211\",\"purpose\":\"Fund Transfer\",\"fromAccountName\":\"NAWAZ ALI\",\"toAccountName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"toAccountNumber\":\"03343498426\",\"currency\":\"PKR\"}},\"selectedAccount\":{\"depositType\":\"S\",\"GLCode\":\"31100400\",\"accountTitle\":\"NAWAZ ALI\",\"accountType\":\"100\",\"accountCurrency\":\"PKR\",\"accountNumber\":\"060510224211\",\"BlockedAmount\":\"0\",\"availableBalance\":\"1590841.33\",\"accountStatus\":\"A\",\"categoryType\":\"01\",\"branchCode\":\"0605\",\"bankName\":\"United Bank Limited\",\"branchName\":\"UBL CBS\",\"AcctOpenDate\":\"11.04.2007\",\"DCCFlag\":\"Y\",\"cnic\":\"4110385560469\",\"contactno\":\"03013577447\",\"fromIban\":\"PK87UNIL0112060510224211\"},\"transferContext\":{\"id\":\"00975050\",\"notes\":\"{\\\"catergoryId\\\":\\\"3\\\",\\\"shelf\\\":\\\"Salary Payments\\\",\\\"branchCode\\\":\\\"627873\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"Raast\",\"accountNumber\":\"03343498426\",\"routingNumber\":\"627873\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"true\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"fromAccountName\":\"NAWAZ ALI\",\"payeeName\":\"MUHAMMAD HASSAN SIDDIQUI\"}",
-                    "transactionReferenceId": "6350453500398942",
-                    "transactionData": "{\"stan\":\"901577\"}",
-                    "requesterName": "Mehmood Sanjrani",
-                    "transactionType2": "Intra Bank Fund Transfer",
-                    "typeId": "MONETARY"
-                }
-            ],
-            "opstatus": 0,
-            "httpStatusCode": 200
-        }
-    }
-Also you need to provide another service for rejection of the approval and here is the information for that.
-Request URL:
-https://prodpk.ubldigital.com/services/data/v1/DCP_Approvals_OB_Object/operations/ApprovalMatrix/RejectRequest
-
-Request Method:
-POST
-
-Payload:
-jsondata=%7B%22contractId%22%3A%221960646668%22%2C%22referenceNo%22%3A%2223300%22%2C%22approverId%22%3A%225939522605%22%2C%22rejectorId%22%3A%225939522605%22%2C%22remarks%22%3A%22test%22%2C%22accountNo%22%3A0%7D
-
-Response:
-{
-    "ApprovalMatrix": [
-        {
-            "opstatus": 0,
-            "reqResponse": "Transaction has been rejected successfully",
-            "httpStatusCode": 200
-        }
-    ],
-    "opstatus": 0,
-    "httpStatusCode": 200
-}
-```
+    
