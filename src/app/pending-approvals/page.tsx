@@ -66,18 +66,19 @@ function PendingApprovalsContent() {
                 ]);
 
                 const rejectedInSessionStr = sessionStorage.getItem('rejectedApprovals');
-                const rejectedInSession: { [key: string]: { status: string; remarks: string } } = rejectedInSessionStr ? JSON.parse(rejectedInSessionStr) : {};
+                const rejectedInSession: { [key: string]: { status: string; remarks: string, approval: Approval } } = rejectedInSessionStr ? JSON.parse(rejectedInSessionStr) : {};
                 const rejectedRefNos = Object.keys(rejectedInSession);
                 
                 const livePendingApprovals = pendingData.opstatus === 0 ? pendingData.ApprovalMatrix.filter(appr => !rejectedRefNos.includes(appr.referenceNo)) : [];
 
-                const sessionRejectedApprovals = (pendingData.opstatus === 0 ? pendingData.ApprovalMatrix : [])
-                    .filter(appr => rejectedRefNos.includes(appr.referenceNo))
-                    .map(appr => ({
-                        ...appr,
-                        status: rejectedInSession[appr.referenceNo].status,
-                        remarks: rejectedInSession[appr.referenceNo].remarks,
-                    }));
+                const sessionRejectedApprovals = rejectedRefNos.map(refNo => {
+                    const rejectedInfo = rejectedInSession[refNo];
+                    return {
+                        ...rejectedInfo.approval,
+                        status: rejectedInfo.status,
+                        remarks: rejectedInfo.remarks,
+                    }
+                });
                 
                 const combinedHistory = [
                     ...sessionRejectedApprovals,
@@ -124,7 +125,7 @@ function PendingApprovalsContent() {
             // Update session storage
             const rejectedInSessionStr = sessionStorage.getItem('rejectedApprovals');
             const rejectedInSession = rejectedInSessionStr ? JSON.parse(rejectedInSessionStr) : {};
-            rejectedInSession[approval.referenceNo] = { status: 'REJECTED', remarks: remarks };
+            rejectedInSession[approval.referenceNo] = { status: 'REJECTED', remarks: remarks, approval: approval };
             sessionStorage.setItem('rejectedApprovals', JSON.stringify(rejectedInSession));
             
             setPendingApprovals(prev => prev.filter(appr => appr.referenceNo !== approval.referenceNo));
