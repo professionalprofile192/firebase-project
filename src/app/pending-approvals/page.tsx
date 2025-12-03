@@ -65,20 +65,16 @@ function PendingApprovalsContent() {
                     getApprovalHistory('5939522605')
                 ]);
 
-                const rejectedInSessionStr = sessionStorage.getItem('rejectedApprovals');
-                const rejectedInSession: { [key: string]: { status: string; remarks: string, approval: Approval } } = rejectedInSessionStr ? JSON.parse(rejectedInSessionStr) : {};
-                const rejectedRefNos = Object.keys(rejectedInSession);
+                // Use localStorage for permanent client-side state
+                const rejectedInStorageStr = localStorage.getItem('rejectedApprovals');
+                const rejectedInStorage: { [key: string]: Approval } = rejectedInStorageStr ? JSON.parse(rejectedInStorageStr) : {};
+                const rejectedRefNos = Object.keys(rejectedInStorage);
                 
-                const livePendingApprovals = pendingData.opstatus === 0 ? pendingData.ApprovalMatrix.filter(appr => !rejectedRefNos.includes(appr.referenceNo)) : [];
+                const livePendingApprovals = pendingData.opstatus === 0 
+                    ? pendingData.ApprovalMatrix.filter(appr => !rejectedRefNos.includes(appr.referenceNo)) 
+                    : [];
 
-                const sessionRejectedApprovals = rejectedRefNos.map(refNo => {
-                    const rejectedInfo = rejectedInSession[refNo];
-                    return {
-                        ...rejectedInfo.approval,
-                        status: rejectedInfo.status,
-                        remarks: rejectedInfo.remarks,
-                    }
-                });
+                const sessionRejectedApprovals = Object.values(rejectedInStorage);
                 
                 const combinedHistory = [
                     ...sessionRejectedApprovals,
@@ -122,11 +118,11 @@ function PendingApprovalsContent() {
         if (response.opstatus === 0 && response.ApprovalMatrix[0].opstatus === 0) {
             const rejectedApproval = { ...approval, status: 'REJECTED', remarks: remarks };
             
-            // Update session storage
-            const rejectedInSessionStr = sessionStorage.getItem('rejectedApprovals');
-            const rejectedInSession = rejectedInSessionStr ? JSON.parse(rejectedInSessionStr) : {};
-            rejectedInSession[approval.referenceNo] = { status: 'REJECTED', remarks: remarks, approval: approval };
-            sessionStorage.setItem('rejectedApprovals', JSON.stringify(rejectedInSession));
+            // Update localStorage
+            const rejectedInStorageStr = localStorage.getItem('rejectedApprovals');
+            const rejectedInStorage = rejectedInStorageStr ? JSON.parse(rejectedInStorageStr) : {};
+            rejectedInStorage[approval.referenceNo] = rejectedApproval;
+            localStorage.setItem('rejectedApprovals', JSON.stringify(rejectedInStorage));
             
             setPendingApprovals(prev => prev.filter(appr => appr.referenceNo !== approval.referenceNo));
             setApprovalHistory(prev => [rejectedApproval, ...prev]);
