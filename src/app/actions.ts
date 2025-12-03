@@ -17,6 +17,18 @@ export async function login(values: any) {
         CIF_NO: '20269367', // Adding CIF_NO for the next service call
       },
     };
+  } else if (values.username === 'idrees.approver' && values.password === 'Kony@1234') {
+    return {
+      success: true,
+      message: 'Login successful',
+      profile: {
+        userid: '5939522605',
+        firstname: 'Idrees',
+        lastname: 'Approver',
+        email: 'idrees.approver@ubl.com.pk',
+        CIF_NO: '20269368', 
+      },
+    };
   } else {
     return { success: false, message: 'Invalid username or password' };
   }
@@ -25,7 +37,7 @@ export async function login(values: any) {
 // This is a placeholder for the actual API call.
 export async function getLastLoginTime(userId: string) {
   // Simulate API call for a specific user
-  if (userId === '7884057484') {
+  if (userId === '7884057484' || userId === '5939522605') {
     return {
       LoginServices: [
         {
@@ -64,7 +76,26 @@ export async function getAccounts(customerId: string, cif: string) {
             "opstatus": 0,
             "httpStatusCode": 0
         }
-    } else {
+    } else if (customerId === '5939522605') {
+         return {
+            "payments": [
+                {
+                    "responseCode": "00",
+                    "ACCT_STATUS": "A",
+                    "ACCT_TITLE": "IDREES APPROVER",
+                    "ACCT_NO": "060510224212",
+                    "IBAN_CODE": "PK87UNIL0112060510224212",
+                    "DEPOSIT_TYPE": "S",
+                    "ACCT_TYPE": "100",
+                    "LEDGER_BAL": "2500000.0",
+                    "AVAIL_BAL": "2500000.0"
+                }
+            ],
+            "opstatus": 0,
+            "httpStatusCode": 0
+        }
+    }
+    else {
         return {
             payments: [],
             opstatus: 1,
@@ -77,7 +108,7 @@ export async function getAccounts(customerId: string, cif: string) {
 
 // This is a placeholder for the actual API call
 export async function getRecentTransactions(acctNo: string) {
-    if (acctNo === '060510224211') {
+    if (acctNo === '060510224211' || acctNo === '060510224212') {
         const paymentsString = "[{\"CRDR\":\"D\",\"seqno\":\"5920713631\",\"instNo\":\"\",\"tranAmt\":\"5000\",\"tranDate\":\"2025-11-20 00:00:00\",\"particulars\":\"CASH WITHDRAWAL - ATM\",\"runBal\":\"1507645.5\"},{\"CRDR\":\"C\",\"seqno\":\"5920711221\",\"instNo\":\"\",\"tranAmt\":\"1000\",\"tranDate\":\"2025-11-20 00:00:00\",\"particulars\":\"EB985674412 UBL DIGITAL:FUNDS TRANSFER  FR-1564308567641 TO-605060510224211TXNTYPE-0010\",\"runBal\":\"1512645.5\"},{\"CRDR\":\"C\",\"seqno\":\"5920526332\",\"instNo\":\"\",\"tranAmt\":\"2000\",\"tranDate\":\"2025-11-21 00:00:00\",\"particulars\":\"EB985619947 UBL DIGITAL:FUNDS TRANSFER  FR-1564308567641 TO-605060510224211TXNTYPE-0010\",\"runBal\":\"1512644.5\"},{\"CRDR\":\"C\",\"seqno\":\"5919360425\",\"instNo\":\"\",\"tranAmt\":\"500\",\"tranDate\":\"2025-11-22 00:00:00\",\"particulars\":\"EB985298862 UBL DIGITAL:FUNDS TRANSFER  FR-1779039510235468 TO-605060510224211TXNTYPE-0010\",\"runBal\":\"1512642.5\"},{\"CRDR\":\"C\",\"seqno\":\"5919342907\",\"instNo\":\"\",\"tranAmt\":\"1000\",\"tranDate\":\"2025-11-23 00:00:00\",\"particulars\":\"RAAST P2P FT FROM SYED BASHIR UL HASAN MEBL ACCT: PK17MEZN*********997 MSGID: AMEZNPKKA003001102889972511203035\",\"runBal\":\"1512637.5\"},{\"CRDR\":\"D\",\"seqno\":\"5917336308\",\"instNo\":\"\",\"tranAmt\":\"5000\",\"tranDate\":\"2025-11-19 00:00:00\",\"particulars\":\"CASH WITHDRAWAL - ATM\",\"runBal\":\"1512627.5\"},{\"CRDR\":\"D\",\"seqno\":\"5914830496\",\"instNo\":\"\",\"tranAmt\":\"5000\",\"tranDate\":\"2025-11-18 00:00:00\",\"particulars\":\"CASH WITHDRAWAL - ATM\",\"runBal\":\"1517627.5\"},{\"CRDR\":\"D\",\"seqno\":\"5911804812\",\"instNo\":\"\",\"tranAmt\":\"3000\",\"tranDate\":\"2025-11-17 00:00:00\",\"particulars\":\"CASH WITHDRAWAL - ATM\",\"runBal\":\"1522627.5\"},{\"CRDR\":\"D\",\"seqno\":\"5908707170\",\"instNo\":\"\",\"tranAmt\":\"2000\",\"tranDate\":\"2025-11-16 00:00:00\",\"particulars\":\"CASH WITHDRAWAL - ATM\",\"runBal\":\"1525627.5\"},{\"CRDR\":\"D\",\"seqno\":\"5907478642\",\"instNo\":\"\",\"tranAmt\":\"7000\",\"tranDate\":\"2025-11-15 00:00:00\",\"particulars\":\"CASH WITHDRAWAL - ATM\",\"runBal\":\"1527627.5\"}]";
         return {
             "payments": JSON.parse(paymentsString),
@@ -95,7 +126,7 @@ export async function getRecentTransactions(acctNo: string) {
 }
 
 export async function getNotifications(userId: string) {
-    if (userId === '7884057484') {
+    if (userId === '7884057484' || userId === '5939522605') {
         return {
             "ApprovalMatrix": [
                 {
@@ -327,7 +358,7 @@ export async function downloadStatement(params: {
 }
 
 export async function getBulkFiles(userId: string) {
-    if (userId === '7884057484') {
+    if (userId === '7884057484' || userId === '5939522605') {
         return {
             "NDC_BulkPayments": [
                 {
@@ -543,7 +574,7 @@ export async function getTradeRequestHistory(userId: string) {
 }
 
 export async function getPendingApprovals(userId: string, searchString: string = "", sortBy: string = "approveDate", sortOrder: string = "desc", limit: number = 10, offset: number = 0) {
-    if (userId === '5939522605' || userId === '7884057484') {
+    if (userId === '5939522605') {
         const url = "https://prodpk.ubldigital.com/services/data/v1/DCP_Approvals_OB_Object/operations/ApprovalMatrix/FetchAllPendingUserApprovals";
 
         const payload = {
@@ -595,13 +626,13 @@ export async function getPendingApprovals(userId: string, searchString: string =
             ApprovalMatrix: [],
             opstatus: 0,
             httpStatusCode: 200,
-            message: 'No pending approvals'
+            message: 'No pending approvals for this user'
         }
     }
 }
 
 export async function getApprovalHistory(userId: string) {
-    if(userId === '5939522605') {
+    if(userId === '5939522605' || userId === '7884057484') {
         return {
                 "ApprovalMatrix": [
                     {
@@ -857,5 +888,6 @@ export async function rejectRequest(payload: {
         };
     }
 }
+    
 
     
