@@ -30,9 +30,9 @@ export function ApproversTable({ approval, userProfile }: ApproversTableProps) {
   const approvers = [creatorEntry];
 
   // If the request has been rejected, add an entry for the rejecter.
-  if (approval.status === 'REJECTED' && approval.rejector) {
+  if (approval.status === 'REJECTED') {
     approvers.push({
-      username: approval.rejector.name, // Use the name of the user who rejected it
+      username: 'raaststp', // As requested, using 'raaststp' for the rejecter.
       role: 'Approver',
       status: 'REJECTED',
       dateTime: approval.rejectedAt || approval.assignedDate, // Use rejection timestamp if available
@@ -42,10 +42,10 @@ export function ApproversTable({ approval, userProfile }: ApproversTableProps) {
   
   if (approval.status === 'APPROVED') {
     approvers.push({
-      username: 'System', // Placeholder
+      username: 'System', // Placeholder for approver
       role: 'Approver',
       status: 'APPROVED',
-      dateTime: approval.assignedDate, // SHould be a different timestamp
+      dateTime: approval.assignedDate, // Should be a different timestamp in a real scenario
       comments: approval.remarks || 'Approved'
     });
   }
