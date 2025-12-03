@@ -44,6 +44,13 @@ function PendingApprovalsContent() {
   const [successAlertMessage, setSuccessAlertMessage] = useState('');
   
   useEffect(() => {
+    const profileString = sessionStorage.getItem('userProfile');
+    if (profileString) {
+        setUserProfile(JSON.parse(profileString));
+    }
+  }, []);
+
+  useEffect(() => {
     async function fetchData() {
         setLoading(true);
         const userProfileString = sessionStorage.getItem('userProfile');
@@ -58,8 +65,27 @@ function PendingApprovalsContent() {
                     getApprovalHistory('5939522605')
                 ]);
 
-                setPendingApprovals(pendingData.opstatus === 0 ? pendingData.ApprovalMatrix : []);
-                setApprovalHistory(historyData.opstatus === 0 ? historyData.ApprovalMatrix : []);
+                const rejectedInSessionStr = sessionStorage.getItem('rejectedApprovals');
+                const rejectedInSession: { [key: string]: { status: string; remarks: string } } = rejectedInSessionStr ? JSON.parse(rejectedInSessionStr) : {};
+                const rejectedRefNos = Object.keys(rejectedInSession);
+                
+                const livePendingApprovals = pendingData.opstatus === 0 ? pendingData.ApprovalMatrix.filter(appr => !rejectedRefNos.includes(appr.referenceNo)) : [];
+
+                const sessionRejectedApprovals = (pendingData.opstatus === 0 ? pendingData.ApprovalMatrix : [])
+                    .filter(appr => rejectedRefNos.includes(appr.referenceNo))
+                    .map(appr => ({
+                        ...appr,
+                        status: rejectedInSession[appr.referenceNo].status,
+                        remarks: rejectedInSession[appr.referenceNo].remarks,
+                    }));
+                
+                const combinedHistory = [
+                    ...sessionRejectedApprovals,
+                    ...(historyData.opstatus === 0 ? historyData.ApprovalMatrix : [])
+                ];
+
+                setPendingApprovals(livePendingApprovals);
+                setApprovalHistory(combinedHistory);
 
             } catch (error) {
                 console.error("Failed to fetch approvals data", error);
@@ -94,6 +120,12 @@ function PendingApprovalsContent() {
         const response = await rejectRequest(payload);
         if (response.opstatus === 0 && response.ApprovalMatrix[0].opstatus === 0) {
             const rejectedApproval = { ...approval, status: 'REJECTED', remarks: remarks };
+            
+            // Update session storage
+            const rejectedInSessionStr = sessionStorage.getItem('rejectedApprovals');
+            const rejectedInSession = rejectedInSessionStr ? JSON.parse(rejectedInSessionStr) : {};
+            rejectedInSession[approval.referenceNo] = { status: 'REJECTED', remarks: remarks };
+            sessionStorage.setItem('rejectedApprovals', JSON.stringify(rejectedInSession));
             
             setPendingApprovals(prev => prev.filter(appr => appr.referenceNo !== approval.referenceNo));
             setApprovalHistory(prev => [rejectedApproval, ...prev]);
