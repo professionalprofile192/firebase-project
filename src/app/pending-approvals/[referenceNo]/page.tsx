@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
@@ -82,6 +81,8 @@ function ApprovalReviewContent() {
         router.push('/pending-approvals');
     }
 
+    const isActionable = !approval.status || approval.status === 'IN PROGRESS';
+
     return (
         <>
             <DashboardLayout>
@@ -92,7 +93,7 @@ function ApprovalReviewContent() {
                     
                     <div className="flex flex-col gap-8">
                         <ReviewDetails approval={approval} />
-                        <ApproversTable approval={approval} />
+                        <ApproversTable approval={approval} userProfile={userProfile} />
                     </div>
                 </main>
                 <footer className="sticky bottom-0 bg-white p-4 border-t z-10">
@@ -100,14 +101,16 @@ function ApprovalReviewContent() {
                         <Button variant="outline" onClick={() => router.back()}>
                             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Approvals
                         </Button>
-                        <div className="flex items-center gap-2">
-                            <Button variant="destructive" className="bg-red-500 hover:bg-red-600" onClick={handleReject}>
-                                <XCircle className="mr-2 h-4 w-4" /> Reject
-                            </Button>
-                            <Button className="bg-green-500 hover:bg-green-600">
-                                <CheckCircle2 className="mr-2 h-4 w-4" /> Approve
-                            </Button>
-                        </div>
+                        {isActionable && (
+                             <div className="flex items-center gap-2">
+                                <Button variant="destructive" className="bg-red-500 hover:bg-red-600" onClick={handleReject}>
+                                    <XCircle className="mr-2 h-4 w-4" /> Reject
+                                </Button>
+                                <Button className="bg-green-500 hover:bg-green-600">
+                                    <CheckCircle2 className="mr-2 h-4 w-4" /> Approve
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </footer>
             </DashboardLayout>

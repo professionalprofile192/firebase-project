@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -15,24 +14,46 @@ import { format } from "date-fns";
 
 interface ApproversTableProps {
   approval: Approval;
+  userProfile: any;
 }
 
-export function ApproversTable({ approval }: ApproversTableProps) {
-  // Mocking data for the approvers table as it's not in the main approval object
-  const approvers = [
-    {
-      username: 'Humnamaker12',
-      role: 'Maker',
-      status: 'Bulk file Self Initiated Approval FT/IBFT/UBP CREATED',
-      dateTime: approval.assignedDate,
-      comments: `ADD BILL REQUEST FROM ${approval.sentBy}`
-    }
-  ];
+export function ApproversTable({ approval, userProfile }: ApproversTableProps) {
+  // Base entry for the creator of the request
+  const creatorEntry = {
+    username: approval.requesterName,
+    role: 'Maker',
+    status: 'CREATED',
+    dateTime: approval.assignedDate,
+    comments: `Request created by ${approval.requesterName}`
+  };
+
+  const approvers = [creatorEntry];
+
+  // If the request has been rejected, add an entry for the rejecter.
+  if (approval.status === 'REJECTED') {
+    approvers.push({
+      username: userProfile?.firstname + ' ' + userProfile?.lastname, // Placeholder for rejecter's name
+      role: 'Approver',
+      status: 'REJECTED',
+      dateTime: approval.assignedDate, // Should ideally be a different timestamp
+      comments: approval.remarks || 'Rejected'
+    });
+  }
+  
+  if (approval.status === 'APPROVED') {
+    approvers.push({
+      username: 'System', // Placeholder
+      role: 'Approver',
+      status: 'APPROVED',
+      dateTime: approval.assignedDate, // SHould be a different timestamp
+      comments: approval.remarks || 'Approved'
+    });
+  }
 
   return (
     <Card>
         <CardHeader>
-            <CardTitle className="text-lg font-semibold">Pending Approvers</CardTitle>
+            <CardTitle className="text-lg font-semibold">Approvers</CardTitle>
         </CardHeader>
         <CardContent>
             <div className="rounded-lg border">
