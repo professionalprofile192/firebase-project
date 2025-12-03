@@ -12,6 +12,7 @@ import { RejectDialog } from '@/components/pending-approvals/reject-dialog';
 import { rejectRequest } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { CustomAlertDialog } from '@/components/common/custom-alert-dialog';
+import { cn } from '@/lib/utils';
 
 
 function ApprovalReviewContent() {
@@ -97,7 +98,10 @@ function ApprovalReviewContent() {
                     </div>
                 </main>
                 <footer className="sticky bottom-0 bg-white p-4 border-t z-10">
-                    <div className="max-w-7xl mx-auto flex justify-between items-center">
+                    <div className={cn(
+                        "max-w-7xl mx-auto flex items-center",
+                        isActionable ? "justify-between" : "justify-end"
+                    )}>
                         <Button variant="outline" onClick={() => router.back()}>
                             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Approvals
                         </Button>
