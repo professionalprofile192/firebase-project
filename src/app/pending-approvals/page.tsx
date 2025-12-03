@@ -62,10 +62,10 @@ function PendingApprovalsContent() {
             setUserProfile(profile);
 
             try {
-                // Use a different user ID for fetching data to ensure we get the records.
-                // This is a workaround for the mock service.
-                const pendingData = await getPendingApprovals('5939522605'); 
-                const historyData = await getApprovalHistory('5939522605');
+                const [pendingData, historyData] = await Promise.all([
+                    getPendingApprovals(profile.userid), 
+                    getApprovalHistory(profile.userid)
+                ]);
 
                 // Use localStorage for permanent client-side state
                 const rejectedInStorageStr = localStorage.getItem('rejectedApprovals');
