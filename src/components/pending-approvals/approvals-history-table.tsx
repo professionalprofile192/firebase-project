@@ -79,7 +79,7 @@ function HistoryRow({ approval, isOpen, onToggle }: { approval: Approval, isOpen
             </Badge>
         </TableCell>
         <TableCell className="text-right">
-            <Link href={{ pathname: `/pending-approvals/${approval.referenceNo}`, query: { approval: JSON.stringify(approval) } }}>
+            <Link href={{ pathname: `/pending-approvals/${approval.referenceNo}`, query: { approval: JSON.stringify(approval) } }} onClick={(e) => e.stopPropagation()}>
                 <Button size="sm" variant="outline" className="bg-gray-100 hover:bg-gray-200">View</Button>
             </Link>
         </TableCell>
