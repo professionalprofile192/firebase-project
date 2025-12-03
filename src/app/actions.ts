@@ -543,110 +543,53 @@ export async function getTradeRequestHistory(userId: string) {
     }
 }
 
-export async function getPendingApprovals(userId: string) {
-    return {
-            "ApprovalMatrix": [
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "referenceNo": "23300",
-                    "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE",
-                    "amount": "1.00",
-                    "assignedDate": "2025-08-12 23:11:19.0",
-                    "sentBy": "8528902206",
-                    "transactionType": "ExternalTransfer",
-                    "fromAccountNumber": "060510224211",
-                    "toAccountNumber": "PK18MEZN0001050105856769",
-                    "notes": "{\"reviewContext\":{\"reviewDetails\":true,\"transferSuccess\":false,\"beneDetails\":{\"id\":\"00948206\",\"notes\":\"{\\\"catergoryId\\\":\\\"4\\\",\\\"shelf\\\":\\\"Travels\\\",\\\"branchCode\\\":\\\"0000\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"hassan\",\"accountType\":\"EXTERNAL_ACCOUNT\",\"bankName\":\"Meezan Bank Limited\",\"accountNumber\":\"PK18MEZN0001050105856769\",\"routingNumber\":\"627873\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"false\",\"phoneNumber\":\"03343498426\",\"email\":\"mehmood.ayoub@systemsltd.com\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"initialView\":\"makeTransfer\"},\"otherDetails\":{\"amount\":\"1.00\",\"fromAccount\":\"060510224211\",\"purpose\":\"Fund Transfer\",\"fromAccountName\":\"NAWAZ ALI\",\"toAccountName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"toAccountNumber\":\"PK18MEZN0001050105856769\",\"currency\":\"PKR\"}},\"selectedAccount\":{\"depositType\":\"S\",\"GLCode\":\"31100400\",\"accountTitle\":\"NAWAZ ALI\",\"accountType\":\"100\",\"accountCurrency\":\"PKR\",\"accountNumber\":\"060510224211\",\"BlockedAmount\":\"0\",\"availableBalance\":\"63970.74\",\"accountStatus\":\"A\",\"categoryType\":\"01\",\"branchCode\":\"0605\",\"bankName\":\"United Bank Limited\",\"branchName\":\"UBL CBS\",\"AcctOpenDate\":\"11.04.2007\",\"DCCFlag\":\"Y\",\"cnic\":\"4110385560469\",\"contactno\":\"03013577447\",\"fromIban\":\"PK87UNIL0112060510224211\"},\"transferContext\":{\"id\":\"00948206\",\"notes\":\"{\\\"catergoryId\\\":\\\"4\\\",\\\"shelf\\\":\\\"Travels\\\",\\\"branchCode\\\":\\\"0000\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"hassan\",\"accountType\":\"EXTERNAL_ACCOUNT\",\"bankName\":\"Meezan Bank Limited\",\"accountNumber\":\"PK18MEZN0001050105856769\",\"routingNumber\":\"627873\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"false\",\"phoneNumber\":\"03343498426\",\"email\":\"mehmood.ayoub@systemsltd.com\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"initialView\":\"makeTransfer\"},\"fromAccountName\":\"NAWAZ ALI\",\"payeeName\":\"MUHAMMAD HASSAN SIDDIQUI\"}",
-                    "transactionReferenceId": "5959986530222080",
-                    "transactionData": "{\"stan\":\"206157\"}",
-                    "requesterName": "Idrees Maker",
-                    "transactionType2": "Interbank Account to Account Fund Transfer",
-                    "typeId": "MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "referenceNo": "1181",
-                    "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE_RECEPIENT",
-                    "assignedDate": "2025-09-15 12:24:28.0",
-                    "sentBy": "3943220338",
-                    "requesterName": "Mehmood Sanjrani",
-                    "transactionType2": "Intra Bank Fund Transfer",
-                    "notes2": "{\"notes\":\"{\\\"catergoryId\\\":\\\"5\\\",\\\"shelf\\\":\\\"Tax Payments\\\",\\\"branchCode\\\":\\\"2919\\\",\\\"bankIMD\\\":\\\"588974\\\"}\",\"isVerified\":\"false\",\"nickName\":\"HOME 360 STORE PRIVATE LIMITED\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"UBL\",\"accountNumber\":\"291964542\",\"routingNumber\":\"588974\",\"isInternationalAccount\":\"false\",\"softDelete\":\"true\",\"beneficiaryName\":\"HOME 360 STORE PRIVATE LIMITED\",\"response\":\"1\",\"isSTP\":\"1\",\"isSameBankAccount\":\"true\",\"Id\":\"00434026\",\"User_id\":\"3943220338\",\"isInsert\":\"1\",\"cId\":\"1960646668\"}",
-                    "typeId": "NON_MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "referenceNo": "343",
-                    "featureActionId": "BILL_PAY_CREATE_PAYEES",
-                    "assignedDate": "2025-08-01 13:43:54.0",
-                    "sentBy": "3943220338",
-                    "requesterName": "Mehmood Sanjrani",
-                    "transactionType2": "Bill Payment Service",
-                    "notes2": "{\"isWiredRecepient\":\"false\",\"zipCode\":\"432156\",\"country\":\"Pakistan\",\"notes\":\"{\\\"typeKey\\\":\\\"UT_EC\\\",\\\"instKey\\\":\\\"KE\\\",\\\"typeVal\\\":\\\"Electricity\\\",\\\"instVal\\\":\\\"K-Electric BILL PAYMENT\\\",\\\"billerAccountNo\\\":\\\"\\\",\\\"billerBrCode\\\":\\\"\\\",\\\"billerBankIMD\\\":\\\"588974\\\",\\\"billerBranchName\\\":\\\"UBL CBS\\\",\\\"billerBankName\\\":\\\"UBL\\\",\\\"billerCurrency\\\":\\\"PKR\\\",\\\"categoryKey\\\":\\\"5\\\",\\\"categoryVal\\\":\\\"Tax Payments\\\",\\\"enquiryID\\\":\\\"935254297\\\",\\\"dueDate\\\":\\\"2025-08-01\\\",\\\"lateSurcharge\\\":\\\"681\\\",\\\"actualAmount\\\":\\\"16313\\\",\\\"partialPaymentAllowed\\\":\\\"false\\\",\\\"consumerNo\\\":\\\"0400004047484\\\",\\\"contractId\\\":\\\"1960646668\\\",\\\"coreCustomerId\\\":\\\"20269367\\\",\\\"billAmount\\\":\\\"16313\\\",\\\"billStatus\\\":\\\"Unpaid\\\"}\",\"isAutoPayEnabled\":\"false\",\"nickName\":\"MUHAMMAD YOUNIS \",\"companyName\":\"K-Electric BILL PAYMENT\",\"transitDays\":\"3\",\"accountNumber\":\"0400004047484\",\"billermaster_id\":\"1\",\"softDelete\":\"true\",\"response\":\"1\",\"isSTP\":\"1\",\"name\":\"MUHAMMAD YOUNIS \",\"addressLine1\":\"$addressLine1\",\"addressLine2\":\"Pakistan\",\"isManuallyAdded\":\"false\",\"eBillEnable\":\"0\",\"Id\":\"00265265\",\"User_Id\":\"3943220338\",\"email\":\"$email\",\"isInsert\":\"1\",\"nameOnBill\":\"Electricity\"}",
-                    "typeId": "NON_MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "referenceNo": "314",
-                    "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE_RECEPIENT",
-                    "assignedDate": "2025-07-15 22:25:06.0",
-                    "sentBy": "8528902206",
-                    "requesterName": "Idrees Maker",
-                    "transactionType2": "Intra Bank Fund Transfer",
-                    "notes2": "{\"response\":\"1\",\"status\":\"Result consisted of more than one row : Error code - 1172\"}",
-                    "typeId": "NON_MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "referenceNo": "313",
-                    "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE_RECEPIENT",
-                    "assignedDate": "2025-07-15 22:20:39.0",
-                    "sentBy": "8528902206",
-                    "requesterName": "Idrees Maker",
-                    "transactionType2": "Interbank Account to Account Fund Transfer",
-                    "notes2": "{\"response\":\"1\",\"status\":\"Result consisted of more than one row : Error code - 1172\"}",
-                    "typeId": "NON_MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "referenceNo": "312",
-                    "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE_RECEPIENT",
-                    "assignedDate": "2025-07-15 22:17:24.0",
-                    "sentBy": "8528902206",
-                    "requesterName": "Idrees Maker",
-                    "transactionType2": "Interbank Account to Account Fund Transfer",
-                    "notes2": "{\"response\":\"1\",\"status\":\"Result consisted of more than one row : Error code - 1172\"}",
-                    "typeId": "NON_MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "referenceNo": "20932",
-                    "featureActionId": "RAAST_TRANSACTION_CREATE",
-                    "amount": "1.00",
-                    "assignedDate": "2025-05-14 02:26:02.0",
-                    "sentBy": "8528902206",
-                    "transactionType": "BulkRaast",
-                    "fromAccountNumber": "060510224211",
-                    "toAccountNumber": "",
-                    "notes": "{\"fromAccount\":{\"depositType\":\"S\",\"GLCode\":\"31100400\",\"accountTitle\":\"NAWAZ ALI\",\"accountType\":\"100\",\"accountCurrency\":\"PKR\",\"accountNumber\":\"060510224211\",\"BlockedAmount\":\"0\",\"availableBalance\":\"914494.16\",\"accountStatus\":\"A\",\"categoryType\":\"01\",\"branchCode\":\"0605\",\"bankName\":\"United Bank Limited\",\"branchName\":\"UBL CBS\",\"AcctOpenDate\":\"11.04.2007\",\"DCCFlag\":\"Y\",\"cnic\":\"4110385560469\",\"contactno\":\"03013577447\"},\"toAccounts\":[{\"fileReferenceNumber\":\"0043538214877226\",\"beneName\":\"Syed Tabish Ali\",\"amount\":\"1\",\"status\":\"1\",\"createdDate\":\"2025-05-14 01:18:54.0\",\"customerID\":\"14052025-22\",\"bankCode\":\"220583\",\"bankName\":\"\",\"remitterType\":\"RAAST\",\"remarks\":\"RECORD ADDED SUCCESSFULLY\",\"id\":\"167534674\",\"accountTo\":\"060510224211\",\"beneAccount\":\"PK96NAYA1234503122629248\",\"bankIMD\":\"220583\",\"branchCode\":\"0000\",\"titleFetchStatus\":\"PROCESSED\",\"accountTitle\":\"\",\"branchName\":\"\",\"batchId\":\"32981945085969325786\",\"cnic\":\"4210151724897\"}],\"fromAccountName\":\"NAWAZ ALI\"}",
-                    "transactionReferenceId": "588086652174336",
-                    "transactionData": "{\"stan\":\"652862\"}",
-                    "requesterName": "Idrees Maker",
-                    "transactionType2": "Raast Transfer",
-                    "typeId": "MONETARY",
-                    "childReferenceIds": "{\"referenceId\":\"4866950639386624\"}"
-                }
-            ],
-            "opstatus": 0,
-            "httpStatusCode": 200
+export async function getPendingApprovals(userId: string, searchString: string = "", sortBy: string = "approveDate", sortOrder: string = "desc", limit: number = 10, offset: number = 0) {
+    const url = "https://prodpk.ubldigital.com/services/data/v1/DCP_Approvals_OB_Object/operations/ApprovalMatrix/FetchAllPendingUserApprovals";
+
+    const payload = {
+        userId: userId,
+        searchString: searchString,
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+        limit: limit,
+        offset: offset
+    };
+
+    const body = `jsondata=${JSON.stringify(payload)}`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: body
+        });
+        
+        if (!response.ok) {
+            console.error('API Error Response:', response.status, response.statusText);
+            const errorBody = await response.text();
+            console.error('Error Body:', errorBody);
+            return {
+                ApprovalMatrix: [],
+                opstatus: 1,
+                httpStatusCode: response.status,
+                message: `API request failed: ${response.statusText}`
+            };
         }
+
+        const data = await response.json();
+        return data;
+
+    } catch (error) {
+        console.error("Failed to fetch pending approvals:", error);
+        return {
+            ApprovalMatrix: [],
+            opstatus: 1,
+            httpStatusCode: 500,
+            message: 'Failed to fetch pending approvals'
+        };
+    }
 }
 
 export async function getApprovalHistory(userId: string) {
@@ -861,3 +804,26 @@ export async function getApprovalHistory(userId: string) {
             "httpStatusCode": 200
         }
     }
+Also you need to provide another service for rejection of the approval and here is the information for that.
+Request URL:
+https://prodpk.ubldigital.com/services/data/v1/DCP_Approvals_OB_Object/operations/ApprovalMatrix/RejectRequest
+
+Request Method:
+POST
+
+Payload:
+jsondata=%7B%22contractId%22%3A%221960646668%22%2C%22referenceNo%22%3A%2223300%22%2C%22approverId%22%3A%225939522605%22%2C%22rejectorId%22%3A%225939522605%22%2C%22remarks%22%3A%22test%22%2C%22accountNo%22%3A0%7D
+
+Response:
+{
+    "ApprovalMatrix": [
+        {
+            "opstatus": 0,
+            "reqResponse": "Transaction has been rejected successfully",
+            "httpStatusCode": 200
+        }
+    ],
+    "opstatus": 0,
+    "httpStatusCode": 200
+}
+```
