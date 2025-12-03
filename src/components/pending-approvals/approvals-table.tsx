@@ -18,8 +18,6 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import { RejectDialog } from './reject-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { CustomAlertDialog } from '../common/custom-alert-dialog';
-
 
 interface ApprovalsTableProps {
   data: Approval[];
@@ -63,11 +61,11 @@ function ApprovalRow({ approval, isOpen, onToggle, onRejectClick }: { approval: 
         <TableCell onClick={onToggle} className="cursor-pointer w-12 text-center">
             {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </TableCell>
-        <TableCell className="font-medium whitespace-nowrap w-[15%]">{approval.referenceNo}</TableCell>
-        <TableCell className="w-[25%] break-words">{approval.transactionType2}</TableCell>
-        <TableCell className="w-[25%] break-words">{approval.featureActionId}</TableCell>
-        <TableCell className="w-[15%]">{approval.requesterName}</TableCell>
-        <TableCell className="text-right flex-1">
+        <TableCell className="font-medium">{approval.referenceNo}</TableCell>
+        <TableCell>{approval.transactionType2}</TableCell>
+        <TableCell>{approval.featureActionId}</TableCell>
+        <TableCell>{approval.requesterName}</TableCell>
+        <TableCell className="text-right">
             <div className="flex items-center justify-end gap-2">
                 <Button size="sm" variant="outline" className="bg-green-100 hover:bg-green-200 text-green-800 border-green-200" onClick={(e) => { e.stopPropagation(); /* approve logic */ }}>
                     Approve <CheckCircle2 className="h-4 w-4 ml-2" />
@@ -220,11 +218,11 @@ export function ApprovalsTable({ data, userProfile, onReject }: ApprovalsTablePr
           <TableHeader>
             <TableRow>
               <TableHead className="w-12"></TableHead>
-              <TableHead className="w-[15%] whitespace-nowrap">Transaction Number</TableHead>
-              <TableHead className="w-[25%]">Transaction Type</TableHead>
-              <TableHead className="w-[25%]">Request Type</TableHead>
-              <TableHead className="w-[15%]">Originator</TableHead>
-              <TableHead className="text-right flex-1">Actions</TableHead>
+              <TableHead>Transaction Number</TableHead>
+              <TableHead>Transaction Type</TableHead>
+              <TableHead>Request Type</TableHead>
+              <TableHead>Originator</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
