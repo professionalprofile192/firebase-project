@@ -21,6 +21,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { useState } from 'react';
 import { Skeleton } from '../ui/skeleton';
 import { format } from 'date-fns';
+import Link from 'next/link';
   
 type Notification = {
     lastModifiedAt: string;
@@ -97,7 +98,9 @@ export function Notifications({ initialNotifications }: NotificationsProps) {
             </CardContent>
         </ScrollArea>
          <CardFooter className="justify-center">
-          <Button variant="link">See all</Button>
+          <Link href="/pending-approvals">
+            <Button variant="link">See all</Button>
+          </Link>
         </CardFooter>
       </Card>
     );
