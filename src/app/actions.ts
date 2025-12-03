@@ -544,21 +544,8 @@ export async function getTradeRequestHistory(userId: string) {
 }
 
 export async function getPendingApprovals(userId: string) {
-    if (userId === '5939522605') {
-        return {
+    return {
             "ApprovalMatrix": [
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "referenceNo": "5881",
-                    "featureActionId": "BILL_PAY_CREATE_PAYEES",
-                    "assignedDate": "2025-12-01 16:52:26.0",
-                    "sentBy": "7905211902",
-                    "requesterName": "Humna Saeed",
-                    "transactionType2": "Bill Payment Service",
-                    "notes2": "{\"isWiredRecepient\":\"false\",\"zipCode\":\"432156\",\"country\":\"Pakistan\",\"notes\":\"{\\\"typeKey\\\":\\\"ONE_BILL\\\",\\\"instKey\\\":\\\"ONEBILLINVOICE\\\",\\\"typeVal\\\":\\\"1 Bill\\\",\\\"instVal\\\":\\\"Invoice/Voucher\\\",\\\"billerAccountNo\\\":\\\"256185056\\\",\\\"billerBrCode\\\":\\\"1888\\\",\\\"billerBankIMD\\\":\\\"588974\\\",\\\"billerBranchName\\\":\\\"UBL CBS\\\",\\\"billerBankName\\\":\\\"UBL\\\",\\\"billerCurrency\\\":\\\"PKR\\\",\\\"categoryKey\\\":\\\"4\\\",\\\"categoryVal\\\":\\\"Travels\\\",\\\"enquiryID\\\":\\\"982654105\\\",\\\"dueDate\\\":\\\"2025-12-01\\\",\\\"lateSurcharge\\\":\\\"-9000000\\\",\\\"actualAmount\\\":\\\"9000000\\\",\\\"partialPaymentAllowed\\\":\\\"false\\\",\\\"consumerNo\\\":\\\"1364762032170397\\\",\\\"contractId\\\":\\\"1960646668\\\",\\\"coreCustomerId\\\":\\\"20269367\\\",\\\"billAmount\\\":\\\"9000000\\\",\\\"billStatus\\\":\\\"Paid\\\"}\",\"isAutoPayEnabled\":\"false\",\"nickName\":\"1bill\",\"companyName\":\"Invoice/Voucher\",\"transitDays\":\"3\",\"accountNumber\":\"1364762032170397\",\"billermaster_id\":\"1\",\"softDelete\":\"true\",\"response\":\"1\",\"isSTP\":\"1\",\"name\":\"1bill\",\"addressLine1\":\"$addressLine1\",\"addressLine2\":\"Pakistan\",\"isManuallyAdded\":\"false\",\"eBillEnable\":\"0\",\"Id\":\"00126006\",\"User_Id\":\"7905211902\",\"email\":\"$email\",\"isInsert\":\"1\",\"nameOnBill\":\"1 Bill\"}",
-                    "typeId": "NON_MONETARY"
-                },
                 {
                     "approverId": "5939522605",
                     "contractId": "1960646668",
@@ -660,19 +647,10 @@ export async function getPendingApprovals(userId: string) {
             "opstatus": 0,
             "httpStatusCode": 200
         }
-    } else {
-        return {
-            ApprovalMatrix: [],
-            opstatus: 1,
-            httpStatusCode: 404,
-            message: 'Pending approvals not found'
-        }
-    }
 }
 
 export async function getApprovalHistory(userId: string) {
-    if (userId === '5939522605') {
-        return {
+    return {
             "ApprovalMatrix": [
                 {
                     "approverId": "5939522605",
@@ -883,40 +861,3 @@ export async function getApprovalHistory(userId: string) {
             "httpStatusCode": 200
         }
     }
-     return {
-        ApprovalMatrix: [],
-        opstatus: 1,
-        httpStatusCode: 404,
-        message: 'Approval history not found'
-    }
-}
-
-
-export async function rejectRequest(payload: {
-    accountNo: number;
-    approverId: string;
-    contractId: string;
-    referenceNo: string;
-    rejectorId: string;
-    remarks: string;
-}) {
-    // This is a mock service. In a real scenario, you'd post this to your backend.
-    const { approverId, referenceNo, remarks } = payload;
-    
-    if (approverId === '5939522605' && referenceNo && remarks) {
-        return {
-            "ApprovalMatrix": [
-                {
-                    "httpStatusCode": 200,
-                    "opstatus": 0,
-                    "reqResponse": "REQUEST REJECTED SUCCESSFULLY"
-                }
-            ],
-            "opstatus": 0,
-            "httpStatusCode": 200
-        };
-    } else {
-        return { opstatus: 1, httpStatusCode: 400, message: "Invalid payload provided for rejectRequest" };
-    }
-}
-    
