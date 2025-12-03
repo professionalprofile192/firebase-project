@@ -1,3 +1,4 @@
+
 'use client';
 
 import { NetWorth } from '@/components/dashboard/net-worth';
@@ -33,7 +34,8 @@ export type Transaction = {
 };
 
 type Notification = {
-    lastModifiedAt: string;
+    lastModifiedAt?: string;
+    assignedDate?: string;
     status: string;
     featureActionId: string;
     referenceNo: string;

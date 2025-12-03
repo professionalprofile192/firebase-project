@@ -24,14 +24,19 @@ import { format } from 'date-fns';
 import Link from 'next/link';
   
 type Notification = {
-    lastModifiedAt: string;
+    lastModifiedAt?: string;
+    assignedDate?: string;
     status: string;
     featureActionId: string;
     referenceNo: string;
 }
   
 const featureActionToMessage: Record<string, string> = {
-    "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE": "Inter-bank fund transfer request"
+    "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE": "Inter-bank fund transfer request",
+    "INTRA_BANK_FUND_TRANSFER_CREATE_RECEPIENT": "Intra-bank fund transfer recepient creation",
+    "BILL_PAY_CREATE_PAYEES": "Bill payment payee creation",
+    "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE_RECEPIENT": "Inter-bank fund transfer recepient creation",
+    "RAAST_TRANSACTION_CREATE": "RAAST transaction",
 }
 
 interface NotificationsProps {
@@ -45,10 +50,11 @@ export function Notifications({ initialNotifications }: NotificationsProps) {
 
     const getNotificationMessage = (notification: Notification) => {
         const baseMessage = featureActionToMessage[notification.featureActionId] || "A new request";
-        if (notification.status === 'IN PROGRESS') {
-            return `You have created a new ${baseMessage} approval request.`;
+        const status = notification.status || 'IN PROGRESS';
+        if (status === 'IN PROGRESS') {
+            return `You have a new ${baseMessage} for approval.`;
         }
-        return `Your request for ${baseMessage} has been ${notification.status.toLowerCase()}.`;
+        return `Your request for ${baseMessage} has been ${status.toLowerCase()}.`;
     }
 
     return (
@@ -76,19 +82,26 @@ export function Notifications({ initialNotifications }: NotificationsProps) {
                     <Skeleton className="h-16 w-full" />
                 </div>
             ) : notifications.length > 0 ? (
-                notifications.map((item) => (
-                    <div key={item.referenceNo} className="flex items-start gap-4 border-b pb-4 last:border-b-0 last:pb-0">
-                        <div className="flex-1">
-                            <p className="text-xs text-muted-foreground">{format(new Date(item.lastModifiedAt), "dd/MM/yyyy h:mm a")}</p>
-                            <p className={cn("font-semibold", {
-                                "text-green-500": item.status === "APPROVED",
-                                "text-yellow-500": item.status === "IN PROGRESS",
-                            })}>{item.status}</p>
-                            <p className="text-sm">{getNotificationMessage(item)}</p>
+                notifications.slice(0, 5).map((item) => {
+                    const date = item.assignedDate || item.lastModifiedAt;
+                    if (!date) return null;
+                    const status = item.status || 'IN PROGRESS';
+
+                    return (
+                        <div key={item.referenceNo} className="flex items-start gap-4 border-b pb-4 last:border-b-0 last:pb-0">
+                            <div className="flex-1">
+                                <p className="text-xs text-muted-foreground">{format(new Date(date), "dd/MM/yyyy h:mm a")}</p>
+                                <p className={cn("font-semibold", {
+                                    "text-green-500": status === "APPROVED",
+                                    "text-red-500": status === "REJECTED",
+                                    "text-yellow-500": status === "IN PROGRESS",
+                                })}>{status}</p>
+                                <p className="text-sm">{getNotificationMessage(item)}</p>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-muted-foreground self-center" />
                         </div>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground self-center" />
-                    </div>
-                ))
+                    )
+                })
             ) : (
                 <div className="flex flex-col items-center justify-center pt-10 text-muted-foreground">
                     <FileQuestion className="h-12 w-12" />
