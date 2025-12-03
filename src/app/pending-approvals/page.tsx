@@ -30,6 +30,8 @@ export type Approval = {
     toAccountNumber?: string;
     status?: string;
     remarks?: string; // Added for rejection comments
+    rejector?: { id: string; name: string };
+    rejectedAt?: string;
 };
 
 function PendingApprovalsContent() {
@@ -60,10 +62,10 @@ function PendingApprovalsContent() {
             setUserProfile(profile);
 
             try {
-                const [pendingData, historyData] = await Promise.all([
-                    getPendingApprovals('5939522605'),
-                    getApprovalHistory('5939522605')
-                ]);
+                // Use a different user ID for fetching data to ensure we get the records.
+                // This is a workaround for the mock service.
+                const pendingData = await getPendingApprovals('5939522605'); 
+                const historyData = await getApprovalHistory('5939522605');
 
                 // Use localStorage for permanent client-side state
                 const rejectedInStorageStr = localStorage.getItem('rejectedApprovals');
@@ -109,14 +111,20 @@ function PendingApprovalsContent() {
         approverId: approval.approverId,
         contractId: approval.contractId,
         referenceNo: approval.referenceNo,
-        rejectorId: userProfile.userid,
+        rejectorId: userProfile.userid, // The one performing the action
         remarks: remarks
     };
     
     try {
         const response = await rejectRequest(payload);
         if (response.opstatus === 0 && response.ApprovalMatrix[0].opstatus === 0) {
-            const rejectedApproval = { ...approval, status: 'REJECTED', remarks: remarks };
+            const rejectedApproval = { 
+                ...approval, 
+                status: 'REJECTED', 
+                remarks: remarks,
+                rejector: { id: userProfile.userid, name: userProfile.firstname + ' ' + userProfile.lastname }, // Store who rejected it
+                rejectedAt: new Date().toISOString(), // Store when it was rejected
+            };
             
             // Update localStorage
             const rejectedInStorageStr = localStorage.getItem('rejectedApprovals');
