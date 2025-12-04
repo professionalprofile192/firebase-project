@@ -879,3 +879,43 @@ export async function getApprovalHistory(userId: string) {
         }
     }
 }
+
+
+export async function rejectRequest(payload: {
+    accountNo: number;
+    approverId: string;
+    contractId: string;
+    referenceNo: string;
+    rejectorId: string;
+    remarks: string;
+}) {
+    // This is a mock service call.
+    return {
+        "ApprovalMatrix": [
+            {
+                "httpStatusCode": 200,
+                "opstatus": 0,
+                "reqResponse": "REQUEST REJECTED SUCCESSFULLY"
+            }
+        ],
+        "opstatus": 0,
+        "httpStatusCode": 200
+    };
+}
+
+export async function updateBulkRecordsStatus(payload: {
+    customerId: string;
+    transactionId: string;
+    status: 'REJECTED';
+}) {
+    // This is a mock service call
+    return {
+        "responses": "{\"records\":[{\"resMsg\":\"Rejected\"}],\"opstatus\":0,\"httpStatusCode\":0}&*&{\"P_RESDESC\":\"ORA-06500: PL/SQL: storage error\",\"opstatus\":0,\"P_RESCODE\":\"500\",\"P_RESMSG\":\"Failure\",\"httpStatusCode\":0}",
+        "opstatus": 0,
+        "responseMessage": "Success",
+        "responseCode": "00",
+        "httpStatusCode": 0
+    };
+}
+
+    
