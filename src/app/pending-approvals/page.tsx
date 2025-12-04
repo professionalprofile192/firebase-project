@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -46,13 +47,6 @@ function PendingApprovalsContent() {
   const [successAlertMessage, setSuccessAlertMessage] = useState('');
   
   useEffect(() => {
-    const profileString = sessionStorage.getItem('userProfile');
-    if (profileString) {
-        setUserProfile(JSON.parse(profileString));
-    }
-  }, []);
-
-  useEffect(() => {
     async function fetchData() {
         setLoading(true);
         const userProfileString = sessionStorage.getItem('userProfile');
@@ -78,9 +72,14 @@ function PendingApprovalsContent() {
 
                 const sessionRejectedApprovals = Object.values(rejectedInStorage);
                 
+                // Filter history data to exclude items already present in sessionRejectedApprovals
+                const serverHistory = historyData.opstatus === 0 ? historyData.ApprovalMatrix : [];
+                const uniqueServerHistory = serverHistory.filter(item => !rejectedInStorage[item.referenceNo]);
+
+
                 const combinedHistory = [
                     ...sessionRejectedApprovals,
-                    ...(historyData.opstatus === 0 ? historyData.ApprovalMatrix : [])
+                    ...uniqueServerHistory
                 ];
 
                 setPendingApprovals(livePendingApprovals);
