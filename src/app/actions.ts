@@ -3,7 +3,7 @@
 'use server';
 
 // This is a placeholder for the actual API call.
-// In a real application, this would make a request to your backend,
+// In a real application, this would make a a request to your backend,
 // which would then securely call the UBL Digital API.
 export async function login(values: any) {
     try {
@@ -665,7 +665,9 @@ export async function getPendingApprovals(userId: string, searchString: string =
 }
 
 export async function getApprovalHistory(userId: string) {
-    if(userId === '5939522605' || userId === '7884057484') {
+    // For 'idrees.approver' (userId: 5939522605), return the detailed mock data.
+    // For other users like 'raaststp', return an empty list to simulate no history.
+    if(userId === '5939522605') {
         return {
             "ApprovalMatrix": [
                 {
