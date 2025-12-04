@@ -28,47 +28,19 @@ export async function login(values: any) {
         const data = await response.json();
 
         if (response.ok && data.profile) {
-            const user = data.profile;
+            // Use the live API response directly
             return {
                 success: true,
                 message: "Login successful",
                 profile: {
-                    userid: user.userid,
-                    firstname: user.firstname,
-                    lastname: user.lastname,
-                    email: user.email,
-                    CIF_NO: user.user_attributes.taxId
+                    userid: data.profile.userid,
+                    firstname: data.profile.firstname,
+                    lastname: data.profile.lastname,
+                    email: data.profile.email,
+                    CIF_NO: data.profile.user_attributes.taxId
                 }
             };
         }
-
-        // Fallback for mock users if the live call fails for them
-        if (values.username === 'raaststp' && values.password === 'Kony@123456') {
-             return {
-                success: true,
-                message: "Login successful",
-                profile: {
-                    userid: '7884057484',
-                    firstname: 'Nawaz',
-                    lastname: 'Ali',
-                    email: 'nawaz.ali@example.com',
-                    CIF_NO: '20269367'
-                }
-            };
-        }
-        if (values.username === 'idrees.approver' && values.password === 'Kony@1234') {
-            return {
-                success: true,
-                message: "Login successful",
-                profile: {
-                    userid: '5939522605',
-                    firstname: 'Idrees',
-                    lastname: 'Approver',
-                    email: 'idrees.ghafoori@systemsltd.com',
-                    CIF_NO: '5343333333333'
-                }
-           };
-       }
 
         return {
             success: false,
@@ -970,6 +942,8 @@ export async function updateBulkRecordsStatus(payload: {
 
 
 
+
+    
 
     
 
