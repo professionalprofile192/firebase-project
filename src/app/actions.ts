@@ -28,17 +28,18 @@ export async function login(values: any) {
 
         const data = await response.json();
 
-        if (response.ok) {
-            const user = data.profile.user_attributes;
+        if (response.ok && data.profile) {
+            const user = data.profile;
+            const userAttributes = user.user_attributes;
             return {
                 success: true,
                 message: "Login successful",
                 profile: {
-                    userid: user.user_id,
-                    firstname: user.FirstName,
-                    lastname: user.LastName,
+                    userid: user.userid,
+                    firstname: user.firstname,
+                    lastname: user.lastname,
                     email: user.email,
-                    CIF_NO: user.taxId
+                    CIF_NO: userAttributes.taxId
                 }
             };
         }
@@ -940,3 +941,6 @@ export async function updateBulkRecordsStatus(payload: {
     
 
 
+
+
+    
