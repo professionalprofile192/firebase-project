@@ -6,34 +6,56 @@
 // In a real application, this would make a request to your backend,
 // which would then securely call the UBL Digital API.
 export async function login(values: any) {
-  if (values.username === 'raaststp' && values.password === 'Kony@123456') {
-    return {
-      success: true,
-      message: 'Login successful',
-      profile: {
-        userid: '7884057484',
-        firstname: 'Nawaz',
-        lastname: 'Ali',
-        email: 'humna.sadia@ubl.com.pk',
-        CIF_NO: '20269367', // Adding CIF_NO for the next service call
-      },
-    };
-  } else if (values.username === 'idrees.approver' && values.password === 'Kony@1234') {
-    return {
-      success: true,
-      message: 'Login successful',
-      profile: {
-        userid: '5939522605',
-        firstname: 'Idrees',
-        lastname: 'Approver',
-        email: 'idrees.approver@ubl.com.pk',
-        CIF_NO: '20269368', 
-      },
-    };
-  } else {
-    return { success: false, message: 'Invalid username or password' };
-  }
+    try {
+        const response = await fetch('https://prodpk.ubldigital.com/authService/100000002/login?provider=DbxUserLogin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                UserName: values.username,
+                Password: values.password,
+                rememberMe: true,
+                loginOptions: {
+                    isOfflineEnabled: false,
+                    isSSOEnabled: true
+                },
+                provider: 'DbxUserLogin'
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Successful login
+            const userAttributes = data.profile.user_attributes;
+            return {
+                success: true,
+                message: 'Login successful',
+                profile: {
+                    userid: userAttributes.user_id,
+                    firstname: userAttributes.FirstName,
+                    lastname: userAttributes.LastName,
+                    email: userAttributes.email,
+                    CIF_NO: userAttributes.taxId, // Assuming taxId is CIF_NO
+                },
+            };
+        } else {
+            // Failed login
+            return { 
+                success: false, 
+                message: data.details?.errmsg || 'Invalid username or password' 
+            };
+        }
+    } catch (error) {
+        console.error('Login API call failed:', error);
+        return {
+            success: false,
+            message: 'An unexpected error occurred during login.'
+        };
+    }
 }
+
 
 // This is a placeholder for the actual API call.
 export async function getLastLoginTime(userId: string) {
@@ -843,27 +865,6 @@ export async function getApprovalHistory(userId: string) {
                     "requesterName": "Mehmood Sanjrani",
                     "transactionType2": "Intra Bank Fund Transfer",
                     "typeId": "MONETARY"
-                },
-                {
-                    "approverId": "5939522605",
-                    "contractId": "1960646668",
-                    "httpStatusCode": 200,
-                    "opstatus": 0,
-                    "referenceNo": "50908",
-                    "featureActionId": "INTRA_BANK_FUND_TRANSFER_CREATE",
-                    "amount": "1.00",
-                    "assignedDate": "2025-11-29 01:45:45.0",
-                    "sentBy": "3943220338",
-                    "status": "REJECTED",
-                    "transactionType": "InternalTransfer",
-                    "fromAccountNumber": "060510224211",
-                    "toAccountNumber": "03343498426",
-                    "notes": "{\"reviewContext\":{\"reviewDetails\":true,\"transferSuccess\":false,\"beneDetails\":{\"id\":\"00975050\",\"notes\":\"{\\\"catergoryId\\\":\\\"3\\\",\\\"shelf\\\":\\\"Salary Payments\\\",\\\"branchCode\\\":\\\"627873\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"Raast\",\"accountNumber\":\"03343498426\",\"routingNumber\":\"627873\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"true\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"otherDetails\":{\"amount\":\"1.00\",\"fromAccount\":\"060510224211\",\"purpose\":\"Fund Transfer\",\"fromAccountName\":\"NAWAZ ALI\",\"toAccountName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"toAccountNumber\":\"03343498426\",\"currency\":\"PKR\"}},\"selectedAccount\":{\"depositType\":\"S\",\"GLCode\":\"31100400\",\"accountTitle\":\"NAWAZ ALI\",\"accountType\":\"100\",\"accountCurrency\":\"PKR\",\"accountNumber\":\"060510224211\",\"BlockedAmount\":\"0\",\"availableBalance\":\"1590841.33\",\"accountStatus\":\"A\",\"categoryType\":\"01\",\"branchCode\":\"0605\",\"bankName\":\"United Bank Limited\",\"branchName\":\"UBL CBS\",\"AcctOpenDate\":\"11.04.2007\",\"DCCFlag\":\"Y\",\"cnic\":\"4110385560469\",\"contactno\":\"03013577447\",\"fromIban\":\"PK87UNIL0112060510224211\"},\"transferContext\":{\"id\":\"00975050\",\"notes\":\"{\\\"catergoryId\\\":\\\"3\\\",\\\"shelf\\\":\\\"Salary Payments\\\",\\\"branchCode\\\":\\\"627873\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"accountType\":\"INTERNAL_ACCOUNT\",\"bankName\":\"Raast\",\"accountNumber\":\"03343498426\",\"routingNumber\":\"627873\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"true\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-11 14:49:22.0\",\"initialView\":\"makeTransfer\"},\"fromAccountName\":\"NAWAZ ALI\",\"payeeName\":\"MUHAMMAD HASSAN SIDDIQUI\"}",
-                    "transactionReferenceId": "6350453500398942",
-                    "transactionData": "{\"stan\":\"901577\"}",
-                    "requesterName": "Mehmood Sanjrani",
-                    "transactionType2": "Intra Bank Fund Transfer",
-                    "typeId": "MONETARY"
                 }
             ],
             "opstatus": 0,
@@ -885,7 +886,7 @@ export async function rejectRequest(payload: {
     approverId: string,
     rejectorId: string,
     remarks: string,
-    accountNo: number,
+    accountNo: string,
 }) {
     // Mocking the API call with the success response you provided
     return {
@@ -920,3 +921,6 @@ export async function updateBulkRecordsStatus(payload: {
     
 
 
+
+
+    
