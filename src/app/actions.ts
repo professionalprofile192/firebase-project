@@ -321,7 +321,7 @@ export async function downloadStatement(params: {
 
         if (fileType === 'pdf') {
             // A valid, minimal PDF file encoded in Base64
-            base64Data = 'JVBERi0xLjQKJfbk/N8KMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovT3V0bGluZXMgMiAwIFIKL1BhZ2VzIDMgMCBSCi9QYWdlTW9kZSAvVXNlT3V0bGluZXMKL1ZpZXdlclByZWZlcmVuY2VzIDw8Ci9GaXQgV2luZG93IHRydWUKPj4KPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL091dGxpbmVzCi9Db3VudCAwCj4+CmVuZG9iagozIDAgb2JqCjw8Ci9UeXBlIC9QYWdlcwovS2lkcyBbNCAwIFJdCi9Db3VudCAxCi9NZWRpYUJveCBbMCAwIDU5NSA4NDJdCj4+CmVuZG9iago0IDAgb2JqCjw8Ci9UeXBlIC9QYWdlCi9QYXJlbnQgMyAwIFIKL1JvdGF0ZSAwCi9Db250ZW50cyA1IDAgUgovUmVzb3VyY2VzIDw8Ci9Gb250IDw8Ci9GMSA2IDAgUgovRmEuIDw8Ci9GMSA2IDAgUgovRmIgIDw8Ci9GMSA2IDAgUgovRmMuIDw8Ci9GMSA2IDAgUgovRmQuIDw8Ci9GMSA2IDAgUgovRmUuIDw8Ci9GMSA2IDAgUgovRmYuIDw8Ci9GMSA2IDAgUgo+Pgo+Pgo+Pgo+PgplbmRvYmoKNSAwIG9iago8PAovTGVuZ3RoIDE0NQo+PgpzdHJlYW0KMSAwIDAgLTEgMCA4NDIgY20KLjYwMCAwIDAgLjYwMCAwIDAgY20KQlQKMCBUZAooQWNjb3VudCBTdGF0ZW1lbnQgZm9yIC0gYWNjb3VudE51bWJlcjogKSBUagplbmRzdHJlYW0KZW5kb2JqCjYgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL1N1YnR5cGUgL1R5cGUxCi9CYXNlRm9udCAvSGVsdmV0aWNhCi9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nCj4+CmVuZG9iagp4cmVmCjAgOAowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA5MyAwMDAwMCBuIAowMDAwMDAwMTQ4IDAwMDAwIG4gCjAwMDAwMDAyMzAgMDAwMDAgbiAKMDAwMDAwMDM3OCAwMDAwMCBuIAowMDAwMDAwNTA5IDAwMDAwIG4gCnRyYWlsZXIKPDwKL1NpemUgOAovUm9vdCAxIDAgUgovSW5mbyA3IDAgUgovSW5mbyA3IDAgUgovSW5mbyA3IDAgUgovSW5mbyA3IDAgUgovSW5mbyA3IDAgUgovSW5mbyA3IDAgUgovSW5mbyA3IDAgUgo+CgpzdGFydHhyZWY6NzE5CiUlRU9G';
+            base64Data = 'JVBERi0xLjQKJfbk/N8KMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovT3V0bGluZXMgMiAwIFIKL1BhZ2VzIDMgMCBSCi9QYWdlTW9kZSAvVXNlT3V0bGluZXMKL1ZpZXdlclByZWZlcmVuY2VzIDw8Ci9GaXQgV2luZG93IHRydWUKPj4KPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL091dGxpbmVzCi9Db3VudCAwCj4+CmVuZG9iagozIDAgb2JqCjw8Ci9UeXBlIC9QYWdlcwovS2lkcyBbNCAwIFJdCi9Db3VudCAxCi9NZWRpYUJveCBbMCAwIDU5NSA4NDJdCj4+CmVuZG9iago0IDAgb2JqCjw8Ci9UeXBlIC9QYWdlCi9QYXJlbnQgMyAwIFIKL1JvdGF0ZSAwCi9Db250ZW50cyA1IDAgUgovUmVzb3VyY2VzIDw8Ci9Gb250IDw8Ci9GMSA2IDAgUgovRmEuIDw8Ci9GMSA2IDAgUgovRmIgIDw8Ci9GMSA2IDAgUgovRmMuIDw8Ci9GMSA2IDAgUgovRmQuIDw8Ci9GMSA2IDAgUgovRmUuIDw8Ci9GMSA2IDAgUgovRmYuIDw8Ci9GMSA2IDAgUgo+Pgo+Pgo+Pgo+PgplbmRvYmoKNSAwIG9iago8PAovTGVuZ3RoIDE0NQo+PgpzdHJlYW0KMSAwIDAgLTEgMCA4NDIgY20KLjYwMCAwIDAgLjYwMCAwIDAgY20KQlQKMCBUZAooQWNjb3VudCBTdGF0ZW1lbnQgZm9yIC0gYWNjb3VudE51bWJlcjogKSBUagplbmRzdHJlYW0KZW5kb2JqCjYgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL1N1YnR5cGUgL1R5cGUxCi9CYXNlRm9udCAvSGVsdmV0aWNhCi9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nCj4+CmVuZG9iagp4cmVmCjAgOAowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA5MyAwMDAwMCBuIAowMDAwMDAwMTQ4IDAwMDAwIG4gCjAwMDAwMDAyMzAgMDAwMDAgbiAKMDAwMDAwMzc4IDAwMDAwIG4gCjAwMDAwMDA1MDkgMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSA4Ci9Sb290IDEgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCi9JbmZvIDcgMCBSCj4+CgpzdGFydHhyZWY6NzE5CiUlRU9G';
             mimeType = 'application/pdf';
         } else {
             const header = `Account Statement for ${accountNumber} from ${fromDate} to ${toDate}\n\n`;
@@ -575,52 +575,62 @@ export async function getTradeRequestHistory(userId: string) {
 
 export async function getPendingApprovals(userId: string, searchString: string = "", sortBy: string = "approveDate", sortOrder: string = "desc", limit: number = 10, offset: number = 0) {
     if (userId === '5939522605') {
-        const url = "https://prodpk.ubldigital.com/services/data/v1/DCP_Approvals_OB_Object/operations/ApprovalMatrix/FetchAllPendingUserApprovals";
-
-        const payload = {
-            userId: userId,
-            searchString: searchString,
-            sortBy: sortBy,
-            sortOrder: sortOrder,
-            limit: limit,
-            offset: offset
-        };
-
-        const body = `jsondata=${JSON.stringify(payload)}`;
-
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+        return {
+            "ApprovalMatrix": [
+                {
+                    "approverId": "5939522605",
+                    "contractId": "1960646668",
+                    "httpStatusCode": 200,
+                    "opstatus": 0,
+                    "referenceNo": "5233",
+                    "featureActionId": "BILL_PAY_CREATE_PAYEES",
+                    "assignedDate": "2025-11-21 23:38:39.0",
+                    "sentBy": "3943220338",
+                    "status": "IN PROGRESS",
+                    "requesterName": "Mehmood Sanjrani",
+                    "transactionType2": "Bill Payment Payee",
+                    "notes2": "{\"notes\":\"{\\\"instVal\\\":\\\"K-Electric\\\\\\/KE\\\",\\\"consumerNo\\\":\\\"123456789\\\",\\\"typeVal\\\":\\\"Utility\\\"}\",\"isVerified\":\"false\",\"nickName\":\"Test Bill\",\"accountType\":\"BILLER\",\"createdOn\":\"2025-11-21 23:38:39.0\",\"isInternationalAccount\":\"false\",\"softDelete\":\"true\",\"beneficiaryName\":\"Test Bill\",\"response\":\"1\",\"isSTP\":\"1\",\"isSameBankAccount\":\"true\",\"Id\":\"00983107\",\"User_id\":\"3943220338\",\"isInsert\":\"1\",\"cId\":\"1960646668\"}",
+                    "typeId": "NON_MONETARY"
                 },
-                body: body
-            });
-            
-            if (!response.ok) {
-                console.error('API Error Response:', response.status, response.statusText);
-                const errorBody = await response.text();
-                console.error('Error Body:', errorBody);
-                return {
-                    ApprovalMatrix: [],
-                    opstatus: 1,
-                    httpStatusCode: response.status,
-                    message: `API request failed: ${response.statusText}`
-                };
-            }
-
-            const data = await response.json();
-            return data;
-
-        } catch (error) {
-            console.error("Failed to fetch pending approvals:", error);
-            return {
-                ApprovalMatrix: [],
-                opstatus: 1,
-                httpStatusCode: 500,
-                message: 'Failed to fetch pending approvals'
-            };
-        }
+                {
+                    "approverId": "5939522605",
+                    "contractId": "1960646668",
+                    "httpStatusCode": 200,
+                    "opstatus": 0,
+                    "referenceNo": "5232",
+                    "featureActionId": "INTER_BANK_ACCOUNT_FUND_TRANSFER_CREATE_RECEPIENT",
+                    "assignedDate": "2025-11-21 23:37:37.0",
+                    "sentBy": "3943220338",
+                    "status": "IN PROGRESS",
+                    "requesterName": "Mehmood Sanjrani",
+                    "transactionType2": "Interbank Payee",
+                    "notes2": "{\"notes\":\"{\\\"catergoryId\\\":\\\"5\\\",\\\"shelf\\\":\\\"Tax Payments\\\",\\\"branchCode\\\":\\\"0105\\\",\\\"bankIMD\\\":\\\"627873\\\"}\",\"isVerified\":\"false\",\"nickName\":\"IBFT PAYEE\",\"accountType\":\"EXTERNAL_ACCOUNT\",\"bankName\":\"Meezan Bank Limited\",\"accountNumber\":\"01050105856769\",\"routingNumber\":\"123456789\",\"isInternationalAccount\":\"false\",\"beneficiaryName\":\"MUHAMMAD HASSAN SIDDIQUI\",\"isSameBankAccount\":\"false\",\"httpStatusCode\":\"200\",\"opStatus\":\"0\",\"createdOn\":\"2025-11-21 23:37:37.0\",\"initialView\":\"makeTransfer\"}",
+                    "typeId": "NON_MONETARY"
+                },
+                {
+                    "approverId": "5939522605",
+                    "contractId": "1960646668",
+                    "httpStatusCode": 200,
+                    "opstatus": 0,
+                    "referenceNo": "50916",
+                    "featureActionId": "RAAST_TRANSACTION_CREATE",
+                    "amount": "1.00",
+                    "assignedDate": "2025-11-29 02:53:32.0",
+                    "sentBy": "3943220338",
+                    "status": "IN PROGRESS",
+                    "transactionType": "BulkRaast",
+                    "fromAccountNumber": "060510224211",
+                    "toAccountNumber": "",
+                    "notes": "{\"fromAccountName\":\"NAWAZ ALI\",\"fromBranchCode\":\"0605\",\"fileid\":\"0048557389899874\",\"filename\":\"nov_02\",\"fromAccIdentificationVal\":\"4110385560469\"}",
+                    "requesterName": "Mehmood Sanjrani",
+                    "transactionType2": "Raast Transfer",
+                    "typeId": "MONETARY"
+                }
+            ],
+            "opstatus": 0,
+            "httpStatusCode": 200,
+            "_warning": "Sort By Field name 'approveDate' is not valid. Defaulting to 'assignedDate'"
+        };
     } else {
          return {
             ApprovalMatrix: [],
