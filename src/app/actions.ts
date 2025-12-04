@@ -1,5 +1,4 @@
 
-
 'use server';
 
 // This is a placeholder for the actual API call.
@@ -7,19 +6,15 @@
 // which would then securely call the UBL Digital API.
 export async function login(values: any) {
     try {
-        const body = new URLSearchParams();
-        body.append('UserName', values.username);
-        body.append('Password', values.password);
-        body.append('rememberMe', 'true');
-        body.append('loginOptions', JSON.stringify({ isOfflineEnabled: false, isSSOEnabled: true }));
-        body.append('provider', 'DbxUserLogin');
+        const body = `UserName=${encodeURIComponent(values.username)}&Password=${encodeURIComponent(values.password)}&rememberMe=true&loginOptions=${encodeURIComponent(JSON.stringify({ isOfflineEnabled: false, isSSOEnabled: true }))}&provider=DbxUserLogin`;
 
         const response = await fetch('https://prodpk.ubldigital.com/authService/100000002/login?provider=DbxUserLogin', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
+                'accept': 'application/json'
             },
-            body: body.toString(),
+            body: body,
         });
 
         const data = await response.json();
@@ -917,5 +912,6 @@ export async function updateBulkRecordsStatus(payload: {
         "httpStatusCode": 0
     };
 }
+    
 
     
