@@ -108,18 +108,6 @@ export async function getLastLoginTime(userId: string) {
     if (response.ok && data.opstatus === 0) {
       return data;
     } else {
-       // Fallback for mock user if live API fails or for testing
-        if (userId === '7884057484' || userId === '5939522605') {
-            return {
-            LoginServices: [
-                {
-                Lastlogintime: '2025-11-20 11:44:19.0',
-                },
-            ],
-            opstatus: 0,
-            httpStatusCode: 200,
-            };
-        }
       return {
         opstatus: data.opstatus || 1,
         httpStatusCode: response.status,
@@ -982,6 +970,8 @@ export async function updateBulkRecordsStatus(payload: {
 
 
 
+
+    
 
     
 
