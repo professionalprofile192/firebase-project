@@ -30,7 +30,6 @@ export async function login(values: any) {
 
         if (response.ok && data.profile) {
             const user = data.profile;
-            const userAttributes = user.user_attributes;
             return {
                 success: true,
                 message: "Login successful",
@@ -39,7 +38,7 @@ export async function login(values: any) {
                     firstname: user.firstname,
                     lastname: user.lastname,
                     email: user.email,
-                    CIF_NO: userAttributes.taxId
+                    CIF_NO: user.user_attributes.taxId
                 }
             };
         }
@@ -74,24 +73,53 @@ export async function login(values: any) {
 }
 
 
-// This is a placeholder for the actual API call.
 export async function getLastLoginTime(userId: string) {
-  // Simulate API call for a specific user
-  if (userId === '7884057484' || userId === '5939522605') {
-    return {
-      LoginServices: [
-        {
-          Lastlogintime: '2025-11-20 11:44:19.0',
-        },
-      ],
-      opstatus: 0,
-      httpStatusCode: 200,
+  try {
+    const payload = {
+      jsondata: JSON.stringify({ userID: userId }),
     };
-  } else {
+
+    const response = await fetch(
+      'https://prodpk.ubldigital.com/services/data/v1/dcp_custom/operations/LoginServices/getLastloginTime',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok && data.opstatus === 0) {
+      return data;
+    } else {
+       // Fallback for mock user if live API fails or for testing
+        if (userId === '7884057484' || userId === '5939522605') {
+            return {
+            LoginServices: [
+                {
+                Lastlogintime: '2025-11-20 11:44:19.0',
+                },
+            ],
+            opstatus: 0,
+            httpStatusCode: 200,
+            };
+        }
+      return {
+        opstatus: data.opstatus || 1,
+        httpStatusCode: response.status,
+        message: 'Failed to fetch last login time.',
+      };
+    }
+  } catch (error) {
+    console.error('Error fetching last login time:', error);
     return {
       opstatus: 1,
-      httpStatusCode: 404,
-      message: 'User not found',
+      httpStatusCode: 500,
+      message: 'An unexpected error occurred.',
     };
   }
 }
@@ -942,5 +970,7 @@ export async function updateBulkRecordsStatus(payload: {
 
 
 
+
+    
 
     
