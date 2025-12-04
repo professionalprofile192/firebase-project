@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -15,8 +14,7 @@ import { UploadStatusDialog } from '@/components/bulk-import/upload-status-dialo
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { BulkFileHistoryTable } from './bulk-file-history-table';
-import type { BulkFile } from '@/app/bulk-import/page';
-import { uploadBulkFile } from '@/app/actions';
+import { getAccounts, getBulkFiles, uploadBulkFile } from '@/app/actions';
 import { format } from 'date-fns';
 
 type Account = {
@@ -24,10 +22,13 @@ type Account = {
     ACCT_TITLE: string;
 };
 
-interface BulkImportClientPageProps {
-    initialAccounts: Account[];
-    initialBulkFiles: BulkFile[];
-}
+export type BulkFile = {
+    fileName: string;
+    uploadDate: string;
+    fileReferenceNumber: string;
+    status: string;
+    comment: string;
+};
 
 const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey, formResetKey }: { id: string, label: string, onFileSelect: (key: string, file: File | null) => void, acceptedFormats: string, fileKey: string, formResetKey: number }) => {
     const [fileName, setFileName] = useState('');
@@ -83,12 +84,12 @@ const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey, formRese
 };
 
 
-export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: BulkImportClientPageProps) {
+export function BulkImportClientPage() {
     const searchParams = useSearchParams();
     const tab = searchParams.get('tab');
     
-    const [accounts, setAccounts] = useState<Account[]>(initialAccounts);
-    const [bulkFiles, setBulkFiles] = useState<BulkFile[]>(initialBulkFiles);
+    const [accounts, setAccounts] = useState<Account[]>([]);
+    const [bulkFiles, setBulkFiles] = useState<BulkFile[]>([]);
     const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
     const [files, setFiles] = useState<{ bulkFile: File | null, chequeInvoiceFile: File | null }>({ bulkFile: null, chequeInvoiceFile: null });
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -103,17 +104,35 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
     const [statusFilter, setStatusFilter] = useState('');
     const [commentFilter, setCommentFilter] = useState('');
     const [activeTab, setActiveTab] = useState(tab || 'upload');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const userProfileString = sessionStorage.getItem('userProfile');
-        if (userProfileString) {
-            setUserProfile(JSON.parse(userProfileString));
-        } else if (!initialAccounts.length) {
-            router.push('/dashboard');
+        const profileString = sessionStorage.getItem('userProfile');
+        if (!profileString) {
+            router.push('/');
+            return;
         }
-        setAccounts(initialAccounts);
-        setBulkFiles(initialBulkFiles);
-    }, [initialAccounts, initialBulkFiles, router]);
+
+        const profile = JSON.parse(profileString);
+        setUserProfile(profile);
+
+        async function fetchData() {
+            setLoading(true);
+            try {
+                const accountsData = await getAccounts(profile.userid, profile.CIF_NO);
+                setAccounts(accountsData.opstatus === 0 ? accountsData.payments : []);
+
+                const bulkFilesData = await getBulkFiles(profile.userid);
+                setBulkFiles(bulkFilesData.opstatus === 0 ? bulkFilesData.NDC_BulkPayments : []);
+            } catch (error) {
+                console.error("Failed to fetch bulk import data", error);
+                toast({ variant: 'destructive', title: 'Error', description: 'Could not fetch data.' });
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchData();
+    }, [router, toast]);
 
     const handleFileSelect = (key: string, file: File | null) => {
         setFiles(prev => ({...prev, [key]: file}));
@@ -260,6 +279,16 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
             <BulkFileHistoryTable data={filteredBulkFiles} />
         </div>
     );
+     
+    if (loading) {
+        return (
+            <DashboardLayout>
+                <main className="flex-1 p-4 sm:px-6 sm:py-4">
+                    <p>Loading data...</p>
+                </main>
+            </DashboardLayout>
+        );
+    }
 
     return (
         <DashboardLayout>
@@ -342,3 +371,4 @@ export function BulkImportClientPage({ initialAccounts, initialBulkFiles }: Bulk
         </DashboardLayout>
     );
 }
+

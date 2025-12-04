@@ -6,13 +6,12 @@
 // which would then securely call the UBL Digital API.
 export async function login(values: any) {
     try {
-
-        const body = 
-            `UserName=${encodeURIComponent(values.username)}` +
-            `&Password=${encodeURIComponent(values.password)}` +
-            `&rememberMe=true` +
-            `&loginOptions=${encodeURIComponent('{"isOfflineEnabled":false,"isSSOEnabled":true}')}` +
-            `&provider=DbxUserLogin`;
+        const body = new URLSearchParams();
+        body.append('UserName', values.username);
+        body.append('Password', values.password);
+        body.append('rememberMe', 'true');
+        body.append('loginOptions', '{"isOfflineEnabled":false,"isSSOEnabled":true}');
+        body.append('provider', 'DbxUserLogin');
 
         const response = await fetch(
             'https://prodpk.ubldigital.com/authService/100000002/login?provider=DbxUserLogin',
@@ -22,7 +21,7 @@ export async function login(values: any) {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Accept': 'application/json'
                 },
-                body: body
+                body: body.toString()
             }
         );
 
@@ -43,7 +42,7 @@ export async function login(values: any) {
             };
         }
 
-        // Handle raaststp user separately if the live call fails for it
+        // Fallback for mock users if the live call fails for them
         if (values.username === 'raaststp' && values.password === 'Kony@123456') {
              return {
                 success: true,
@@ -57,6 +56,19 @@ export async function login(values: any) {
                 }
             };
         }
+        if (values.username === 'idrees.approver' && values.password === 'Kony@1234') {
+            return {
+                success: true,
+                message: "Login successful",
+                profile: {
+                    userid: '5939522605',
+                    firstname: 'Idrees',
+                    lastname: 'Approver',
+                    email: 'idrees.ghafoori@systemsltd.com',
+                    CIF_NO: '5343333333333'
+                }
+           };
+       }
 
         return {
             success: false,

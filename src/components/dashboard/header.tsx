@@ -201,7 +201,6 @@ export function Header() {
 
   const confirmLogout = async () => {
     setShowLogoutDialog(false);
-    await logout();
     sessionStorage.clear();
     router.push('/');
   };

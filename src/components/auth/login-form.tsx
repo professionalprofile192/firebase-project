@@ -28,8 +28,7 @@ import {
 import { EyeOff, Eye, User, Lock } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { sendOtpForUsernameRecovery, validateUser, verifyOtp, forgotUsername } from '@/app/actions';
-import { loginAndSetSession } from '@/app/login/actions';
+import { sendOtpForUsernameRecovery, validateUser, verifyOtp, forgotUsername, login, getLastLoginTime, getAccounts } from '@/app/actions';
 import { cn } from '@/lib/utils';
 import { OtpDialog } from './otp-dialog';
 import { CustomAlertDialog } from '../common/custom-alert-dialog';
@@ -476,9 +475,23 @@ export function LoginForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await loginAndSetSession(values);
+      const response = await login(values);
 
-      if (response.success) {
+      if (response.success && response.profile) {
+        // Store user data in sessionStorage
+        sessionStorage.setItem('userProfile', JSON.stringify(response.profile));
+
+        // Fetch additional data and store it
+        const loginTimeResponse = await getLastLoginTime(response.profile.userid);
+        if (loginTimeResponse.opstatus === 0) {
+            sessionStorage.setItem('lastLoginTime', loginTimeResponse.LoginServices[0].Lastlogintime);
+        }
+        
+        const accountsData = await getAccounts(response.profile.userid, response.profile.CIF_NO);
+        if (accountsData.opstatus === 0) {
+            sessionStorage.setItem('accounts', JSON.stringify(accountsData.payments));
+        }
+
         toast({
           title: 'Login Successful',
           description: 'Redirecting to your dashboard...',
