@@ -7,21 +7,19 @@
 // which would then securely call the UBL Digital API.
 export async function login(values: any) {
     try {
+        const body = new URLSearchParams();
+        body.append('UserName', values.username);
+        body.append('Password', values.password);
+        body.append('rememberMe', 'true');
+        body.append('loginOptions', JSON.stringify({ isOfflineEnabled: false, isSSOEnabled: true }));
+        body.append('provider', 'DbxUserLogin');
+
         const response = await fetch('https://prodpk.ubldigital.com/authService/100000002/login?provider=DbxUserLogin', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: JSON.stringify({
-                UserName: values.username,
-                Password: values.password,
-                rememberMe: true,
-                loginOptions: {
-                    isOfflineEnabled: false,
-                    isSSOEnabled: true
-                },
-                provider: 'DbxUserLogin'
-            })
+            body: body.toString(),
         });
 
         const data = await response.json();
@@ -881,48 +879,3 @@ export async function getApprovalHistory(userId: string) {
         }
     }
 }
-
-export async function rejectRequest(payload: {
-    contractId: string,
-    referenceNo: string,
-    approverId: string,
-    rejectorId: string,
-    remarks: string,
-    accountNo: string,
-}) {
-    // Mocking the API call with the success response you provided
-    return {
-        "ApprovalMatrix": [
-            {
-                "httpStatusCode": 200,
-                "opstatus": 0,
-                "reqResponse": "REQUEST REJECTED SUCCESSFULLY"
-            }
-        ],
-        "opstatus": 0,
-        "httpStatusCode": 200
-    };
-}
-
-export async function updateBulkRecordsStatus(payload: {
-    customerId: string;
-    transactionId: string;
-    status: 'REJECTED';
-}) {
-    // This is a mock service.
-    return {
-        "responses": "{\"records\":[{\"resMsg\":\"Rejected\"}],\"opstatus\":0,\"httpStatusCode\":0}&*&{\"P_RESDESC\":\"ORA-06500: PL/SQL: storage error\",\"opstatus\":0,\"P_RESCODE\":\"500\",\"P_RESMSG\":\"Failure\",\"httpStatusCode\":0}",
-        "opstatus": 0,
-        "responseMessage": "Success",
-        "responseCode": "00",
-        "httpStatusCode": 0
-    }
-}
-    
-
-    
-
-
-
-
-    
