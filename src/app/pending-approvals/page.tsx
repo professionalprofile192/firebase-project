@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search } from 'lucide-react';
 import { ApprovalsHistoryTable } from '@/components/pending-approvals/approvals-history-table';
-import { getPendingApprovals, getApprovalHistory, rejectRequest } from '../actions';
+import { getPendingApprovals, getApprovalHistory, rejectRequest, updateBulkRecordsStatus } from '../actions';
 import { useToast } from '@/hooks/use-toast';
 import { useSearchParams } from 'next/navigation';
 import { CustomAlertDialog } from '@/components/common/custom-alert-dialog';
@@ -105,24 +105,24 @@ function PendingApprovalsContent() {
         return false;
     }
 
-    const payload = {
+    const rejectPayload = {
         accountNo: 0, 
         approverId: approval.approverId,
         contractId: approval.contractId,
         referenceNo: approval.referenceNo,
-        rejectorId: userProfile.userid, // The one performing the action
+        rejectorId: userProfile.userid,
         remarks: remarks
     };
     
     try {
-        const response = await rejectRequest(payload);
-        if (response.opstatus === 0 && response.ApprovalMatrix[0].opstatus === 0) {
+        const rejectResponse = await rejectRequest(rejectPayload);
+        if (rejectResponse.opstatus === 0 && rejectResponse.ApprovalMatrix[0].opstatus === 0) {
             const rejectedApproval = { 
                 ...approval, 
                 status: 'REJECTED', 
                 remarks: remarks,
-                rejector: { id: userProfile.userid, name: userProfile.firstname + ' ' + userProfile.lastname }, // Store who rejected it
-                rejectedAt: new Date().toISOString(), // Store when it was rejected
+                rejector: { id: userProfile.userid, name: userProfile.firstname + ' ' + userProfile.lastname },
+                rejectedAt: new Date().toISOString(),
             };
             
             // Update localStorage
@@ -134,11 +134,25 @@ function PendingApprovalsContent() {
             setPendingApprovals(prev => prev.filter(appr => appr.referenceNo !== approval.referenceNo));
             setApprovalHistory(prev => [rejectedApproval, ...prev]);
 
-            setSuccessAlertMessage(response.ApprovalMatrix[0].reqResponse);
+            // Call the second service to update status
+            const updateStatusPayload = {
+                customerId: userProfile.userid, // Assuming rejectorId is the customerId
+                transactionId: approval.referenceNo,
+                status: 'REJECTED' as const
+            };
+            
+            const updateStatusResponse = await updateBulkRecordsStatus(updateStatusPayload);
+
+            if (updateStatusResponse.opstatus === 0 && updateStatusResponse.responseMessage) {
+                 setSuccessAlertMessage(updateStatusResponse.responseMessage);
+            } else {
+                 setSuccessAlertMessage(rejectResponse.ApprovalMatrix[0].reqResponse);
+            }
+
             setShowSuccessAlert(true);
             return true;
         } else {
-            toast({ variant: 'destructive', title: 'Rejection Failed', description: response.message || "An unknown error occurred." });
+            toast({ variant: 'destructive', title: 'Rejection Failed', description: rejectResponse.message || "An unknown error occurred." });
             return false;
         }
     } catch (error) {

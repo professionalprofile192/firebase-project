@@ -900,7 +900,23 @@ export async function rejectRequest(payload: {
         "httpStatusCode": 200
     };
 }
+
+export async function updateBulkRecordsStatus(payload: {
+    customerId: string;
+    transactionId: string;
+    status: 'REJECTED';
+}) {
+    // This is a mock service.
+    return {
+        "responses": "{\"records\":[{\"resMsg\":\"Rejected\"}],\"opstatus\":0,\"httpStatusCode\":0}&*&{\"P_RESDESC\":\"ORA-06500: PL/SQL: storage error\",\"opstatus\":0,\"P_RESCODE\":\"500\",\"P_RESMSG\":\"Failure\",\"httpStatusCode\":0}",
+        "opstatus": 0,
+        "responseMessage": "Success",
+        "responseCode": "00",
+        "httpStatusCode": 0
+    }
+}
     
 
     
+
 
