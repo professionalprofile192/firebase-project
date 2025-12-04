@@ -67,7 +67,7 @@ export async function login(values: any) {
         console.error("Login error:", err);
         return {
             success: false,
-            message: "Unexpected error"
+            message: "An unexpected error occurred during login."
         };
     }
 }
@@ -938,4 +938,5 @@ export async function updateBulkRecordsStatus(payload: {
     
 
     
+
 
