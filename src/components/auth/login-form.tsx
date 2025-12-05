@@ -28,7 +28,10 @@ import {
 import { EyeOff, Eye, User, Lock } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { sendOtpForUsernameRecovery, validateUser, verifyOtp, forgotUsername, login, getLastLoginTime, getAccounts } from '@/app/actions';
+import { sendOtpForUsernameRecovery, validateUser, verifyOtp, forgotUsername, getLastLoginTime, getAccounts } from '@/app/actions';
+
+import { loginClient } from '@/app/login-client';  
+
 import { cn } from '@/lib/utils';
 import { OtpDialog } from './otp-dialog';
 import { CustomAlertDialog } from '../common/custom-alert-dialog';
@@ -473,48 +476,175 @@ export function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof loginFormSchema>) {
     setIsSubmitting(true);
-
+  
     try {
-      const response = await login(values);
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(values)
+      });
+  
+      const data = await res.json();
+      console.log("LOGIN API RESPONSE:", data);
+ 
+      console.log("🧑‍💼 Logged in user:", data.profile);
+      console.log("📦 Attributes:", data.profile?.user_attributes);
 
-      if (response.success && response.profile) {
-        // Store user data in sessionStorage
-        sessionStorage.setItem('userProfile', JSON.stringify(response.profile));
-
-        // Fetch additional data and store it
-        const loginTimeResponse = await getLastLoginTime(response.profile.userid);
-        if (loginTimeResponse.opstatus === 0) {
-            sessionStorage.setItem('lastLoginTime', loginTimeResponse.LoginServices[0].Lastlogintime);
-        }
-        
-        const accountsData = await getAccounts(response.profile.userid, response.profile.CIF_NO);
-        if (accountsData.opstatus === 0) {
-            sessionStorage.setItem('accounts', JSON.stringify(accountsData.payments));
-        }
-
-        toast({
-          title: 'Login Successful',
-          description: 'Redirecting to your dashboard...',
-        });
-        router.push('/dashboard');
-      } else {
+      if (data.errmsg || data.message?.includes("Invalid")) {
         toast({
           variant: 'destructive',
           title: 'Login Failed',
-          description: response.message,
+          description: data.message,
         });
+        return;
       }
-    } catch (error) {
+  
+      // ⭐ yeh wali condition ab sahi hai
+      if (data?.profile && data?.claims_token && data?.provider_token) {
+
+          sessionStorage.setItem("userProfile", JSON.stringify(data.profile));
+        } else {
+          console.error("❌ profile missing:", data);
+          return;
+        }
+      
+        // ⭐ Now fetch session user attributes
+       // ⭐ FETCH USER SESSION ATTRIBUTES
+      const sessionRes = await fetch("/api/user-attributes", {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "x-kony-authorization": data?.claims_token?.value || "",
+          "x-kony-requestid":
+          crypto.randomUUID(), 
+        },
+      });
+
+      const sessionData = await sessionRes.json();
+      console.log("SESSION API RESPONSE:", sessionData);
+
+        // ⭐ STEP: GET SECURITY ATTRIBUTES (REAL SESSION TOKEN)
+      const secRes = await fetch("/api/security-attributes", {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "x-kony-authorization": data?.claims_token?.value || "",
+          "x-kony-requestid":
+          crypto.randomUUID(),
+        },
+      });
+
+      const secData = await secRes.json();
+      console.log("SECURITY ATTRIBUTES:", secData);
+
+      // ⭐ REAL SESSION TOKEN
+      const realSessionToken = secData?.session_token;
+
+      // Save token for all next APIs
+      sessionStorage.setItem("sessionToken", realSessionToken);
+      
+
+      const sessionToken = sessionStorage.getItem("sessionToken");
+
+      // ⭐ 4) NOW CALL USERS API HERE
+      const usersRes = await fetch("/api/users", {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "x-kony-authorization": data?.claims_token?.value,
+          "x-kony-api-version": "1.0",
+          "x-kony-requestid": crypto.randomUUID(),
+          "x-kony-deviceid": crypto.randomUUID(),
+          "x-kony-reportingparams": JSON.stringify({
+            os: "1",
+            dm: "",
+            did: crypto.randomUUID(),
+            ua: navigator.userAgent,
+            aid: "OnlineBanking",
+            aname: "OnlineBanking",
+            chnl: "desktop",
+            plat: "web",
+            aver: "1.0.0",
+            atype: "spa",
+            stype: "b2c",
+            svcid: "Users",
+          })
+        }
+      });
+      
+      const usersData = await usersRes.json();
+      console.log("USERS API DATA:", usersData);
+
+//fetch accounts
+
+      const resAccounts = await fetch("/api/fetch-accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cif: data.profile.userid,
+          token: data.claimsToken,  
+          kuid: data.profile.UserName
+        })
+      });
+      
+      const result = await resAccounts.json();
+      console.log(result);
+      
+     
+
+  // ⭐ 5) GET USER PROFILE IMAGE
+
+// const imageRes = await fetch("/api/get-user-profile-image", {
+//   method: "POST",
+//   headers: {
+//     "Content-Type": "application/json",
+//     "x-session-token": sessionToken,           // REAL token
+//     "x-kony-authorization": data?.claims_token?.value,   // REQUIRED
+//   },
+// });
+
+// const imageData = await imageRes.json();
+// console.log("PROFILE IMAGE:", imageData);
+
+
+
+
+  //     const legacyToken =
+  // data?.provider_token?.params?.security_attributes?.session_token;
+  //     // ⭐ NOW call Last Login API (after saving)
+  //     const lastLoginRes = await fetch("/api/last-login", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "x-kony-authorization": legacyToken,   // <-- direct use
+  //       },
+  //       body: JSON.stringify({ userID: data?.profile?.userid }),
+  //     });
+
+  //     const lastLogin = await lastLoginRes.json();
+  //     console.log("🔥 LAST LOGIN TIME:", lastLogin);
+
+        toast({
+          title: "Login Successful",
+          description: "Redirecting to dashboard...",
+        });
+  
+        router.push("/dashboard");
+      }
+  
+    
+     catch(error){
       toast({
         variant: 'destructive',
-        title: 'An error occurred',
-        description: 'Please try again later.',
+        title: 'Error',
+        description: 'Something went wrong. Please try again.',
       });
     } finally {
       setIsSubmitting(false);
     }
   }
-
   // ⭐ FINAL LAYOUT (RIGHT SIDE ONLY — MATCHES YOUR NEED)
   return (
     <>

@@ -6,55 +6,43 @@
 // which would then securely call the UBL Digital API.
 export async function login(values: any) {
     try {
-        const body = new URLSearchParams();
-        body.append('UserName', values.username);
-        body.append('Password', values.password);
-        body.append('rememberMe', 'true');
-        body.append('loginOptions', '{"isOfflineEnabled":false,"isSSOEnabled":true}');
-        body.append('provider', 'DbxUserLogin');
-
-        const response = await fetch(
-            'https://prodpk.ubldigital.com/authService/100000002/login?provider=DbxUserLogin',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Accept': 'application/json'
-                },
-                body: body.toString()
-            }
-        );
-
-        const data = await response.json();
-
-        if (response.ok && data.profile) {
-            // Use the live API response directly
-            return {
-                success: true,
-                message: "Login successful",
-                profile: {
-                    userid: data.profile.userid,
-                    firstname: data.profile.firstname,
-                    lastname: data.profile.lastname,
-                    email: data.profile.email,
-                    CIF_NO: data.profile.user_attributes.taxId
-                }
-            };
+      const body = new URLSearchParams();
+      body.append('UserName', values.username);
+      body.append('Password', values.password);
+      body.append('rememberMe', 'true');
+      body.append('loginOptions', '{"isOfflineEnabled":false,"isSSOEnabled":true}');
+      body.append('provider', 'DbxUserLogin');
+  
+      const response = await fetch(
+        'https://prodpk.ubldigital.com/authService/100000002/login?provider=DbxUserLogin',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json',
+          },
+          body: body.toString(),
         }
-
+      );
+  
+      if (!response.ok) {
         return {
-            success: false,
-            message: data.details?.errmsg || "Invalid username or password"
+          success: false,
+          message: `API Error: ${response.status}`
         };
-
-    } catch (err) {
-        console.error("Login error:", err);
-        return {
-            success: false,
-            message: "An unexpected error occurred during login."
-        };
+      }
+  
+      const data = await response.json();
+      return data;   // full raw API response
+    } catch (error: any) {
+      console.error('Login Error:', error);
+      return {
+        success: false,
+        message: error.message || 'Something went wrong'
+      };
     }
-}
+  }
+  
 
 
 export async function getLastLoginTime(userId: string) {

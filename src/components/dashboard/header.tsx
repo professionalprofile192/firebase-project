@@ -19,7 +19,7 @@ import { LogoutDialog } from '../auth/logout-dialog';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
 import { cn } from '@/lib/utils';
-import { logout } from '@/app/login/actions';
+import { logout } from '@/app/login/route';
 
 
 type UserProfile = {

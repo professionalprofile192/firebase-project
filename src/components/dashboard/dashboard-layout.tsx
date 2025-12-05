@@ -5,7 +5,7 @@ import { Header } from '@/components/dashboard/header';
 import { SessionTimeoutDialog } from '@/components/dashboard/session-timeout-dialog';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback, ReactNode } from 'react';
-import { logout } from '@/app/login/actions';
+import { logout } from '@/lib/logout';
 
 const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
