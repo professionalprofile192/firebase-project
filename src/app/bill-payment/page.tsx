@@ -12,7 +12,7 @@ import { BillPaymentHistoryTable, type HistoryItem } from '@/components/bill-pay
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 // This will be replaced with your actual API data
 const payees: Payee[] = [
@@ -57,19 +57,22 @@ const accounts: Account[] = [
 
 
 function BillPaymentContent() {
-  const [activeTab, setActiveTab] = useState('bill-payment');
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'bill-payment');
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [multiPayMode, setMultiPayMode] = useState(false);
   const [payeeSearchTerm, setPayeeSearchTerm] = useState('');
   const [historySearchTerm, setHistorySearchTerm] = useState('');
-  const pathname = usePathname();
+
+  // By using useSearchParams, we make this component dynamic, which causes it to
+  // re-evaluate when navigating back, resetting the state.
+  const a = searchParams.get('a'); // This is just to ensure re-render
 
   useEffect(() => {
-    // This effect runs when the component mounts or the pathname changes.
-    // When navigating back, the component might re-mount, resetting the state.
+    // This effect now reliably runs on navigation, clearing the search terms.
     setPayeeSearchTerm('');
     setHistorySearchTerm('');
-  }, [pathname]);
+  }, [a]);
 
 
   const handleAccountChange = (acctNo: string) => {
@@ -100,8 +103,8 @@ function BillPaymentContent() {
   );
 
   const filteredHistory = billPaymentHistory.filter(item => 
-    item.consumerName.toLowerCase().includes(historySearchTerm.toLowerCase()) ||
-    item.consumerNumber.toLowerCase().includes(historySearchTerm.toLowerCase()) ||
+    (item.consumerName?.toLowerCase() || '').includes(historySearchTerm.toLowerCase()) ||
+    (item.consumerNumber?.toLowerCase() || '').includes(historySearchTerm.toLowerCase()) ||
     (item.transactionId && item.transactionId.toLowerCase().includes(historySearchTerm.toLowerCase()))
   );
 
