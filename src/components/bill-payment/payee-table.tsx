@@ -159,6 +159,7 @@ export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
   useEffect(() => {
     if (!multiPayMode) {
       setSelectedPayees([]);
+      setOpenPayeeId(null);
     }
   }, [multiPayMode]);
 
@@ -245,8 +246,8 @@ export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
           <TableFooter>
             <TableRow>
               <TableCell colSpan={multiPayMode ? 5 : 5}>
-                <div className="flex items-center justify-between p-2">
-                  <span className="text-sm text-muted-foreground">
+                <div className="flex items-center justify-between p-2 text-sm text-muted-foreground">
+                  <span>
                       {startIndex + 1} - {endIndex} Payee
                   </span>
                   <div className="flex items-center">
