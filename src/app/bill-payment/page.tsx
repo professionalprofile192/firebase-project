@@ -7,13 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PayeeTable } from '@/components/bill-payment/payee-table';
+import { PayeeTable, type Payee } from '@/components/bill-payment/payee-table';
 import { BillPaymentHistoryTable } from '@/components/bill-payment/bill-payment-history-table';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 
 // This will be replaced with your actual API data
-const payees = [
+const payees: Payee[] = [
   {
     consumerName: 'ASHAQ SO SHEAKH AHMED',
     billerType: 'Electricity HAZECO Bill Payment',
@@ -54,6 +54,7 @@ const accounts: Account[] = [
 function BillPaymentContent() {
   const [activeTab, setActiveTab] = useState('bill-payment');
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  const [multiPayMode, setMultiPayMode] = useState(false);
 
   const handleAccountChange = (acctNo: string) => {
     const account = accounts.find(a => a.acctNo === acctNo);
@@ -65,11 +66,16 @@ function BillPaymentContent() {
       <main className="flex-1 p-4 sm:px-6 sm:py-4 flex flex-col gap-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold">
-                {activeTab === 'bulk-bill-payment' ? 'Bulk Utility Bill Payments' : 'Bill Payment'}
+                {multiPayMode ? 'Multiple Bill Payment' : 
+                 activeTab === 'bulk-bill-payment' ? 'Bulk Utility Bill Payments' : 'Bill Payment'}
             </h1>
             {activeTab === 'bill-payment' && (
                 <div className='flex items-center gap-2'>
-                    <Button variant="outline">Pay Multiple Bills</Button>
+                    {multiPayMode ? (
+                        <Button variant="outline" onClick={() => setMultiPayMode(false)}>Pay Single Bills</Button>
+                    ) : (
+                        <Button variant="outline" onClick={() => setMultiPayMode(true)}>Pay Multiple Bills</Button>
+                    )}
                     <Button>Add Utility Bill +</Button>
                 </div>
             )}
@@ -103,7 +109,7 @@ function BillPaymentContent() {
                     </SelectContent>
                 </Select>
             </div>
-            <PayeeTable data={payees} />
+            <PayeeTable data={payees} multiPayMode={multiPayMode} />
           </TabsContent>
 
           <TabsContent value="bill-payment-history">

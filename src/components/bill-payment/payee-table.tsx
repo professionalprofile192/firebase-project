@@ -11,13 +11,14 @@ import {
   TableFooter,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Edit, Trash2, BarChart2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
+import { Checkbox } from '../ui/checkbox';
 
-type Payee = {
+export type Payee = {
   consumerName: string;
   billerType: string;
   consumerNumber: string;
@@ -29,11 +30,26 @@ type Payee = {
 
 interface PayeeTableProps {
   data: Payee[];
+  multiPayMode: boolean;
 }
 
 const ITEMS_PER_PAGE = 8;
 
-function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, onToggle: () => void }) {
+function PayeeRow({ 
+  payee, 
+  isOpen, 
+  onToggle, 
+  multiPayMode,
+  isSelected,
+  onSelectionChange
+}: { 
+  payee: Payee, 
+  isOpen: boolean, 
+  onToggle: () => void,
+  multiPayMode: boolean,
+  isSelected: boolean,
+  onSelectionChange: (checked: boolean) => void
+}) {
 
   const getStatusClass = (status: string) => {
     switch(status) {
@@ -53,9 +69,23 @@ function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, 
     e.stopPropagation();
   };
 
+  const handleRowClick = () => {
+    if (!multiPayMode) {
+      onToggle();
+    }
+  }
+
   return (
     <>
-      <TableRow onClick={onToggle} className="cursor-pointer">
+      <TableRow onClick={handleRowClick} className={cn({'cursor-pointer': !multiPayMode})}>
+        {multiPayMode && (
+          <TableCell className="w-12 text-center" onClick={stopPropagation}>
+            <Checkbox 
+              checked={isSelected} 
+              onCheckedChange={(checked) => onSelectionChange(Boolean(checked))}
+            />
+          </TableCell>
+        )}
         <TableCell className="font-medium">
           <div>{payee.consumerName.split(' ')[0]}</div>
           <div className="text-muted-foreground text-xs">{payee.consumerName}</div>
@@ -67,21 +97,23 @@ function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, 
         <TableCell>
           <span className={cn("font-semibold", getStatusClass(payee.status))}>{payee.status}</span>
         </TableCell>
-        <TableCell className="text-right">
-            <div className='flex items-center justify-end gap-2' onClick={stopPropagation}>
-              {payee.status === 'Unpaid' && 
-                <Button size="sm" variant="ghost" className="hover:bg-primary/10 text-primary" onClick={handlePayNowClick}>
-                    Pay Now <ArrowRight className="h-4 w-4 ml-1" />
+        {!multiPayMode && (
+          <TableCell className="text-right">
+              <div className='flex items-center justify-end gap-2' onClick={stopPropagation}>
+                {payee.status === 'Unpaid' && 
+                  <Button size="sm" variant="ghost" className="hover:bg-primary/10 text-primary" onClick={handlePayNowClick}>
+                      Pay Now <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
+                }
+                <Button variant="ghost" size="icon" className="p-2 h-auto w-auto" onClick={onToggle}>
+                    {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                    <span className="sr-only">Toggle Details</span>
                 </Button>
-              }
-              <Button variant="ghost" size="icon" className="p-2 h-auto w-auto" onClick={onToggle}>
-                  {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-                  <span className="sr-only">Toggle Details</span>
-              </Button>
-            </div>
-        </TableCell>
+              </div>
+          </TableCell>
+        )}
       </TableRow>
-      {isOpen && (
+      {!multiPayMode && isOpen && (
         <TableRow>
           <TableCell colSpan={5} className="p-0">
             <div className="bg-muted/50 p-4 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
@@ -119,9 +151,16 @@ function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, 
   );
 }
 
-export function PayeeTable({ data }: PayeeTableProps) {
-  const [openPayeeId, setOpenPayeeId] = useState<string | null>('01271111630306'); // Keep first one open by default as in image
+export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
+  const [openPayeeId, setOpenPayeeId] = useState<string | null>('01271111630306');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedPayees, setSelectedPayees] = useState<string[]>([]);
+  
+  useEffect(() => {
+    if (!multiPayMode) {
+      setSelectedPayees([]);
+    }
+  }, [multiPayMode]);
 
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -129,7 +168,9 @@ export function PayeeTable({ data }: PayeeTableProps) {
   const currentData = data.slice(startIndex, endIndex);
 
   const handleRowToggle = (consumerNumber: string) => {
-    setOpenPayeeId(prevId => (prevId === consumerNumber ? null : consumerNumber));
+    if (!multiPayMode) {
+      setOpenPayeeId(prevId => (prevId === consumerNumber ? null : consumerNumber));
+    }
   };
   
   const handlePreviousPage = () => {
@@ -140,16 +181,43 @@ export function PayeeTable({ data }: PayeeTableProps) {
     setCurrentPage(prev => Math.min(prev + 1, totalPages));
   }
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedPayees(currentData.map(p => p.consumerNumber));
+    } else {
+      setSelectedPayees([]);
+    }
+  }
+
+  const handleSelectionChange = (consumerNumber: string, checked: boolean) => {
+    if (checked) {
+      setSelectedPayees(prev => [...prev, consumerNumber]);
+    } else {
+      setSelectedPayees(prev => prev.filter(cn => cn !== consumerNumber));
+    }
+  }
+
+  const isAllSelected = currentData.length > 0 && selectedPayees.length === currentData.length;
+
+
   return (
     <div className="rounded-lg border bg-card text-card-foreground shadow-sm mt-4">
       <Table>
         <TableHeader>
           <TableRow>
+            {multiPayMode && (
+              <TableHead className="w-12 text-center">
+                <Checkbox 
+                  checked={isAllSelected}
+                  onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
+                />
+              </TableHead>
+            )}
             <TableHead>Consumer Name</TableHead>
             <TableHead>Biller Type</TableHead>
             <TableHead>Consumer / Account Number</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            {!multiPayMode && <TableHead className="text-right">Actions</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -158,13 +226,16 @@ export function PayeeTable({ data }: PayeeTableProps) {
               <PayeeRow 
                 key={payee.consumerNumber} 
                 payee={payee}
-                isOpen={openPayeeId === payee.consumerNumber}
+                isOpen={!multiPayMode && openPayeeId === payee.consumerNumber}
                 onToggle={() => handleRowToggle(payee.consumerNumber)}
+                multiPayMode={multiPayMode}
+                isSelected={selectedPayees.includes(payee.consumerNumber)}
+                onSelectionChange={(checked) => handleSelectionChange(payee.consumerNumber, checked)}
               />
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={5} className="h-24 text-center">
+              <TableCell colSpan={multiPayMode ? 5 : 5} className="h-24 text-center">
                 No Payees Found
               </TableCell>
             </TableRow>
@@ -173,7 +244,7 @@ export function PayeeTable({ data }: PayeeTableProps) {
         {data.length > 0 && (
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={5}>
+              <TableCell colSpan={multiPayMode ? 5 : 5}>
                 <div className="flex items-center justify-between p-2">
                   <span className="text-sm text-muted-foreground">
                       {startIndex + 1} - {endIndex} Payee
