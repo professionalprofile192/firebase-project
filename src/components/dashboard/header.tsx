@@ -83,7 +83,7 @@ const SidebarNav = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             label: 'Payments', 
             icon: CreditCard, 
             subItems: [
-                { label: 'Bill Payment', href: '#' },
+                { label: 'Bill Payment', href: '/bill-payment' },
                 { label: 'Bulk Bill Payments', href: '#' },
                 { label: 'Bill Payment History', href: '#' }
             ] 
@@ -294,7 +294,7 @@ export function Header() {
                     Home
                 </Link>
                 <Link
-                    href="#"
+                    href="/bill-payment"
                     className="transition-colors hover:text-primary/80"
                 >
                     Payments
