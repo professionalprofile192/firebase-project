@@ -92,7 +92,7 @@ function BillPaymentContent() {
                         limit: 100,
                         sortBy: "createdOn",
                         order: "desc",
-                        payeeId: userProfile.userid, 
+                        payeeId: userProfile.UserName, 
                         searchString: ""
                     }
                 })
@@ -137,14 +137,14 @@ function BillPaymentContent() {
       } else {
         setAllPayees([]);
         setFilteredPayees([]);
-        toast({ variant: "destructive", title: "Failed to fetch payees", description: payeeData.errmsg || 'Could not load payee data.' });
+        toast({ variant: "destructive", title: "Failed to fetch payees", description: payeeData.errmsg || payeeData.error || 'Could not load payee data.' });
       }
 
       if (categoryData.opstatus === 0 && categoryData.PaymentService) {
           setCategories(categoryData.PaymentService);
       } else {
           setCategories([]);
-          toast({ variant: "destructive", title: "Failed to fetch categories", description: categoryData.errmsg || 'Could not load category data.' });
+          toast({ variant: "destructive", title: "Failed to fetch categories", description: categoryData.errmsg || categoryData.error || 'Could not load category data.' });
       }
 
     } catch (error) {
@@ -342,3 +342,5 @@ export default function BillPaymentPage() {
     </Suspense>
   )
 }
+
+    
