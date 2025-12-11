@@ -577,15 +577,12 @@ export function LoginForm() {
       const usersData = await usersRes.json();
       console.log("USERS API DATA:", usersData);
 
-// === EXTRACT TOKEN & KUID FOR PAYEE LIST ===
-const token = data?.claims_token?.value;
-const kuid =
-  data?.claims_token?._prov_userid ||
-  data?.claims_token?._puid ||
-  data?.profile?.userid;
-
-console.log("TOKEN:", token);
-console.log("KUID:", kuid);
+      // === EXTRACT TOKEN & KUID FOR PAYEE LIST ===
+      const token = data?.claims_token?.value;
+      const kuid = data?.profile?.UserName; // Corrected path for username
+      
+      console.log("TOKEN:", token);
+      console.log("KUID:", kuid);
 
 //fetch accounts
 
@@ -604,31 +601,43 @@ console.log("KUID:", kuid);
       
      
 
-  // === CALL GET PAYEE LIST API ===
+  // ⭐ 5) GET USER PROFILE IMAGE
+
+// const imageRes = await fetch("/api/get-user-profile-image", {
+//   method: "POST",
+//   headers: {
+//     "Content-Type": "application/json",
+//     "x-session-token": sessionToken,           // REAL token
+//     "x-kony-authorization": data?.claims_token?.value,   // REQUIRED
+//   },
+// });
+
+// const imageData = await imageRes.json();
+// console.log("PROFILE IMAGE:", imageData);
+
+// === CALL GET PAYEE LIST API ===
 const payeePayload = {
-  id: "",
-  offset: 0,
-  limit: 10,
-  sortBy: "createdOn",
-  order: "desc",
-  payeeId: data?.profile?.userid,
-  searchString: ""
+    id: "",
+    offset: 0,
+    limit: 10,
+    sortBy: "createdOn",
+    order: "desc",
+    payeeId: data?.profile?.userid, // Use the correct user id
+    searchString: ""
 };
 
 const payeeRes = await fetch("/api/get-payee-list", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    token,
-    kuid,
-    payload: payeePayload
-  })
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        token,
+        kuid,
+        payload: payeePayload
+    })
 });
 
 const payeeData = await payeeRes.json();
 console.log("GET PAYEE LIST RESPONSE:", payeeData);
-
-
 
 
   //     const legacyToken =
@@ -822,3 +831,7 @@ console.log("GET PAYEE LIST RESPONSE:", payeeData);
     </>
   );
 }
+
+    
+
+    
