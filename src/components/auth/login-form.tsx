@@ -577,6 +577,16 @@ export function LoginForm() {
       const usersData = await usersRes.json();
       console.log("USERS API DATA:", usersData);
 
+// === EXTRACT TOKEN & KUID FOR PAYEE LIST ===
+const token = data?.claims_token?.value;
+const kuid =
+  data?.claims_token?._prov_userid ||
+  data?.claims_token?._puid ||
+  data?.profile?.userid;
+
+console.log("TOKEN:", token);
+console.log("KUID:", kuid);
+
 //fetch accounts
 
       const resAccounts = await fetch("/api/fetch-accounts", {
@@ -594,19 +604,29 @@ export function LoginForm() {
       
      
 
-  // ⭐ 5) GET USER PROFILE IMAGE
+  // === CALL GET PAYEE LIST API ===
+const payeePayload = {
+  id: "",
+  offset: 0,
+  limit: 10,
+  sortBy: "createdOn",
+  order: "desc",
+  payeeId: data?.profile?.userid,
+  searchString: ""
+};
 
-// const imageRes = await fetch("/api/get-user-profile-image", {
-//   method: "POST",
-//   headers: {
-//     "Content-Type": "application/json",
-//     "x-session-token": sessionToken,           // REAL token
-//     "x-kony-authorization": data?.claims_token?.value,   // REQUIRED
-//   },
-// });
+const payeeRes = await fetch("/api/get-payee-list", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    token,
+    kuid,
+    payload: payeePayload
+  })
+});
 
-// const imageData = await imageRes.json();
-// console.log("PROFILE IMAGE:", imageData);
+const payeeData = await payeeRes.json();
+console.log("GET PAYEE LIST RESPONSE:", payeeData);
 
 
 
@@ -802,5 +822,3 @@ export function LoginForm() {
     </>
   );
 }
-
-    
