@@ -13,7 +13,7 @@ import { BillPaymentHistoryTable, type HistoryItem } from '@/components/bill-pay
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 
@@ -37,6 +37,7 @@ type Category = {
 
 function BillPaymentContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'bill-payment');
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [multiPayMode, setMultiPayMode] = useState(false);
@@ -72,12 +73,13 @@ function BillPaymentContent() {
     if (!sessionToken || !userProfileString) {
       toast({ variant: "destructive", title: "Error", description: "Session not found. Please log in again." });
       setLoadingPayees(false);
+      router.push('/');
       return;
     }
     
-    const userProfile = JSON.parse(userProfileString);
-
     try {
+        const userProfile = JSON.parse(userProfileString);
+
         const [payeeData, categoryData] = await Promise.all([
             // Fetch Payees
             fetch("/api/get-payee-list", {
@@ -92,7 +94,7 @@ function BillPaymentContent() {
                         limit: 100,
                         sortBy: "createdOn",
                         order: "desc",
-                        payeeId: userProfile.userid, 
+                        payeeId: userProfile.userid,
                         searchString: ""
                     }
                 })
@@ -152,7 +154,7 @@ function BillPaymentContent() {
     } finally {
       setLoadingPayees(false);
     }
-  }, [toast]);
+  }, [toast, router]);
 
   useEffect(() => {
     fetchData();
