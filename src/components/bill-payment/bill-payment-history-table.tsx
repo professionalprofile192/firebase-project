@@ -72,11 +72,11 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
              <TableFooter>
                 <TableRow>
                 <TableCell colSpan={7}>
-                    <div className="flex items-center justify-center p-2">
+                    <div className="flex items-center justify-between p-2">
                         <Button variant="ghost" size="icon">
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
-                        <span className="text-sm text-muted-foreground mx-4">
+                        <span className="text-sm text-muted-foreground">
                             1 - {data.length > 10 ? 10 : data.length} of {data.length} Transactions
                         </span>
                         <Button variant="ghost" size="icon">
