@@ -92,7 +92,7 @@ function BillPaymentContent() {
                         limit: 100,
                         sortBy: "createdOn",
                         order: "desc",
-                        payeeId: userProfile.UserName, 
+                        payeeId: userProfile.userid, 
                         searchString: ""
                     }
                 })
