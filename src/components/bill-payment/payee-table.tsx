@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Edit, Trash2, BarChart2 } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,10 @@ type Payee = {
   consumerName: string;
   billerType: string;
   consumerNumber: string;
-  status: string;
+  status: 'Unpaid' | 'Not Payable' | 'Paid';
+  amountDue?: string;
+  dueDate?: string;
+  amountAfterDueDate?: string;
 };
 
 interface PayeeTableProps {
@@ -31,28 +34,73 @@ const ITEMS_PER_PAGE = 8;
 
 function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, onToggle: () => void }) {
 
+  const getStatusVariant = (status: string) => {
+    switch(status) {
+      case 'Unpaid': return 'destructive';
+      case 'Paid': return 'success';
+      default: return 'secondary';
+    }
+  }
+
+  const getStatusClass = (status: string) => {
+    switch(status) {
+      case 'Unpaid': return 'text-red-600';
+      case 'Paid': return 'text-green-600';
+      default: return 'text-gray-500';
+    }
+  }
+
   return (
     <>
-      <TableRow>
-        <TableCell className="font-medium">{payee.consumerName}</TableCell>
+      <TableRow onClick={onToggle} className="cursor-pointer">
+        <TableCell className="font-medium">
+          <div>{payee.consumerName.split(' ')[0]}</div>
+          <div className="text-muted-foreground text-xs">{payee.consumerName}</div>
+        </TableCell>
         <TableCell>
-            <Link href="#" className="text-primary hover:underline">{payee.billerType}</Link>
+            <Link href="#" className="text-primary hover:underline" onClick={(e) => e.stopPropagation()}>{payee.billerType}</Link>
         </TableCell>
         <TableCell>{payee.consumerNumber}</TableCell>
         <TableCell>
-          <Badge variant="secondary" className="bg-gray-200 text-gray-700">{payee.status}</Badge>
+          <span className={cn("font-semibold", getStatusClass(payee.status))}>{payee.status}</span>
         </TableCell>
         <TableCell className="text-right">
-             <Button size="sm" variant="ghost" onClick={onToggle}>
-                <ChevronDown className={cn("h-5 w-5 transition-transform", { "rotate-180": isOpen })} />
-             </Button>
+            <div className='flex items-center justify-end gap-2'>
+              {payee.status === 'Unpaid' && <Button size="sm" variant="ghost" className="hover:bg-primary/10 text-primary">Pay Now <ChevronRight className="h-4 w-4 ml-1" /></Button>}
+              <Button size="sm" variant="ghost" onClick={onToggle} className="p-2 h-auto">
+                  {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+              </Button>
+            </div>
         </TableCell>
       </TableRow>
       {isOpen && (
         <TableRow>
           <TableCell colSpan={5} className="p-0">
-            <div className="bg-muted/50 p-4 grid grid-cols-4 gap-4 items-center">
-                <p className="text-sm text-muted-foreground">Additional details can be shown here.</p>
+            <div className="bg-muted/50 p-4 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+                {payee.amountDue && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">Amount Due</p>
+                    <p className="font-semibold">PKR {payee.amountDue}</p>
+                  </div>
+                )}
+                 {payee.dueDate && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">Due Date</p>
+                    <p className="font-semibold">{payee.dueDate}</p>
+                  </div>
+                )}
+                {payee.amountAfterDueDate && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">Amount After Due Date</p>
+                    <p className="font-semibold">PKR {payee.amountAfterDueDate}</p>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2 justify-end md:col-start-4">
+                    <Button variant="outline" size="sm"><BarChart2 className="h-4 w-4 mr-1" /> View Activity</Button>
+                    <Button variant="outline" size="sm"><Edit className="h-4 w-4 mr-1" /> Edit</Button>
+                    <Button variant="outline" size="sm" className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4 mr-1" /> Delete</Button>
+                </div>
             </div>
           </TableCell>
         </TableRow>
@@ -117,29 +165,26 @@ export function PayeeTable({ data }: PayeeTableProps) {
             <TableRow>
               <TableCell colSpan={5}>
                 <div className="flex items-center justify-between p-2">
-                  <div></div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm text-muted-foreground">
-                        {startIndex + 1} - {Math.min(endIndex, data.length)} Payee
-                    </span>
-                    <div className="flex items-center">
-                      <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={handlePreviousPage}
-                          disabled={currentPage === 1}
-                      >
-                          <ChevronLeft className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={handleNextPage}
-                          disabled={currentPage === totalPages}
-                      >
-                          <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
+                  <span className="text-sm text-muted-foreground">
+                      {startIndex + 1} - {Math.min(endIndex, data.length)} Payee
+                  </span>
+                  <div className="flex items-center">
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={handlePreviousPage}
+                        disabled={currentPage === 1}
+                    >
+                        <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={handleNextPage}
+                        disabled={currentPage === totalPages}
+                    >
+                        <ChevronRight className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               </TableCell>

@@ -15,19 +15,22 @@ const payees = [
     consumerName: 'ASHAQ SO SHEAKH AHMED',
     billerType: 'Electricity HAZECO Bill Payment',
     consumerNumber: '01271111630306',
-    status: 'Unknown',
+    status: 'Not Payable' as const,
   },
   {
     consumerName: 'humn humn',
     billerType: '1 Bill Invoice/Voucher',
     consumerNumber: '11144401142440133703',
-    status: 'Unknown',
+    status: 'Unpaid' as const,
+    amountDue: '653.00',
+    dueDate: '22/12/2025',
+    amountAfterDueDate: '685.00'
   },
   {
     consumerName: 'Humna Humna',
     billerType: '1 Bill Invoice/Voucher',
     consumerNumber: '10011450865000054126',
-    status: 'Unknown',
+    status: 'Not Payable' as const,
   },
 ];
 
