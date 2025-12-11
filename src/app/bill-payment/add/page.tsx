@@ -18,7 +18,7 @@ export default function AddUtilityBillPage() {
                     <h1 className="text-2xl font-semibold">Add Utility Bill</h1>
                 </div>
 
-                <Card className="w-full max-w-4xl">
+                <Card className="w-full">
                     <CardContent className="p-6">
                         <form className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
