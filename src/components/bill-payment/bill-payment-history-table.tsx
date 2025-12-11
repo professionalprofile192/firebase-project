@@ -71,9 +71,7 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
         <TableFooter>
             <TableRow>
               <TableCell colSpan={7}>
-                <div className="flex items-center justify-between p-2 text-sm text-muted-foreground">
-                  <span>1-20 Transactions</span>
-                  <div className="flex items-center">
+                <div className="flex items-center justify-between p-2">
                     <Button 
                         variant="ghost" 
                         size="icon" 
@@ -81,6 +79,9 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
                     >
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
+                    <span className="text-sm text-muted-foreground">
+                      1-20 Transactions
+                    </span>
                     <Button 
                         variant="ghost" 
                         size="icon"
@@ -88,7 +89,6 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
                     >
                         <ChevronRight className="h-4 w-4" />
                     </Button>
-                  </div>
                 </div>
               </TableCell>
             </TableRow>
