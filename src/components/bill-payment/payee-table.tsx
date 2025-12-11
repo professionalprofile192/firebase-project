@@ -74,8 +74,9 @@ function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, 
                     Pay Now <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               }
-              <Button size="icon" variant="ghost" onClick={onToggle} className="p-2 h-auto w-auto">
+              <Button variant="ghost" size="icon" className="p-2 h-auto w-auto" onClick={onToggle}>
                   {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                  <span className="sr-only">Toggle Details</span>
               </Button>
             </div>
         </TableCell>
@@ -124,7 +125,7 @@ export function PayeeTable({ data }: PayeeTableProps) {
 
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, data.length);
   const currentData = data.slice(startIndex, endIndex);
 
   const handleRowToggle = (consumerNumber: string) => {
@@ -175,7 +176,7 @@ export function PayeeTable({ data }: PayeeTableProps) {
               <TableCell colSpan={5}>
                 <div className="flex items-center justify-between p-2">
                   <span className="text-sm text-muted-foreground">
-                      {startIndex + 1} - {Math.min(endIndex, data.length)} Payee
+                      {startIndex + 1} - {endIndex} Payee
                   </span>
                   <div className="flex items-center">
                     <Button 
