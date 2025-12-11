@@ -152,7 +152,7 @@ function PayeeRow({
 }
 
 export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
-  const [openPayeeId, setOpenPayeeId] = useState<string | null>('01271111630306');
+  const [openPayeeId, setOpenPayeeId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPayees, setSelectedPayees] = useState<string[]>([]);
   
