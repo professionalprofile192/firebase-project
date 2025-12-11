@@ -159,9 +159,10 @@ export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
   useEffect(() => {
     if (!multiPayMode) {
       setSelectedPayees([]);
-      setOpenPayeeId(null);
     }
-  }, [multiPayMode]);
+    setOpenPayeeId(null);
+    setCurrentPage(1);
+  }, [multiPayMode, data]);
 
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -246,8 +247,8 @@ export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
           <TableFooter>
             <TableRow>
               <TableCell colSpan={multiPayMode ? 5 : 5}>
-                <div className="flex items-center justify-between p-2 text-sm text-muted-foreground">
-                   <Button 
+                <div className="flex items-center justify-between p-2">
+                    <Button 
                         variant="ghost" 
                         size="icon" 
                         onClick={handlePreviousPage}
@@ -255,10 +256,10 @@ export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
                     >
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
-                  <span className="text-center">
-                      {startIndex + 1} - {endIndex} Payee
-                  </span>
-                  <Button 
+                    <span className="text-sm text-muted-foreground">
+                      {startIndex + 1} - {endIndex} of {data.length} Payees
+                    </span>
+                    <Button 
                         variant="ghost" 
                         size="icon"
                         onClick={handleNextPage}

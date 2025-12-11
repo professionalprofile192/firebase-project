@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export type HistoryItem = {
   consumerNumber: string;
@@ -26,7 +27,27 @@ interface BillPaymentHistoryTableProps {
   data: HistoryItem[];
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [data]);
+
+  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, data.length);
+  const currentData = data.slice(startIndex, endIndex);
+
+  const handlePreviousPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  }
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  }
 
   return (
     <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
@@ -43,8 +64,8 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.length > 0 ? (
-            data.map((item) => (
+          {currentData.length > 0 ? (
+            currentData.map((item) => (
               <TableRow key={item.transactionId}>
                 <TableCell>{item.consumerNumber}</TableCell>
                 <TableCell>{item.transactionId}</TableCell>
@@ -68,31 +89,35 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
             </TableRow>
           )}
         </TableBody>
-        <TableFooter>
-            <TableRow>
-              <TableCell colSpan={7}>
-                <div className="flex items-center justify-between p-2">
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        disabled={true}
-                    >
-                        <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <span className="text-sm text-muted-foreground">
-                      1-20 Transactions
-                    </span>
-                    <Button 
-                        variant="ghost" 
-                        size="icon"
-                        disabled={true}
-                    >
-                        <ChevronRight className="h-4 w-4" />
-                    </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-        </TableFooter>
+        {data.length > 0 && (
+            <TableFooter>
+                <TableRow>
+                <TableCell colSpan={7}>
+                    <div className="flex items-center justify-between p-2">
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={handlePreviousPage}
+                            disabled={currentPage === 1}
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <span className="text-sm text-muted-foreground">
+                            {startIndex + 1} - {endIndex} of {data.length} Transactions
+                        </span>
+                        <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={handleNextPage}
+                            disabled={currentPage === totalPages}
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </TableCell>
+                </TableRow>
+            </TableFooter>
+        )}
       </Table>
     </div>
   );
