@@ -11,6 +11,7 @@ import { PayeeTable, type Payee } from '@/components/bill-payment/payee-table';
 import { BillPaymentHistoryTable } from '@/components/bill-payment/bill-payment-history-table';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import Link from 'next/link';
 
 // This will be replaced with your actual API data
 const payees: Payee[] = [
@@ -76,7 +77,9 @@ function BillPaymentContent() {
                     ) : (
                         <Button variant="outline" onClick={() => setMultiPayMode(true)}>Pay Multiple Bills</Button>
                     )}
-                    <Button>Add Utility Bill +</Button>
+                     <Button asChild>
+                        <Link href="/bill-payment/add">Add Utility Bill +</Link>
+                    </Button>
                 </div>
             )}
         </div>
