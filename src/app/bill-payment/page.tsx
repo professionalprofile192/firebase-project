@@ -12,6 +12,7 @@ import { BillPaymentHistoryTable, type HistoryItem } from '@/components/bill-pay
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 // This will be replaced with your actual API data
 const payees: Payee[] = [
@@ -61,6 +62,15 @@ function BillPaymentContent() {
   const [multiPayMode, setMultiPayMode] = useState(false);
   const [payeeSearchTerm, setPayeeSearchTerm] = useState('');
   const [historySearchTerm, setHistorySearchTerm] = useState('');
+  const pathname = usePathname();
+
+  useEffect(() => {
+    // This effect runs when the component mounts or the pathname changes.
+    // When navigating back, the component might re-mount, resetting the state.
+    setPayeeSearchTerm('');
+    setHistorySearchTerm('');
+  }, [pathname]);
+
 
   const handleAccountChange = (acctNo: string) => {
     const account = accounts.find(a => a.acctNo === acctNo);
@@ -92,7 +102,7 @@ function BillPaymentContent() {
   const filteredHistory = billPaymentHistory.filter(item => 
     item.consumerName.toLowerCase().includes(historySearchTerm.toLowerCase()) ||
     item.consumerNumber.toLowerCase().includes(historySearchTerm.toLowerCase()) ||
-    item.transactionId.toLowerCase().includes(historySearchTerm.toLowerCase())
+    (item.transactionId && item.transactionId.toLowerCase().includes(historySearchTerm.toLowerCase()))
   );
 
   return (
@@ -229,5 +239,3 @@ export default function BillPaymentPage() {
     </Suspense>
   )
 }
-
-    

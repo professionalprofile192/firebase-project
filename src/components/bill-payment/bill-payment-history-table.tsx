@@ -97,5 +97,3 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
     </div>
   );
 }
-
-    
