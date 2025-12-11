@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState, useEffect, useCallback } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,37 +13,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-
-// This will be replaced with your actual API data
-const payees: Payee[] = [
-  {
-    consumerName: 'ASHAQ SO SHEAKH AHMED',
-    billerType: 'Electricity HAZECO Bill Payment',
-    consumerNumber: '01271111630306',
-    status: 'Not Payable' as const,
-    amountDue: '481.00',
-    dueDate: '24/11/2025',
-    amountAfterDueDate: '484.00'
-  },
-  {
-    consumerName: 'humn humn',
-    billerType: '1 Bill Invoice/Voucher',
-    consumerNumber: '11144401142440133703',
-    status: 'Unpaid' as const,
-    amountDue: '653.00',
-    dueDate: '22/12/2025',
-    amountAfterDueDate: '685.00'
-  },
-  {
-    consumerName: 'Humna Humna',
-    billerType: '1 Bill Invoice/Voucher',
-    consumerNumber: '10011450865000054126',
-    status: 'Not Payable' as const,
-  },
-];
+import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 const billPaymentHistory: HistoryItem[] = [];
-
 
 type Account = {
   acctNo: string;
@@ -64,15 +37,88 @@ function BillPaymentContent() {
   const [payeeSearchTerm, setPayeeSearchTerm] = useState('');
   const [historySearchTerm, setHistorySearchTerm] = useState('');
 
-  // By using useSearchParams, we make this component dynamic, which causes it to
-  // re-evaluate when navigating back, resetting the state.
-  const a = searchParams.get('a'); // This is just to ensure re-render
+  const [payees, setPayees] = useState<Payee[]>([]);
+  const [loadingPayees, setLoadingPayees] = useState(true);
+  const { toast } = useToast();
+
+  const a = searchParams.get('a'); 
 
   useEffect(() => {
-    // This effect now reliably runs on navigation, clearing the search terms.
+    async function fetchPayees() {
+      const sessionToken = sessionStorage.getItem("sessionToken");
+      const userProfileString = sessionStorage.getItem('userProfile');
+
+      if (!sessionToken || !userProfileString) {
+        toast({ variant: "destructive", title: "Error", description: "Session not found. Please log in again." });
+        setLoadingPayees(false);
+        return;
+      }
+      
+      const userProfile = JSON.parse(userProfileString);
+
+      try {
+        const payload = {
+            id: "",
+            offset: 0,
+            limit: 100, // Fetch more to show more data
+            sortBy: "createdOn",
+            order: "desc",
+            payeeId: userProfile.userid, 
+            searchString: ""
+        };
+
+        const res = await fetch("/api/get-payee-list", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token: sessionToken,
+            kuid: userProfile.UserName,
+            payload: payload
+          })
+        });
+
+        const data = await res.json();
+        if (data.opstatus === 0 && data.payee) {
+          const mappedPayees: Payee[] = data.payee.map((p: any) => {
+            let notes = {};
+            try {
+              notes = JSON.parse(p.notes || '{}');
+            } catch (e) {
+              console.error("Failed to parse payee notes", e);
+            }
+            
+            const billStatus = (notes as any).billStatus;
+            let status: Payee['status'] = 'Not Payable';
+            if (billStatus === 'Unpaid') {
+              status = 'Unpaid';
+            } else if (billStatus === 'Paid') {
+              status = 'Paid';
+            }
+
+            return {
+              consumerName: p.payeeNickName || 'N/A',
+              billerType: p.nameOnBill || p.companyName || 'N/A',
+              consumerNumber: p.accountNumber,
+              status: status,
+              amountDue: (notes as any).billAmount,
+              dueDate: (notes as any).dueDate ? format(new Date((notes as any).dueDate), 'dd/MM/yyyy') : undefined,
+              amountAfterDueDate: (notes as any).lateSurcharge,
+            };
+          });
+          setPayees(mappedPayees);
+        } else {
+          toast({ variant: "destructive", title: "Failed to fetch payees", description: data.errmsg || 'Could not load payee data.' });
+        }
+      } catch (error) {
+         toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred while fetching payees." });
+      } finally {
+        setLoadingPayees(false);
+      }
+    }
+    fetchPayees();
     setPayeeSearchTerm('');
     setHistorySearchTerm('');
-  }, [a]);
+  }, [a, toast]);
 
 
   const handleAccountChange = (acctNo: string) => {
@@ -159,7 +205,7 @@ function BillPaymentContent() {
                     </SelectContent>
                 </Select>
             </div>
-            <PayeeTable data={filteredPayees} multiPayMode={multiPayMode} />
+            <PayeeTable data={filteredPayees} multiPayMode={multiPayMode} loading={loadingPayees}/>
           </TabsContent>
 
           <TabsContent value="bill-payment-history">

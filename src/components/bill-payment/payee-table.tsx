@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -17,6 +16,8 @@ import Link from 'next/link';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '../ui/checkbox';
+import { Skeleton } from '../ui/skeleton';
+
 
 export type Payee = {
   consumerName: string;
@@ -31,6 +32,7 @@ export type Payee = {
 interface PayeeTableProps {
   data: Payee[];
   multiPayMode: boolean;
+  loading?: boolean;
 }
 
 const ITEMS_PER_PAGE = 8;
@@ -85,7 +87,7 @@ function PayeeRow({
           </TableCell>
         )}
         <TableCell className="font-medium">
-          <div>{payee.consumerName.split(' ')[0]}</div>
+          <div>{payee.consumerName}</div>
           <div className="text-muted-foreground text-xs">{payee.consumerName}</div>
         </TableCell>
         <TableCell>
@@ -151,7 +153,7 @@ function PayeeRow({
   );
 }
 
-export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
+export function PayeeTable({ data, multiPayMode, loading }: PayeeTableProps) {
   const [openPayeeId, setOpenPayeeId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPayees, setSelectedPayees] = useState<string[]>([]);
@@ -223,7 +225,15 @@ export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {currentData.length > 0 ? (
+          {loading ? (
+            [...Array(ITEMS_PER_PAGE)].map((_, i) => (
+              <TableRow key={i}>
+                <TableCell colSpan={multiPayMode ? 5 : 5}>
+                  <Skeleton className="h-10 w-full" />
+                </TableCell>
+              </TableRow>
+            ))
+          ) : currentData.length > 0 ? (
             currentData.map((payee) => (
               <PayeeRow 
                 key={payee.consumerNumber} 
@@ -245,21 +255,21 @@ export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
         </TableBody>
         {data.length > 0 && (
           <TableFooter>
-            <TableRow>
-              <TableCell colSpan={multiPayMode ? 5 : 5}>
-                <div className="flex items-center justify-between p-2">
-                    <Button variant="ghost" size="icon" disabled>
-                        <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <span className="text-sm text-muted-foreground">
-                      1 - {data.length > 8 ? 8 : data.length} Payees
-                    </span>
-                    <Button variant="ghost" size="icon" disabled>
-                        <ChevronRight className="h-4 w-4" />
-                    </Button>
-                </div>
-              </TableCell>
-            </TableRow>
+             <TableRow>
+                <TableCell colSpan={multiPayMode ? 5 : 5}>
+                    <div className="flex items-center justify-between p-2">
+                        <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <span className="text-sm text-muted-foreground">
+                            {startIndex + 1} - {endIndex} of {data.length} Payees
+                        </span>
+                        <Button variant="ghost" size="icon" onClick={handleNextPage} disabled={currentPage === totalPages}>
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </TableCell>
+              </TableRow>
           </TableFooter>
         )}
       </Table>
