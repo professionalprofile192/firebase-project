@@ -16,6 +16,9 @@ const payees = [
     billerType: 'Electricity HAZECO Bill Payment',
     consumerNumber: '01271111630306',
     status: 'Not Payable' as const,
+    amountDue: '481.00',
+    dueDate: '24/11/2025',
+    amountAfterDueDate: '484.00'
   },
   {
     consumerName: 'humn humn',

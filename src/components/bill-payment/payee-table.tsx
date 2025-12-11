@@ -34,14 +34,6 @@ const ITEMS_PER_PAGE = 8;
 
 function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, onToggle: () => void }) {
 
-  const getStatusVariant = (status: string) => {
-    switch(status) {
-      case 'Unpaid': return 'destructive';
-      case 'Paid': return 'success';
-      default: return 'secondary';
-    }
-  }
-
   const getStatusClass = (status: string) => {
     switch(status) {
       case 'Unpaid': return 'text-red-600';
@@ -67,7 +59,7 @@ function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, 
         <TableCell className="text-right">
             <div className='flex items-center justify-end gap-2'>
               {payee.status === 'Unpaid' && <Button size="sm" variant="ghost" className="hover:bg-primary/10 text-primary">Pay Now <ChevronRight className="h-4 w-4 ml-1" /></Button>}
-              <Button size="sm" variant="ghost" onClick={onToggle} className="p-2 h-auto">
+              <Button size="icon" variant="ghost" onClick={onToggle} className="p-2 h-auto w-auto">
                   {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
               </Button>
             </div>
@@ -110,7 +102,7 @@ function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, 
 }
 
 export function PayeeTable({ data }: PayeeTableProps) {
-  const [openPayeeId, setOpenPayeeId] = useState<string | null>(null);
+  const [openPayeeId, setOpenPayeeId] = useState<string | null>('01271111630306'); // Keep first one open by default as in image
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
