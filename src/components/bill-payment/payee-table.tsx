@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Edit, Trash2, BarChart2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Edit, Trash2, BarChart2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
@@ -48,6 +48,10 @@ function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, 
     // Logic for 'Pay Now' will be added later
     console.log(`Pay Now clicked for ${payee.consumerNumber}`);
   };
+  
+  const stopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
 
   return (
     <>
@@ -57,17 +61,17 @@ function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, 
           <div className="text-muted-foreground text-xs">{payee.consumerName}</div>
         </TableCell>
         <TableCell>
-            <Link href="#" className="text-primary hover:underline" onClick={(e) => e.stopPropagation()}>{payee.billerType}</Link>
+            <Link href="#" className="text-primary hover:underline" onClick={stopPropagation}>{payee.billerType}</Link>
         </TableCell>
         <TableCell>{payee.consumerNumber}</TableCell>
         <TableCell>
           <span className={cn("font-semibold", getStatusClass(payee.status))}>{payee.status}</span>
         </TableCell>
         <TableCell className="text-right">
-            <div className='flex items-center justify-end gap-2'>
+            <div className='flex items-center justify-end gap-2' onClick={stopPropagation}>
               {payee.status === 'Unpaid' && 
                 <Button size="sm" variant="ghost" className="hover:bg-primary/10 text-primary" onClick={handlePayNowClick}>
-                    Pay Now <ChevronRight className="h-4 w-4 ml-1" />
+                    Pay Now <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               }
               <Button size="icon" variant="ghost" onClick={onToggle} className="p-2 h-auto w-auto">
@@ -80,29 +84,31 @@ function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, 
         <TableRow>
           <TableCell colSpan={5} className="p-0">
             <div className="bg-muted/50 p-4 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-                {payee.amountDue && (
-                  <div>
-                    <p className="text-xs text-muted-foreground">Amount Due</p>
-                    <p className="font-semibold">PKR {payee.amountDue}</p>
-                  </div>
-                )}
-                 {payee.dueDate && (
-                  <div>
-                    <p className="text-xs text-muted-foreground">Due Date</p>
-                    <p className="font-semibold">{payee.dueDate}</p>
-                  </div>
-                )}
-                {payee.amountAfterDueDate && (
-                  <div>
-                    <p className="text-xs text-muted-foreground">Amount After Due Date</p>
-                    <p className="font-semibold">PKR {payee.amountAfterDueDate}</p>
-                  </div>
-                )}
+                <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {payee.amountDue && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">Amount Due</p>
+                      <p className="font-semibold">PKR {payee.amountDue}</p>
+                    </div>
+                  )}
+                  {payee.dueDate && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">Due Date</p>
+                      <p className="font-semibold">{payee.dueDate}</p>
+                    </div>
+                  )}
+                  {payee.amountAfterDueDate && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">Amount After Due Date</p>
+                      <p className="font-semibold">PKR {payee.amountAfterDueDate}</p>
+                    </div>
+                  )}
+                </div>
 
                 <div className="flex items-center gap-2 justify-end md:col-start-4">
                     <Button variant="outline" size="sm"><BarChart2 className="h-4 w-4 mr-1" /> View Activity</Button>
                     <Button variant="outline" size="sm"><Edit className="h-4 w-4 mr-1" /> Edit</Button>
-                    <Button variant="outline" size="sm" className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4 mr-1" /> Delete</Button>
+                    <Button variant="outline" size="icon" className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
                 </div>
             </div>
           </TableCell>
