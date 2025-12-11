@@ -247,11 +247,7 @@ export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
             <TableRow>
               <TableCell colSpan={multiPayMode ? 5 : 5}>
                 <div className="flex items-center justify-between p-2 text-sm text-muted-foreground">
-                  <span>
-                      {startIndex + 1} - {endIndex} Payee
-                  </span>
-                  <div className="flex items-center">
-                    <Button 
+                   <Button 
                         variant="ghost" 
                         size="icon" 
                         onClick={handlePreviousPage}
@@ -259,7 +255,10 @@ export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
                     >
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button 
+                  <span className="text-center">
+                      {startIndex + 1} - {endIndex} Payee
+                  </span>
+                  <Button 
                         variant="ghost" 
                         size="icon"
                         onClick={handleNextPage}
@@ -267,7 +266,6 @@ export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
                     >
                         <ChevronRight className="h-4 w-4" />
                     </Button>
-                  </div>
                 </div>
               </TableCell>
             </TableRow>
