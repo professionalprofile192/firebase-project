@@ -50,103 +50,116 @@ function BillPaymentContent() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const a = searchParams.get('a'); 
+  const tabFromParams = searchParams.get('tab'); 
 
   useEffect(() => {
-    async function fetchData() {
-      setLoadingPayees(true);
-      const sessionToken = sessionStorage.getItem("sessionToken");
-      const userProfileString = sessionStorage.getItem('userProfile');
-
-      if (!sessionToken || !userProfileString) {
-        toast({ variant: "destructive", title: "Error", description: "Session not found. Please log in again." });
-        setLoadingPayees(false);
-        return;
-      }
-      
-      const userProfile = JSON.parse(userProfileString);
-
-      try {
-        // Fetch Payees
-        const payeePayload = {
-            id: "",
-            offset: 0,
-            limit: 100,
-            sortBy: "createdOn",
-            order: "desc",
-            payeeId: userProfile.userid, 
-            searchString: ""
-        };
-
-        const payeeRes = await fetch("/api/get-payee-list", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            token: sessionToken,
-            kuid: userProfile.UserName,
-            payload: payeePayload
-          })
-        });
-
-        const payeeData = await payeeRes.json();
-        if (payeeData.opstatus === 0 && payeeData.payee) {
-          const mappedPayees: Payee[] = payeeData.payee.map((p: any) => {
-            let notes = {};
-            try {
-              notes = JSON.parse(p.notes || '{}');
-            } catch (e) { console.error("Failed to parse payee notes", e); }
-            
-            const billStatus = (notes as any).billStatus;
-            let status: Payee['status'] = 'Not Payable';
-            if (billStatus === 'Unpaid') status = 'Unpaid';
-            else if (billStatus === 'Paid') status = 'Paid';
-
-            return {
-              consumerName: p.payeeNickName || 'N/A',
-              billerType: p.nameOnBill || p.companyName || 'N/A',
-              consumerNumber: p.accountNumber,
-              status: status,
-              amountDue: (notes as any).billAmount,
-              dueDate: (notes as any).dueDate ? format(new Date((notes as any).dueDate), 'dd/MM/yyyy') : undefined,
-              amountAfterDueDate: (notes as any).lateSurcharge,
-              category: (notes as any).typeVal || 'Uncategorized'
-            };
-          });
-          setAllPayees(mappedPayees);
-          setFilteredPayees(mappedPayees);
-        } else {
-          toast({ variant: "destructive", title: "Failed to fetch payees", description: payeeData.errmsg || 'Could not load payee data.' });
-        }
-
-        // Fetch Categories
-        const categoryRes = await fetch("/api/get-bill-categories", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            token: sessionToken,
-            kuid: userProfile.UserName,
-          })
-        });
-        const categoryData = await categoryRes.json();
-
-        if (categoryData.opstatus === 0 && categoryData.PaymentService) {
-            setCategories(categoryData.PaymentService);
-        } else {
-            toast({ variant: "destructive", title: "Failed to fetch categories", description: categoryData.errmsg || 'Could not load category data.' });
-        }
-
-      } catch (error) {
-         toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred while fetching data." });
-      } finally {
-        setLoadingPayees(false);
-      }
+    if (tabFromParams) {
+      setActiveTab(tabFromParams);
     }
+  }, [tabFromParams]);
 
-    fetchData();
+
+  const fetchData = useCallback(async () => {
+    setLoadingPayees(true);
     setPayeeSearchTerm('');
     setHistorySearchTerm('');
     setSelectedCategory('all');
-  }, [a, toast]);
+
+    const sessionToken = sessionStorage.getItem("sessionToken");
+    const userProfileString = sessionStorage.getItem('userProfile');
+
+    if (!sessionToken || !userProfileString) {
+      toast({ variant: "destructive", title: "Error", description: "Session not found. Please log in again." });
+      setLoadingPayees(false);
+      return;
+    }
+    
+    const userProfile = JSON.parse(userProfileString);
+
+    try {
+      // Fetch Payees
+      const payeePayload = {
+          id: "",
+          offset: 0,
+          limit: 100,
+          sortBy: "createdOn",
+          order: "desc",
+          payeeId: userProfile.userid, 
+          searchString: ""
+      };
+
+      const payeeRes = await fetch("/api/get-payee-list", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: sessionToken,
+          kuid: userProfile.UserName,
+          payload: payeePayload
+        })
+      });
+
+      const payeeData = await payeeRes.json();
+      if (payeeData.opstatus === 0 && payeeData.payee) {
+        const mappedPayees: Payee[] = payeeData.payee.map((p: any) => {
+          let notes = {};
+          try {
+            notes = JSON.parse(p.notes || '{}');
+          } catch (e) { console.error("Failed to parse payee notes", e); }
+          
+          const billStatus = (notes as any).billStatus;
+          let status: Payee['status'] = 'Not Payable';
+          if (billStatus === 'Unpaid') status = 'Unpaid';
+          else if (billStatus === 'Paid') status = 'Paid';
+
+          return {
+            consumerName: p.payeeNickName || 'N/A',
+            billerType: p.nameOnBill || p.companyName || 'N/A',
+            consumerNumber: p.accountNumber,
+            status: status,
+            amountDue: (notes as any).billAmount,
+            dueDate: (notes as any).dueDate ? format(new Date((notes as any).dueDate), 'dd/MM/yyyy') : undefined,
+            amountAfterDueDate: (notes as any).lateSurcharge,
+            category: (notes as any).categoryVal || 'Uncategorized'
+          };
+        });
+        setAllPayees(mappedPayees);
+        setFilteredPayees(mappedPayees);
+      } else {
+        setAllPayees([]);
+        setFilteredPayees([]);
+        toast({ variant: "destructive", title: "Failed to fetch payees", description: payeeData.errmsg || 'Could not load payee data.' });
+      }
+
+      // Fetch Categories
+      const categoryRes = await fetch("/api/get-bill-categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: sessionToken,
+          kuid: userProfile.UserName,
+        })
+      });
+      const categoryData = await categoryRes.json();
+
+      if (categoryData.opstatus === 0 && categoryData.PaymentService) {
+          setCategories(categoryData.PaymentService);
+      } else {
+          setCategories([]);
+          toast({ variant: "destructive", title: "Failed to fetch categories", description: categoryData.errmsg || 'Could not load category data.' });
+      }
+
+    } catch (error) {
+       toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred while fetching data." });
+    } finally {
+      setLoadingPayees(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toast]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
 
   useEffect(() => {
     let newFilteredPayees = allPayees;
