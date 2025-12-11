@@ -247,24 +247,14 @@ export function PayeeTable({ data, multiPayMode }: PayeeTableProps) {
           <TableFooter>
             <TableRow>
               <TableCell colSpan={multiPayMode ? 5 : 5}>
-                <div className="flex items-center justify-between p-2">
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={handlePreviousPage}
-                        disabled={currentPage === 1}
-                    >
+                <div className="flex items-center justify-center p-2">
+                    <Button variant="ghost" size="icon" disabled>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <span className="text-sm text-muted-foreground">
-                      {startIndex + 1} - {endIndex} of {data.length} Payees
+                    <span className="text-sm text-muted-foreground mx-4">
+                      1 - {data.length > 8 ? 8 : data.length} of {data.length} Payees
                     </span>
-                    <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={handleNextPage}
-                        disabled={currentPage === totalPages}
-                    >
+                    <Button variant="ghost" size="icon" disabled>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>

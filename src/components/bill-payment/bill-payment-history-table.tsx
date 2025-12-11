@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export type HistoryItem = {
   consumerNumber: string;
@@ -27,28 +27,7 @@ interface BillPaymentHistoryTableProps {
   data: HistoryItem[];
 }
 
-const ITEMS_PER_PAGE = 10;
-
 export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [data]);
-
-  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, data.length);
-  const currentData = data.slice(startIndex, endIndex);
-
-  const handlePreviousPage = () => {
-    setCurrentPage(prev => Math.max(prev - 1, 1));
-  }
-
-  const handleNextPage = () => {
-    setCurrentPage(prev => Math.min(prev + 1, totalPages));
-  }
-
   return (
     <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
       <Table>
@@ -64,8 +43,8 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
           </TableRow>
         </TableHeader>
         <TableBody>
-          {currentData.length > 0 ? (
-            currentData.map((item) => (
+          {data.length > 0 ? (
+            data.map((item) => (
               <TableRow key={item.transactionId}>
                 <TableCell>{item.consumerNumber}</TableCell>
                 <TableCell>{item.transactionId}</TableCell>
@@ -90,27 +69,17 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
           )}
         </TableBody>
         {data.length > 0 && (
-            <TableFooter>
+             <TableFooter>
                 <TableRow>
                 <TableCell colSpan={7}>
-                    <div className="flex items-center justify-between p-2">
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={handlePreviousPage}
-                            disabled={currentPage === 1}
-                        >
+                    <div className="flex items-center justify-center p-2">
+                        <Button variant="ghost" size="icon">
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
-                        <span className="text-sm text-muted-foreground">
-                            {startIndex + 1} - {endIndex} of {data.length} Transactions
+                        <span className="text-sm text-muted-foreground mx-4">
+                            1 - {data.length > 10 ? 10 : data.length} of {data.length} Transactions
                         </span>
-                        <Button 
-                            variant="ghost" 
-                            size="icon"
-                            onClick={handleNextPage}
-                            disabled={currentPage === totalPages}
-                        >
+                        <Button variant="ghost" size="icon">
                             <ChevronRight className="h-4 w-4" />
                         </Button>
                     </div>
