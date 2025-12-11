@@ -164,8 +164,8 @@ function BillPaymentContent() {
 
           <TabsContent value="bill-payment-history">
              <div className="mt-6 space-y-6">
-                <div className="flex flex-col sm:flex-row items-center gap-4">
-                    <div className="relative w-full max-w-sm">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                    <div className="relative md:col-span-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input 
                             placeholder="Search"
@@ -174,25 +174,27 @@ function BillPaymentContent() {
                             onChange={(e) => setHistorySearchTerm(e.target.value)}
                         />
                     </div>
-                    <Select>
-                        <SelectTrigger className="w-full sm:w-[180px]">
-                            <SelectValue placeholder="Select Account" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="acc1">Account 1</SelectItem>
-                            <SelectItem value="acc2">Account 2</SelectItem>
-                        </SelectContent>
-                    </Select>
-                     <Select>
-                        <SelectTrigger className="w-full sm:w-[180px]">
-                            <SelectValue placeholder="View" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All</SelectItem>
-                            <SelectItem value="last7">Last 7 days</SelectItem>
-                            <SelectItem value="last30">Last 30 days</SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <div className="flex gap-4 md:col-span-2">
+                        <Select>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select Account" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="acc1">Account 1</SelectItem>
+                                <SelectItem value="acc2">Account 2</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Select>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="View" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                <SelectItem value="last7">Last 7 days</SelectItem>
+                                <SelectItem value="last30">Last 30 days</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
                 <BillPaymentHistoryTable data={filteredHistory} />
              </div>
