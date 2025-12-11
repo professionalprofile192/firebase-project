@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const reportingParams = JSON.stringify({
         os: "143.0.0.0",
         dm: "",
-        did: "FCA7FB9F-C412-4995-93BD-2CE2D507A467", // This can be a static or randomly generated UUID
+        did: "FCA7FB9F-C412-4995-93BD-2CE2D507A467",
         ua: "Mozilla/5.0",
         aid: "OnlineBanking",
         aname: "OnlineBanking",
