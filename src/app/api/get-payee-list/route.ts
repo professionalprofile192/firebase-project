@@ -11,11 +11,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // 🔹 Convert payload to the encoded format `jsondata=<string>`
-    const encodedBody =
-      "jsondata=" + encodeURIComponent(JSON.stringify(payload));
+    // Convert payload to the encoded format `jsondata=<string>`
+    const encodedBody = "jsondata=" + encodeURIComponent(JSON.stringify(payload));
 
-    // 🔹 reporting params from your network logs
+    // Reporting params from your network logs
     const reportingParams = JSON.stringify({
       os: "143.0.0.0",
       dm: "",
@@ -41,7 +40,7 @@ export async function POST(req: Request) {
       svcid: "payee"
     });
 
-    // 🔹 API REQUEST
+    // API REQUEST
     const res = await fetch(
       "https://prodpk.ubldigital.com/services/data/v1/DCP_BillerObjService/operations/payee/getPayeeList",
       {
@@ -50,7 +49,7 @@ export async function POST(req: Request) {
           "Content-Type": "application/x-www-form-urlencoded",
           "x-kony-api-version": "1.0",
           "x-kony-authorization": token,
-          "x-kony-deviceid": crypto.randomUUID(),
+          "x-kony-deviceid": "FCA7FB9F-C412-4995-93BD-2CE2D507A467",
           "x-kony-requestid": crypto.randomUUID(),
           "x-kony-reportingparams": reportingParams
         },
