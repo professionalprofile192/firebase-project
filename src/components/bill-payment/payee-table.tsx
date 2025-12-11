@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -42,6 +43,12 @@ function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, 
     }
   }
 
+  const handlePayNowClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Logic for 'Pay Now' will be added later
+    console.log(`Pay Now clicked for ${payee.consumerNumber}`);
+  };
+
   return (
     <>
       <TableRow onClick={onToggle} className="cursor-pointer">
@@ -58,7 +65,11 @@ function PayeeRow({ payee, isOpen, onToggle }: { payee: Payee, isOpen: boolean, 
         </TableCell>
         <TableCell className="text-right">
             <div className='flex items-center justify-end gap-2'>
-              {payee.status === 'Unpaid' && <Button size="sm" variant="ghost" className="hover:bg-primary/10 text-primary">Pay Now <ChevronRight className="h-4 w-4 ml-1" /></Button>}
+              {payee.status === 'Unpaid' && 
+                <Button size="sm" variant="ghost" className="hover:bg-primary/10 text-primary" onClick={handlePayNowClick}>
+                    Pay Now <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              }
               <Button size="icon" variant="ghost" onClick={onToggle} className="p-2 h-auto w-auto">
                   {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
               </Button>
