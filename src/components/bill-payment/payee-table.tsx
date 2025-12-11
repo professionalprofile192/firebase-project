@@ -61,8 +61,6 @@ function PayeeRow({
 
   const handlePayNowClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Logic for 'Pay Now' will be added later
-    console.log(`Pay Now clicked for ${payee.consumerNumber}`);
   };
   
   const stopPropagation = (e: React.MouseEvent) => {
@@ -101,8 +99,10 @@ function PayeeRow({
           <TableCell className="text-right">
               <div className='flex items-center justify-end gap-2' onClick={stopPropagation}>
                 {payee.status === 'Unpaid' && 
-                  <Button size="sm" variant="ghost" className="hover:bg-primary/10 text-primary" onClick={handlePayNowClick}>
-                      Pay Now <ArrowRight className="h-4 w-4 ml-1" />
+                  <Button asChild size="sm" variant="ghost" className="hover:bg-primary/10 text-primary" onClick={handlePayNowClick}>
+                      <Link href={{ pathname: '/bill-payment/pay', query: { payee: JSON.stringify(payee) } }}>
+                        Pay Now <ArrowRight className="h-4 w-4 ml-1" />
+                      </Link>
                   </Button>
                 }
                 <Button variant="ghost" size="icon" className="p-2 h-auto w-auto" onClick={onToggle}>
