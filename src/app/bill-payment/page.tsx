@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Suspense, useState, useEffect, useCallback } from 'react';
@@ -151,7 +152,6 @@ function BillPaymentContent() {
     } finally {
       setLoadingPayees(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toast]);
 
   useEffect(() => {
@@ -263,41 +263,39 @@ function BillPaymentContent() {
           </TabsContent>
 
           <TabsContent value="bill-payment-history">
-             <div className="mt-6 space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
-                     <div className="relative flex-1 sm:col-span-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input 
-                            placeholder="Search by name, number, or ID"
-                            className="pl-10 bg-background"
-                            value={historySearchTerm}
-                            onChange={(e) => setHistorySearchTerm(e.target.value)}
-                        />
-                    </div>
-                    <div className='sm:col-span-2 flex items-center gap-4'>
-                        <Select>
-                            <SelectTrigger className="flex-1">
-                                <SelectValue placeholder="Select Account" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="acc1">Account 1</SelectItem>
-                                <SelectItem value="acc2">Account 2</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Select>
-                            <SelectTrigger className="flex-1">
-                                <SelectValue placeholder="View" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All</SelectItem>
-                                <SelectItem value="last7">Last 7 days</SelectItem>
-                                <SelectItem value="last30">Last 30 days</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                <div className="relative sm:col-span-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input 
+                        placeholder="Search by name, number, or ID"
+                        className="pl-10 bg-background"
+                        value={historySearchTerm}
+                        onChange={(e) => setHistorySearchTerm(e.target.value)}
+                    />
                 </div>
-                <BillPaymentHistoryTable data={filteredHistory} />
-             </div>
+                <div className='sm:col-span-2 flex items-center gap-4'>
+                    <Select>
+                        <SelectTrigger className="flex-1">
+                            <SelectValue placeholder="Select Account" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="acc1">Account 1</SelectItem>
+                            <SelectItem value="acc2">Account 2</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Select>
+                        <SelectTrigger className="flex-1">
+                            <SelectValue placeholder="View" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="last7">Last 7 days</SelectItem>
+                            <SelectItem value="last30">Last 30 days</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+            <BillPaymentHistoryTable data={filteredHistory} />
           </TabsContent>
           <TabsContent value="bulk-bill-payment">
             <Card className="mt-6">

@@ -5,9 +5,9 @@ export async function POST(req: Request) {
   try {
     const { token, kuid, payload } = await req.json();
 
-    if (!token || !payload) {
+    if (!token || !payload || !kuid) {
       return NextResponse.json(
-        { error: "Missing token or payload" },
+        { error: "Missing token, KUID, or payload" },
         { status: 400 }
       );
     }
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
         aver: "1.0.0",
         atype: "spa",
         stype: "b2c",
-        kuid: kuid ?? "", // Dynamically use the kuid from the request
+        kuid: kuid, // Dynamically use the kuid from the request
         mfaid: "64b27d29-eac2-472b-927b-d6052c564f24",
         mfbaseid: "ce401c19-81b6-41f8-a358-79e5b7c38ace",
         mfaname: "DigitalBanking-Composite",
