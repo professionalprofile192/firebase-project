@@ -27,6 +27,7 @@ export type Payee = {
   amountDue?: string;
   dueDate?: string;
   amountAfterDueDate?: string;
+  category?: string;
 };
 
 interface PayeeTableProps {
@@ -257,11 +258,11 @@ export function PayeeTable({ data, multiPayMode, loading }: PayeeTableProps) {
           <TableFooter>
              <TableRow>
                 <TableCell colSpan={multiPayMode ? 5 : 5}>
-                    <div className="flex items-center justify-between p-2">
+                    <div className="flex items-center justify-center p-2">
                         <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-muted-foreground mx-4">
                             {startIndex + 1} - {endIndex} of {data.length} Payees
                         </span>
                         <Button variant="ghost" size="icon" onClick={handleNextPage} disabled={currentPage === totalPages}>
