@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
 
-type HistoryItem = {
+export type HistoryItem = {
   consumerNumber: string;
   transactionId: string;
   transactionDate: string;
@@ -97,3 +97,5 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
     </div>
   );
 }
+
+    

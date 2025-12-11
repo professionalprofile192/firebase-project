@@ -8,7 +8,7 @@ import { Search } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PayeeTable, type Payee } from '@/components/bill-payment/payee-table';
-import { BillPaymentHistoryTable } from '@/components/bill-payment/bill-payment-history-table';
+import { BillPaymentHistoryTable, type HistoryItem } from '@/components/bill-payment/bill-payment-history-table';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
@@ -41,6 +41,9 @@ const payees: Payee[] = [
   },
 ];
 
+const billPaymentHistory: HistoryItem[] = [];
+
+
 type Account = {
   acctNo: string;
   acctName: string;
@@ -56,6 +59,8 @@ function BillPaymentContent() {
   const [activeTab, setActiveTab] = useState('bill-payment');
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [multiPayMode, setMultiPayMode] = useState(false);
+  const [payeeSearchTerm, setPayeeSearchTerm] = useState('');
+  const [historySearchTerm, setHistorySearchTerm] = useState('');
 
   const handleAccountChange = (acctNo: string) => {
     const account = accounts.find(a => a.acctNo === acctNo);
@@ -77,6 +82,18 @@ function BillPaymentContent() {
         return 'Bill Payment';
     }
   }
+
+  const filteredPayees = payees.filter(payee => 
+    payee.consumerName.toLowerCase().includes(payeeSearchTerm.toLowerCase()) ||
+    payee.consumerNumber.toLowerCase().includes(payeeSearchTerm.toLowerCase()) ||
+    payee.billerType.toLowerCase().includes(payeeSearchTerm.toLowerCase())
+  );
+
+  const filteredHistory = billPaymentHistory.filter(item => 
+    item.consumerName.toLowerCase().includes(historySearchTerm.toLowerCase()) ||
+    item.consumerNumber.toLowerCase().includes(historySearchTerm.toLowerCase()) ||
+    item.transactionId.toLowerCase().includes(historySearchTerm.toLowerCase())
+  );
 
   return (
     <DashboardLayout>
@@ -113,6 +130,8 @@ function BillPaymentContent() {
                     <Input 
                         placeholder="Search"
                         className="pl-10 bg-muted border-none"
+                        value={payeeSearchTerm}
+                        onChange={(e) => setPayeeSearchTerm(e.target.value)}
                     />
                 </div>
                 <Select>
@@ -127,7 +146,7 @@ function BillPaymentContent() {
                     </SelectContent>
                 </Select>
             </div>
-            <PayeeTable data={payees} multiPayMode={multiPayMode} />
+            <PayeeTable data={filteredPayees} multiPayMode={multiPayMode} />
           </TabsContent>
 
           <TabsContent value="bill-payment-history">
@@ -138,6 +157,8 @@ function BillPaymentContent() {
                         <Input 
                             placeholder="Search"
                             className="pl-10 bg-muted border-none"
+                            value={historySearchTerm}
+                            onChange={(e) => setHistorySearchTerm(e.target.value)}
                         />
                     </div>
                     <Select>
@@ -160,7 +181,7 @@ function BillPaymentContent() {
                         </SelectContent>
                     </Select>
                 </div>
-                <BillPaymentHistoryTable data={[]} />
+                <BillPaymentHistoryTable data={filteredHistory} />
              </div>
           </TabsContent>
           <TabsContent value="bulk-bill-payment">
@@ -208,3 +229,5 @@ export default function BillPaymentPage() {
     </Suspense>
   )
 }
+
+    
