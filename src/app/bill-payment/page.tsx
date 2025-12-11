@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PayeeTable } from '@/components/bill-payment/payee-table';
 import { BillPaymentHistoryTable } from '@/components/bill-payment/bill-payment-history-table';
+import { Card, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 
 // This will be replaced with your actual API data
 const payees = [
@@ -38,15 +40,33 @@ const payees = [
   },
 ];
 
+type Account = {
+  acctNo: string;
+  acctName: string;
+}
+
+const accounts: Account[] = [
+    { acctNo: '060510224211', acctName: 'NAWAZ ALI' },
+    { acctNo: '060510224212', acctName: 'IDREES APPROVER' },
+];
+
 
 function BillPaymentContent() {
   const [activeTab, setActiveTab] = useState('bill-payment');
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+
+  const handleAccountChange = (acctNo: string) => {
+    const account = accounts.find(a => a.acctNo === acctNo);
+    setSelectedAccount(account || null);
+  };
 
   return (
     <DashboardLayout>
       <main className="flex-1 p-4 sm:px-6 sm:py-4 flex flex-col gap-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold">Bill Payment</h1>
+            <h1 className="text-2xl font-semibold">
+                {activeTab === 'bulk-bill-payment' ? 'Bulk Utility Bill Payments' : 'Bill Payment'}
+            </h1>
             {activeTab === 'bill-payment' && (
                 <div className='flex items-center gap-2'>
                     <Button variant="outline">Pay Multiple Bills</Button>
@@ -120,10 +140,36 @@ function BillPaymentContent() {
              </div>
           </TabsContent>
           <TabsContent value="bulk-bill-payment">
-            <div className="mt-8 p-8 text-center text-muted-foreground bg-gray-50 rounded-lg">
-                <h3 className='text-lg font-semibold'>Bulk Bill Payment</h3>
-                <p>This feature will be available soon.</p>
-            </div>
+            <Card className="mt-6">
+                <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-xl">
+                        <div className="space-y-2">
+                            <Label htmlFor="account-number">Account Number</Label>
+                             <Select onValueChange={handleAccountChange} value={selectedAccount?.acctNo}>
+                                <SelectTrigger id="account-number">
+                                    <SelectValue placeholder="Select Account" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                     {accounts.map((account) => (
+                                        <SelectItem key={account.acctNo} value={account.acctNo}>
+                                            {account.acctNo}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="account-name">Account Name</Label>
+                            <Input 
+                                id="account-name" 
+                                value={selectedAccount?.acctName || ''} 
+                                disabled 
+                                className="bg-gray-100"
+                            />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>
