@@ -77,28 +77,37 @@ function BillPaymentContent() {
     const userProfile = JSON.parse(userProfileString);
 
     try {
-      // Fetch Payees
-      const payeePayload = {
-          id: "",
-          offset: 0,
-          limit: 100,
-          sortBy: "createdOn",
-          order: "desc",
-          payeeId: userProfile.userid, 
-          searchString: ""
-      };
+        const [payeeData, categoryData] = await Promise.all([
+            // Fetch Payees
+            fetch("/api/get-payee-list", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    token: sessionToken,
+                    kuid: userProfile.UserName,
+                    payload: {
+                        id: "",
+                        offset: 0,
+                        limit: 100,
+                        sortBy: "createdOn",
+                        order: "desc",
+                        payeeId: userProfile.userid, 
+                        searchString: ""
+                    }
+                })
+            }).then(res => res.json()),
 
-      const payeeRes = await fetch("/api/get-payee-list", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: sessionToken,
-          kuid: userProfile.UserName,
-          payload: payeePayload
-        })
-      });
+            // Fetch Categories
+            fetch("/api/get-bill-categories", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    token: sessionToken,
+                    kuid: userProfile.UserName,
+                })
+            }).then(res => res.json())
+        ]);
 
-      const payeeData = await payeeRes.json();
       if (payeeData.opstatus === 0 && payeeData.payee) {
         const mappedPayees: Payee[] = payeeData.payee.map((p: any) => {
           let notes = {};
@@ -129,17 +138,6 @@ function BillPaymentContent() {
         setFilteredPayees([]);
         toast({ variant: "destructive", title: "Failed to fetch payees", description: payeeData.errmsg || 'Could not load payee data.' });
       }
-
-      // Fetch Categories
-      const categoryRes = await fetch("/api/get-bill-categories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: sessionToken,
-          kuid: userProfile.UserName,
-        })
-      });
-      const categoryData = await categoryRes.json();
 
       if (categoryData.opstatus === 0 && categoryData.PaymentService) {
           setCategories(categoryData.PaymentService);
@@ -266,35 +264,37 @@ function BillPaymentContent() {
 
           <TabsContent value="bill-payment-history">
              <div className="mt-6 space-y-6">
-                <div className="flex items-center gap-4">
-                     <div className="relative flex-1">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                     <div className="relative flex-1 sm:col-span-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input 
-                            placeholder="Search"
-                            className="pl-10 bg-muted border-none"
+                            placeholder="Search by name, number, or ID"
+                            className="pl-10 bg-background"
                             value={historySearchTerm}
                             onChange={(e) => setHistorySearchTerm(e.target.value)}
                         />
                     </div>
-                    <Select>
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Select Account" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="acc1">Account 1</SelectItem>
-                            <SelectItem value="acc2">Account 2</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <Select>
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="View" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All</SelectItem>
-                            <SelectItem value="last7">Last 7 days</SelectItem>
-                            <SelectItem value="last30">Last 30 days</SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <div className='sm:col-span-2 flex items-center gap-4'>
+                        <Select>
+                            <SelectTrigger className="flex-1">
+                                <SelectValue placeholder="Select Account" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="acc1">Account 1</SelectItem>
+                                <SelectItem value="acc2">Account 2</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Select>
+                            <SelectTrigger className="flex-1">
+                                <SelectValue placeholder="View" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All</SelectItem>
+                                <SelectItem value="last7">Last 7 days</SelectItem>
+                                <SelectItem value="last30">Last 30 days</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
                 <BillPaymentHistoryTable data={filteredHistory} />
              </div>
