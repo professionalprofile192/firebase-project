@@ -28,6 +28,13 @@ const generateBulkDetails = (count: number) => {
         localAmount: `${(120000 + i * 1000).toLocaleString()}.00`,
         beneficiaryAccountNo: `PK42UNIL01090002300175${88 + i}`,
         customerUniqueId: `UB_amt_${10 + i}`,
+        beneficiaryEmail: `beneficiary${i}@example.com`,
+        beneficiaryPhone: `0300-123456${i}`,
+        beneficiaryBankCode: `00${i % 9 + 1}`,
+        beneficiaryBankName: ['UBL', 'HBL', 'Meezan', 'Alfalah', 'Askari'][i % 5],
+        status: i % 3 === 0 ? 'Processed' : i % 3 === 1 ? 'Failed' : 'Pending',
+        titleFetch: i % 2 === 0 ? 'Success' : 'Failed',
+        reasonOfFailure: i % 3 === 1 ? 'Insufficient funds' : '',
     }));
 };
 
@@ -172,7 +179,7 @@ export function BulkTransfer() {
                 <TabsContent value="details">
                     {selectedBulkFile ? (
                         <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                            <ScrollArea>
+                            <ScrollArea className="w-full whitespace-nowrap">
                                 <Table>
                                     <TableHeader>
                                         <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
@@ -188,6 +195,13 @@ export function BulkTransfer() {
                                             <TableHead>Local Amount</TableHead>
                                             <TableHead>Beneficiary Account No.</TableHead>
                                             <TableHead>Customer Unique ID</TableHead>
+                                            <TableHead>Beneficiary Email Id</TableHead>
+                                            <TableHead>Beneficiary Phone Number</TableHead>
+                                            <TableHead>Beneficiary Bank Code</TableHead>
+                                            <TableHead>Beneficiary Bank Name</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead>Title fetch</TableHead>
+                                            <TableHead>Reason of Failure</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -205,6 +219,13 @@ export function BulkTransfer() {
                                                 <TableCell>{detail.localAmount}</TableCell>
                                                 <TableCell>{detail.beneficiaryAccountNo}</TableCell>
                                                 <TableCell>{detail.customerUniqueId}</TableCell>
+                                                <TableCell>{detail.beneficiaryEmail}</TableCell>
+                                                <TableCell>{detail.beneficiaryPhone}</TableCell>
+                                                <TableCell>{detail.beneficiaryBankCode}</TableCell>
+                                                <TableCell>{detail.beneficiaryBankName}</TableCell>
+                                                <TableCell>{detail.status}</TableCell>
+                                                <TableCell>{detail.titleFetch}</TableCell>
+                                                <TableCell>{detail.reasonOfFailure}</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -218,7 +239,7 @@ export function BulkTransfer() {
                                     <span className="text-sm text-muted-foreground">Rows per page</span>
                                     <Select value={rowsPerPage} onValueChange={handleRowsPerPageChange}>
                                         <SelectTrigger className="w-28">
-                                            <SelectValue placeholder="Please select" />
+                                            <SelectValue placeholder="100" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="50">50</SelectItem>
