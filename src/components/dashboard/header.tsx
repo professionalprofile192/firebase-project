@@ -84,8 +84,8 @@ const SidebarNav = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             icon: CreditCard, 
             subItems: [
                 { label: 'Bill Payment', href: '/bill-payment' },
-                { label: 'Bulk Bill Payments', href: '#' },
-                { label: 'Bill Payment History', href: '#' }
+                { label: 'Bulk Bill Payments', href: '/bill-payment?tab=bulk-bill-payment' },
+                { label: 'Bill Payment History', href: '/bill-payment?tab=bill-payment-history' }
             ] 
         },
         { 
