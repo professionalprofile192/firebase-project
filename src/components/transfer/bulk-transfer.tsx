@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from "react";
@@ -361,7 +362,7 @@ export function BulkTransfer() {
                 <TabsContent value="details">
                     {selectedBulkFile ? (
                         <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                            <div className="h-[500px] overflow-auto">
+                            <div className="overflow-auto h-[450px]">
                                 <Table>
                                     <TableHeader className="sticky top-0 z-10 bg-card" style={{ backgroundColor: '#ECECEC8C' }}>
                                         <TableRow>
