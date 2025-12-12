@@ -61,13 +61,20 @@ const bulkFiles = [
 
 export function BulkTransfer() {
     const [selectedType, setSelectedType] = useState(transferTypes[0].title);
-    const [selectedAccount, setSelectedAccount] = useState<typeof accounts[0] | null>(accounts[0] || null);
-    const [selectedBulkFile, setSelectedBulkFile] = useState<string>(bulkFiles.length > 0 ? bulkFiles[0].fileId : '');
-    const [rowsPerPage, setRowsPerPage] = useState<string>('50');
+    const [selectedAccount, setSelectedAccount] = useState<typeof accounts[0] | null>(null);
+    const [selectedBulkFile, setSelectedBulkFile] = useState<string | undefined>(undefined);
+    const [rowsPerPage, setRowsPerPage] = useState<string | undefined>(undefined);
 
     const handleAccountChange = (acctNo: string) => {
         const account = accounts.find(a => a.acctNo === acctNo);
         setSelectedAccount(account || null);
+    }
+    
+    const handleTypeSelect = (title: string) => {
+        setSelectedType(title);
+        setSelectedAccount(null);
+        setSelectedBulkFile(undefined);
+        setRowsPerPage(undefined);
     }
 
     return (
@@ -80,7 +87,7 @@ export function BulkTransfer() {
                             "cursor-pointer transition-all",
                             selectedType === type.title ? "ring-2 ring-primary bg-primary/5" : "hover:bg-muted/50"
                         )}
-                        onClick={() => setSelectedType(type.title)}
+                        onClick={() => handleTypeSelect(type.title)}
                     >
                         <CardContent className="p-4">
                             <h3 className="font-semibold text-sm">{type.title}</h3>

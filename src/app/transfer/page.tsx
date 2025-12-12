@@ -121,7 +121,6 @@ function InitiateTransferContent() {
                         <SelectValue placeholder="Select Category" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="placeholder" disabled>Please select</SelectItem>
                         <SelectItem value="cat1">Category 1</SelectItem>
                         <SelectItem value="cat2">Category 2</SelectItem>
                     </SelectContent>
@@ -150,7 +149,6 @@ function InitiateTransferContent() {
                         <SelectValue placeholder="Select Account" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="placeholder" disabled>Please select</SelectItem>
                         <SelectItem value="acc1">Account 1</SelectItem>
                         <SelectItem value="acc2">Account 2</SelectItem>
                     </SelectContent>
@@ -160,7 +158,6 @@ function InitiateTransferContent() {
                         <SelectValue placeholder="View" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="placeholder" disabled>Please select</SelectItem>
                         <SelectItem value="all">All</SelectItem>
                         <SelectItem value="last7">Last 7 Days</SelectItem>
                     </SelectContent>
