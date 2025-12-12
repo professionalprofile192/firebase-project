@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -59,9 +58,9 @@ const generateBulkDetails = (count: number): BulkDetail[] => {
 const bulkProcessingDetails = generateBulkDetails(100);
 
 const accounts = [
-    { acctNo: '253237095', acctName: 'BUYIRABHPTIJBGGVBLAVMBLQINKV' },
-    { acctNo: '060510224211', acctName: 'NAWAZ ALI' },
-    { acctNo: '060510224212', acctName: 'IDREES APPROVER' },
+    { acctNo: '253237095', acctName: 'BUYIRABHPTIJBGGVBLAVMBLQINKV', balance: 1522110.03 },
+    { acctNo: '060510224211', acctName: 'NAWAZ ALI', balance: 2500000.00 },
+    { acctNo: '060510224212', acctName: 'IDREES APPROVER', balance: 500000.00 },
 ];
 
 const bulkFiles = [
@@ -92,7 +91,6 @@ const BulkDetailRow = ({ detail, onSelect, isSelected }: { detail: BulkDetail; o
                         />
                     </TableCell>
                     <TableCell>{detail.beneficiaryName}</TableCell>
-                    <TableCell>{detail.beneficiaryAccountNo}</TableCell>
                     <TableCell>{detail.accountTitle}</TableCell>
                     <TableCell>{detail.customerUniqueId}</TableCell>
                     <TableCell>{detail.localAmount}</TableCell>
@@ -130,6 +128,86 @@ const BulkDetailRow = ({ detail, onSelect, isSelected }: { detail: BulkDetail; o
         </Collapsible>
     )
 }
+
+const formatCurrency = (amount: number) => {
+    return `PKR ${new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)}`;
+};
+
+const ReviewSummary = ({
+    totalPayment,
+    availableBalance,
+    grandTotalCount,
+    grandTotalAmount,
+    selectedCount,
+    transactionsToHoldCount,
+    transactionsToHoldAmount,
+}: {
+    totalPayment: number;
+    availableBalance: number;
+    grandTotalCount: number;
+    grandTotalAmount: number;
+    selectedCount: number;
+    transactionsToHoldCount: number;
+    transactionsToHoldAmount: number;
+}) => {
+    const remainingBalance = availableBalance - totalPayment;
+    return (
+        <footer className="sticky bottom-0 bg-background/95 p-4 border-t z-10 mt-6">
+            <div className="max-w-7xl mx-auto flex flex-col gap-4">
+                 <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold">Review Summary</h2>
+                    <div className="flex items-center gap-6 text-right">
+                        <div>
+                            <p className="text-sm text-muted-foreground">Total Payment</p>
+                            <p className="font-semibold text-primary">{formatCurrency(totalPayment)}</p>
+                        </div>
+                         <div>
+                            <p className="text-sm text-muted-foreground">Available Balance</p>
+                            <p className="font-semibold text-green-600">{formatCurrency(availableBalance)}</p>
+                        </div>
+                         <div>
+                            <p className="text-sm text-muted-foreground">Remaining Balance</p>
+                            <p className="font-semibold text-red-600">{formatCurrency(remainingBalance)}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="bg-muted/50">
+                                <TableHead></TableHead>
+                                <TableHead className="font-bold">Grand Total</TableHead>
+                                <TableHead className="font-bold">Transactions to Hold</TableHead>
+                                <TableHead className="font-bold">Transactions Selected</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell className="font-medium text-muted-foreground">Transactions Selected</TableCell>
+                                <TableCell>{grandTotalCount}</TableCell>
+                                <TableCell>{transactionsToHoldCount}</TableCell>
+                                <TableCell>{selectedCount}</TableCell>
+                            </TableRow>
+                             <TableRow>
+                                <TableCell className="font-medium text-muted-foreground">Amount</TableCell>
+                                <TableCell>{formatCurrency(grandTotalAmount)}</TableCell>
+                                <TableCell>{formatCurrency(transactionsToHoldAmount)}</TableCell>
+                                <TableCell>{formatCurrency(totalPayment)}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
+                
+                 <div className="flex justify-end items-center gap-2">
+                    <Button variant="outline">Cancel</Button>
+                    <Button variant="destructive">Reject</Button>
+                    <Button>Continue</Button>
+                </div>
+            </div>
+        </footer>
+    );
+};
 
 
 export function BulkTransfer() {
@@ -192,6 +270,30 @@ export function BulkTransfer() {
     };
 
     const isAllSelected = selectedRows.length === currentData.length && currentData.length > 0;
+    
+    const summaryData = useMemo(() => {
+        if (selectedRows.length === 0) return null;
+
+        const selectedTransactions = bulkProcessingDetails.filter(d => selectedRows.includes(d.customerUniqueId));
+        const totalPayment = selectedTransactions.reduce((sum, d) => sum + parseFloat(d.localAmount.replace(/,/g, '')), 0);
+        
+        const grandTotalCount = bulkProcessingDetails.length;
+        const grandTotalAmount = bulkProcessingDetails.reduce((sum, d) => sum + parseFloat(d.localAmount.replace(/,/g, '')), 0);
+
+        const transactionsToHoldCount = grandTotalCount - selectedTransactions.length;
+        const transactionsToHoldAmount = grandTotalAmount - totalPayment;
+        
+        return {
+            totalPayment,
+            availableBalance: selectedAccount?.balance ?? 0,
+            grandTotalCount,
+            grandTotalAmount,
+            selectedCount: selectedTransactions.length,
+            transactionsToHoldCount,
+            transactionsToHoldAmount,
+        };
+    }, [selectedRows, selectedAccount]);
+
 
     return (
         <div className="mt-4 space-y-6">
@@ -262,14 +364,13 @@ export function BulkTransfer() {
                                 <Table className="whitespace-nowrap">
                                     <TableHeader className="sticky top-0 bg-card z-10">
                                         <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
-                                            <TableHead className="w-12 sticky left-0 bg-card">
+                                            <TableHead className="w-12 sticky left-0 bg-card z-10">
                                                 <Checkbox
                                                     checked={isAllSelected}
                                                     onCheckedChange={handleSelectAll}
                                                 />
                                             </TableHead>
                                             <TableHead>Beneficiary Name</TableHead>
-                                            <TableHead>Beneficiary Account No.</TableHead>
                                             <TableHead>Account Title</TableHead>
                                             <TableHead>Customer Unique ID</TableHead>
                                             <TableHead>Local Amount</TableHead>
@@ -326,6 +427,8 @@ export function BulkTransfer() {
                     </div>
                 </TabsContent>
             </Tabs>
+            
+            {summaryData && <ReviewSummary {...summaryData} />}
 
         </div>
     )
