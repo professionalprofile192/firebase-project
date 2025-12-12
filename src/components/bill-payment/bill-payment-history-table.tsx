@@ -76,7 +76,7 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="h-64 text-center" />
+              <TableCell colSpan={7} className="h-24" />
             </TableRow>
           )}
         </TableBody>
