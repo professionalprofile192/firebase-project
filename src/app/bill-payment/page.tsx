@@ -129,6 +129,7 @@ function BillPaymentContent() {
 
           return {
             consumerName: p.payeeNickName || 'N/A',
+            payeeName: p.payeeName || 'N/A',
             billerType: p.nameOnBill || p.companyName || 'N/A',
             consumerNumber: p.accountNumber,
             status: status,
@@ -165,7 +166,7 @@ function BillPaymentContent() {
   }, [toast, router]);
 
   useEffect(() => {
-    fetchData();
+    // fetchData();
   }, [fetchData]);
 
 
@@ -352,3 +353,5 @@ export default function BillPaymentPage() {
     </Suspense>
   )
 }
+
+    

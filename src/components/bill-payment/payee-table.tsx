@@ -20,6 +20,7 @@ import { Skeleton } from '../ui/skeleton';
 
 export type Payee = {
   consumerName: string;
+  payeeName: string;
   billerType: string;
   consumerNumber: string;
   status: 'Unpaid' | 'Not Payable' | 'Paid';
@@ -88,7 +89,7 @@ function PayeeRow({
         )}
         <TableCell className="font-medium">
           <div>{payee.consumerName}</div>
-          <div className="text-muted-foreground text-xs">{payee.consumerName}</div>
+          <div className="text-muted-foreground text-xs">{payee.payeeName}</div>
         </TableCell>
         <TableCell>
             <Link href="#" className="text-primary hover:underline" onClick={stopPropagation}>{payee.billerType}</Link>
@@ -246,7 +247,11 @@ export function PayeeTable({ data, multiPayMode, loading }: PayeeTableProps) {
               />
             ))
           ) : (
-             null
+             <TableRow>
+              <TableCell colSpan={multiPayMode ? 5 : 5} className="h-24 text-center">
+                No Record Found
+              </TableCell>
+            </TableRow>
           )}
         </TableBody>
       </Table>
@@ -264,3 +269,5 @@ export function PayeeTable({ data, multiPayMode, loading }: PayeeTableProps) {
     </div>
   );
 }
+
+    
