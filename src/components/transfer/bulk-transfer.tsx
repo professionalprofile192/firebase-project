@@ -10,6 +10,7 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Checkbox } from "../ui/checkbox";
+import { ScrollArea } from "../ui/scroll-area";
 
 const transferTypes = [
     { title: "Funds Transfer", description: "Own & Internal" },
@@ -18,32 +19,18 @@ const transferTypes = [
     { title: "Omni Payment", description: "All Omni Accounts" },
 ];
 
-const bulkProcessingDetails = [
-    {
+const generateBulkDetails = (count: number) => {
+    return Array.from({ length: count }, (_, i) => ({
         fileReferenceNumber: '0016249076386172',
-        beneficiaryName: 'ali akber',
+        beneficiaryName: ['ali akber', 'shahzain', 'Jatoi', 'Ahmed', 'Fatima', 'Bilal'][i % 6],
         accountTitle: 'PGEBSTYCCCESXVGIDQBMKWU',
-        localAmount: '120,000.00',
-        beneficiaryAccountNo: 'PK42UNIL0109000230017588',
-        customerUniqueId: 'UB_amt_10',
-    },
-    {
-        fileReferenceNumber: '0016249076386172',
-        beneficiaryName: 'shahzain',
-        accountTitle: 'PGEBSTYCCCESXVGIDQBMKWU',
-        localAmount: '130,000.00',
-        beneficiaryAccountNo: 'PK42UNIL0109000230017588',
-        customerUniqueId: 'UB_amt_11',
-    },
-    {
-        fileReferenceNumber: '0016249076386172',
-        beneficiaryName: 'Jatoi',
-        accountTitle: 'PGEBSTYCCCESXVGIDQBMKWU',
-        localAmount: '140,000.00',
-        beneficiaryAccountNo: 'PK42UNIL0109000230017588',
-        customerUniqueId: 'UB_amt_12',
-    }
-];
+        localAmount: `${(120000 + i * 1000).toLocaleString()}.00`,
+        beneficiaryAccountNo: `PK42UNIL01090002300175${88 + i}`,
+        customerUniqueId: `UB_amt_${10 + i}`,
+    }));
+};
+
+const bulkProcessingDetails = generateBulkDetails(100);
 
 const accounts = [
     { acctNo: '253237095', acctName: 'BUYIRABHPTIJBGGVBLAVMBLQINKV' },
@@ -63,11 +50,12 @@ export function BulkTransfer() {
     const [selectedAccount, setSelectedAccount] = useState<typeof accounts[0] | null>(null);
     const [selectedBulkFile, setSelectedBulkFile] = useState<string | undefined>(undefined);
     const [rowsPerPage, setRowsPerPage] = useState<string | undefined>(undefined);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const handleAccountChange = (acctNo: string) => {
         const account = accounts.find(a => a.acctNo === acctNo);
         setSelectedAccount(account || null);
-        setSelectedBulkFile(undefined);
+        setSelectedBulkFile(undefined); // Reset bulk file selection
     }
     
     const handleTypeSelect = (title: string) => {
@@ -75,7 +63,28 @@ export function BulkTransfer() {
         setSelectedAccount(null);
         setSelectedBulkFile(undefined);
         setRowsPerPage(undefined);
+        setCurrentPage(1);
     }
+    
+    const handleRowsPerPageChange = (value: string) => {
+        setRowsPerPage(value);
+        setCurrentPage(1);
+    }
+
+    const handlePreviousPage = () => {
+        setCurrentPage(prev => Math.max(prev - 1, 1));
+    };
+
+    const handleNextPage = () => {
+        const totalPages = rowsPerPage ? Math.ceil(bulkProcessingDetails.length / parseInt(rowsPerPage)) : 1;
+        setCurrentPage(prev => Math.min(prev + 1, totalPages));
+    };
+
+    const rows = rowsPerPage ? parseInt(rowsPerPage) : bulkProcessingDetails.length;
+    const totalPages = Math.ceil(bulkProcessingDetails.length / rows);
+    const startIndex = (currentPage - 1) * rows;
+    const endIndex = Math.min(startIndex + rows, bulkProcessingDetails.length);
+    const currentData = bulkProcessingDetails.slice(startIndex, endIndex);
 
     return (
         <div className="mt-4 space-y-6">
@@ -142,39 +151,41 @@ export function BulkTransfer() {
                 <TabsContent value="details">
                     {selectedBulkFile ? (
                         <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-12"><Checkbox /></TableHead>
-                                        <TableHead>File Reference Number</TableHead>
-                                        <TableHead>Beneficiary Name</TableHead>
-                                        <TableHead>Account Title</TableHead>
-                                        <TableHead>Local Amount</TableHead>
-                                        <TableHead>Beneficiary Account No.</TableHead>
-                                        <TableHead>Customer Unique ID</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {bulkProcessingDetails.map((detail, index) => (
-                                        <TableRow key={index}>
-                                            <TableCell><Checkbox /></TableCell>
-                                            <TableCell>{detail.fileReferenceNumber}</TableCell>
-                                            <TableCell>{detail.beneficiaryName}</TableCell>
-                                            <TableCell>{detail.accountTitle}</TableCell>
-                                            <TableCell>{detail.localAmount}</TableCell>
-                                            <TableCell>{detail.beneficiaryAccountNo}</TableCell>
-                                            <TableCell>{detail.customerUniqueId}</TableCell>
+                            <ScrollArea>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-12"><Checkbox /></TableHead>
+                                            <TableHead>File Reference Number</TableHead>
+                                            <TableHead>Beneficiary Name</TableHead>
+                                            <TableHead>Account Title</TableHead>
+                                            <TableHead>Local Amount</TableHead>
+                                            <TableHead>Beneficiary Account No.</TableHead>
+                                            <TableHead>Customer Unique ID</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {currentData.map((detail, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell><Checkbox /></TableCell>
+                                                <TableCell>{detail.fileReferenceNumber}</TableCell>
+                                                <TableCell>{detail.beneficiaryName}</TableCell>
+                                                <TableCell>{detail.accountTitle}</TableCell>
+                                                <TableCell>{detail.localAmount}</TableCell>
+                                                <TableCell>{detail.beneficiaryAccountNo}</TableCell>
+                                                <TableCell>{detail.customerUniqueId}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </ScrollArea>
                             <div className="flex items-center justify-between p-4 border-t">
-                                <Button variant="ghost" size="icon" disabled>
+                                <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
                                     <ChevronLeft className="h-5 w-5" />
                                 </Button>
                                 <div className="flex items-center gap-4">
                                     <span className="text-sm text-muted-foreground">Rows per page</span>
-                                    <Select value={rowsPerPage} onValueChange={setRowsPerPage}>
+                                    <Select value={rowsPerPage} onValueChange={handleRowsPerPageChange}>
                                         <SelectTrigger className="w-28">
                                             <SelectValue placeholder="Please select" />
                                         </SelectTrigger>
@@ -184,9 +195,9 @@ export function BulkTransfer() {
                                             <SelectItem value="200">200</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <span className="text-sm text-muted-foreground">1 - 100 Transactions</span>
+                                    <span className="text-sm text-muted-foreground">{startIndex + 1} - {endIndex} of {bulkProcessingDetails.length} Transactions</span>
                                 </div>
-                                <Button variant="ghost" size="icon">
+                                <Button variant="ghost" size="icon" onClick={handleNextPage} disabled={currentPage === totalPages}>
                                     <ChevronRight className="h-5 w-5" />
                                 </Button>
                             </div>
