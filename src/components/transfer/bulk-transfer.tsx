@@ -362,39 +362,37 @@ export function BulkTransfer() {
                 <TabsContent value="details">
                     {selectedBulkFile ? (
                         <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                            <ScrollArea style={{ height: '500px' }}>
-                                <div className="relative">
-                                    <Table>
-                                        <TableHeader className="sticky top-0 z-10 bg-card">
-                                            <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
-                                                <TableHead>
-                                                    <Checkbox
-                                                        checked={isAllSelected}
-                                                        onCheckedChange={handleSelectAll}
-                                                    />
-                                                </TableHead>
-                                                <TableHead>Beneficiary Name</TableHead>
-                                                <TableHead>Account Title</TableHead>
-                                                <TableHead>Customer Unique ID</TableHead>
-                                                <TableHead>Beneficiary Account No.</TableHead>
-                                                <TableHead>Local Amount</TableHead>
-                                                <TableHead>Status</TableHead>
-                                                <TableHead className="text-right">Actions</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {currentData.map((detail) => (
-                                                <BulkDetailRow
-                                                    key={detail.customerUniqueId}
-                                                    detail={detail}
-                                                    isSelected={selectedRows.includes(detail.customerUniqueId)}
-                                                    onSelect={handleRowSelect}
+                            <div className="h-[500px] overflow-auto">
+                                <Table>
+                                    <TableHeader className="sticky top-0 z-10" style={{ backgroundColor: '#ECECEC8C' }}>
+                                        <TableRow>
+                                            <TableHead>
+                                                <Checkbox
+                                                    checked={isAllSelected}
+                                                    onCheckedChange={handleSelectAll}
                                                 />
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </div>
-                            </ScrollArea>
+                                            </TableHead>
+                                            <TableHead>Beneficiary Name</TableHead>
+                                            <TableHead>Account Title</TableHead>
+                                            <TableHead>Customer Unique ID</TableHead>
+                                            <TableHead>Beneficiary Account No.</TableHead>
+                                            <TableHead>Local Amount</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {currentData.map((detail) => (
+                                            <BulkDetailRow
+                                                key={detail.customerUniqueId}
+                                                detail={detail}
+                                                isSelected={selectedRows.includes(detail.customerUniqueId)}
+                                                onSelect={handleRowSelect}
+                                            />
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
                             <div className="flex items-center justify-between p-4 border-t">
                                 <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
                                     <ChevronLeft className="h-5 w-5" />
