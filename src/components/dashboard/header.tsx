@@ -93,7 +93,7 @@ const SidebarNav = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             icon: ArrowRightLeft, 
             subItems: [
                 { label: 'Initiate Transfer', href: '/transfer' },
-                { label: 'Bulk Transfers', href: '#' },
+                { label: 'Bulk Transfers', href: '/transfer?tab=bulk' },
                 { label: 'Transfer History', href: '/transfer?tab=activity' }
             ] 
         },

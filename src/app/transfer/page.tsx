@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BeneficiaryList, type Beneficiary } from '@/components/transfer/beneficiary-list';
 import { TransferActivityTable, type TransferActivity } from '@/components/transfer/transfer-activity-table';
+import { BulkTransfer } from '@/components/transfer/bulk-transfer';
 
 
 // Dummy data based on the provided image for Beneficiaries
@@ -88,6 +89,8 @@ function InitiateTransferContent() {
         switch (activeTab) {
             case 'activity':
                 return 'Transfer History';
+            case 'bulk':
+                return 'Bulk Transfer';
             case 'transfer':
             default:
                 return 'Initiate Transfer';
@@ -162,18 +165,34 @@ function InitiateTransferContent() {
         </>
     );
 
+    const BulkTransferHeader = () => (
+        <h1 className="text-2xl font-semibold">{getPageTitle()}</h1>
+    );
+
+    const renderHeader = () => {
+        switch (activeTab) {
+            case 'activity':
+                return <ActivityTabHeader />;
+            case 'bulk':
+                return <BulkTransferHeader />;
+            case 'transfer':
+            default:
+                return <TransferTabHeader />;
+        }
+    }
+
 
     return (
         <DashboardLayout>
             <main className="flex-1 p-4 sm:px-6 sm:py-4 flex flex-col gap-6">
                 
-                {activeTab === 'activity' ? <ActivityTabHeader /> : <TransferTabHeader />}
+                {renderHeader()}
 
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                     <TabsList className="grid w-full max-w-lg grid-cols-3">
                         <TabsTrigger value="transfer">Transfers</TabsTrigger>
-                        <TabsTrigger value="activity">Transfer Activity</TabsTrigger>
-                        <TabsTrigger value="bulk">Bulk Transfers</TabsTrigger>
+                        <TabsTrigger value="activity">Transfer History</TabsTrigger>
+                        <TabsTrigger value="bulk">Bulk Transfer</TabsTrigger>
                     </TabsList>
                     <TabsContent value="transfer">
                         <BeneficiaryList beneficiaries={beneficiaries} />
@@ -182,7 +201,7 @@ function InitiateTransferContent() {
                         <TransferActivityTable activities={transferActivities} />
                     </TabsContent>
                     <TabsContent value="bulk">
-                        <p className="p-6 text-center text-muted-foreground">Bulk transfers functionality will be here.</p>
+                        <BulkTransfer />
                     </TabsContent>
                 </Tabs>
 
