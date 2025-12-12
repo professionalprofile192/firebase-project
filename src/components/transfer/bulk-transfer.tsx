@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from "react";
@@ -51,6 +52,17 @@ export function BulkTransfer() {
     const [selectedBulkFile, setSelectedBulkFile] = useState<string | undefined>(undefined);
     const [rowsPerPage, setRowsPerPage] = useState<string | undefined>(undefined);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedRows, setSelectedRows] = useState<string[]>([]);
+
+    const rows = rowsPerPage ? parseInt(rowsPerPage) : bulkProcessingDetails.length;
+    const totalPages = Math.ceil(bulkProcessingDetails.length / rows);
+    const startIndex = (currentPage - 1) * rows;
+    const endIndex = Math.min(startIndex + rows, bulkProcessingDetails.length);
+    const currentData = bulkProcessingDetails.slice(startIndex, endIndex);
+
+    useEffect(() => {
+        setSelectedRows([]);
+    }, [currentPage, rowsPerPage, selectedBulkFile]);
 
     const handleAccountChange = (acctNo: string) => {
         const account = accounts.find(a => a.acctNo === acctNo);
@@ -76,15 +88,24 @@ export function BulkTransfer() {
     };
 
     const handleNextPage = () => {
-        const totalPages = rowsPerPage ? Math.ceil(bulkProcessingDetails.length / parseInt(rowsPerPage)) : 1;
         setCurrentPage(prev => Math.min(prev + 1, totalPages));
     };
 
-    const rows = rowsPerPage ? parseInt(rowsPerPage) : bulkProcessingDetails.length;
-    const totalPages = Math.ceil(bulkProcessingDetails.length / rows);
-    const startIndex = (currentPage - 1) * rows;
-    const endIndex = Math.min(startIndex + rows, bulkProcessingDetails.length);
-    const currentData = bulkProcessingDetails.slice(startIndex, endIndex);
+    const handleSelectAll = (checked: boolean | string) => {
+        if (checked) {
+            setSelectedRows(currentData.map(d => d.customerUniqueId));
+        } else {
+            setSelectedRows([]);
+        }
+    };
+
+    const handleRowSelect = (rowId: string, checked: boolean | string) => {
+        setSelectedRows(prev => 
+            checked ? [...prev, rowId] : prev.filter(id => id !== rowId)
+        );
+    };
+
+    const isAllSelected = selectedRows.length === currentData.length && currentData.length > 0;
 
     return (
         <div className="mt-4 space-y-6">
@@ -155,7 +176,12 @@ export function BulkTransfer() {
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead className="w-12"><Checkbox /></TableHead>
+                                            <TableHead className="w-12">
+                                                <Checkbox
+                                                    checked={isAllSelected}
+                                                    onCheckedChange={handleSelectAll}
+                                                />
+                                            </TableHead>
                                             <TableHead>File Reference Number</TableHead>
                                             <TableHead>Beneficiary Name</TableHead>
                                             <TableHead>Account Title</TableHead>
@@ -165,9 +191,14 @@ export function BulkTransfer() {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {currentData.map((detail, index) => (
-                                            <TableRow key={index}>
-                                                <TableCell><Checkbox /></TableCell>
+                                        {currentData.map((detail) => (
+                                            <TableRow key={detail.customerUniqueId}>
+                                                <TableCell>
+                                                    <Checkbox
+                                                        checked={selectedRows.includes(detail.customerUniqueId)}
+                                                        onCheckedChange={(checked) => handleRowSelect(detail.customerUniqueId, checked)}
+                                                    />
+                                                </TableCell>
                                                 <TableCell>{detail.fileReferenceNumber}</TableCell>
                                                 <TableCell>{detail.beneficiaryName}</TableCell>
                                                 <TableCell>{detail.accountTitle}</TableCell>
