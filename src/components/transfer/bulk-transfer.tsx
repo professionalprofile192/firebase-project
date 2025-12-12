@@ -11,7 +11,7 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Checkbox } from "../ui/checkbox";
-import { ScrollArea } from "../ui/scroll-area";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
 const transferTypes = [
     { title: "Funds Transfer", description: "Own & Internal" },
@@ -179,11 +179,11 @@ export function BulkTransfer() {
                 <TabsContent value="details">
                     {selectedBulkFile ? (
                         <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                            <ScrollArea className="w-full whitespace-nowrap">
+                            <ScrollArea className="w-full whitespace-nowrap" style={{ height: '400px' }}>
                                 <Table>
-                                    <TableHeader>
+                                    <TableHeader className='sticky top-0 bg-card z-10'>
                                         <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
-                                            <TableHead className="w-12">
+                                            <TableHead className="w-12 sticky left-0 bg-card z-20">
                                                 <Checkbox
                                                     checked={isAllSelected}
                                                     onCheckedChange={handleSelectAll}
@@ -207,7 +207,7 @@ export function BulkTransfer() {
                                     <TableBody>
                                         {currentData.map((detail) => (
                                             <TableRow key={detail.customerUniqueId}>
-                                                <TableCell>
+                                                <TableCell className="sticky left-0 bg-card z-10">
                                                     <Checkbox
                                                         checked={selectedRows.includes(detail.customerUniqueId)}
                                                         onCheckedChange={(checked) => handleRowSelect(detail.customerUniqueId, checked)}
@@ -230,6 +230,7 @@ export function BulkTransfer() {
                                         ))}
                                     </TableBody>
                                 </Table>
+                                <ScrollBar orientation="horizontal" />
                             </ScrollArea>
                             <div className="flex items-center justify-between p-4 border-t">
                                 <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
