@@ -181,7 +181,7 @@ export function BulkTransfer() {
                         <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
                             <ScrollArea className="w-full whitespace-nowrap" style={{ height: '400px' }}>
                                 <Table>
-                                    <TableHeader className='sticky top-0 z-10'>
+                                    <TableHeader className='sticky top-0 z-20'>
                                         <TableRow style={{ backgroundColor: '#ECECEC8C' }} className="bg-card">
                                             <TableHead className="w-12 sticky left-0 z-20" style={{ backgroundColor: '#ECECEC8C' }}>
                                                 <Checkbox
