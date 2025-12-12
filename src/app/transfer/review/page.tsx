@@ -36,7 +36,7 @@ function TransferReviewContent() {
             </div>
         </main>
 
-        <div className="printable-area">
+        <div className="printable-area hidden print:block">
           <TransferPrintReceipt activity={activity} />
         </div>
 
