@@ -131,9 +131,11 @@
 }
 
 @media print {
-  body, html {
+  body * {
+    visibility: hidden;
+  }
+  .printable-container, .printable-container * {
     visibility: visible;
-    background: white;
   }
   .printable-container {
     position: absolute;
@@ -141,18 +143,30 @@
     top: 0;
     width: 100%;
     height: 100%;
-    padding: 2rem;
-    background: white;
-    visibility: visible;
+    padding: 0;
+    margin: 0;
   }
-  .no-print, .no-print * {
+  .printable {
+    visibility: visible;
+    display: block !important;
+  }
+  .no-print {
     display: none !important;
   }
-  body > * {
+  /* Ensure the dashboard layout doesn't interfere */
+  div[class*="DashboardLayout"] > div,
+  div[class*="DashboardLayout"] > header {
+      display: none !important;
+  }
+  main[class*="flex flex-1"] {
+    background-color: white !important;
+    padding: 0 !important;
+  }
+  body, html {
+      background: white;
+  }
+}
+
+html .printable {
     display: none;
-  }
-  .printable-container, .printable-container * {
-    display: block;
-    visibility: visible;
-  }
 }

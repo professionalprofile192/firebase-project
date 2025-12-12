@@ -15,9 +15,10 @@ type TransactionDetail = {
 
 interface TransactionDetailsCardProps {
     transaction: TransactionDetail;
+    isPrintView?: boolean;
 }
 
-export function TransactionDetailsCard({ transaction }: TransactionDetailsCardProps) {
+export function TransactionDetailsCard({ transaction, isPrintView = false }: TransactionDetailsCardProps) {
     
     const formatCurrency = (amount: string) => {
         return `PKR ${new Intl.NumberFormat('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseFloat(amount))}`;
@@ -30,8 +31,21 @@ export function TransactionDetailsCard({ transaction }: TransactionDetailsCardPr
         { label: "Status", value: "Success" },
         { label: "Amount", value: formatCurrency(transaction.tranAmt) },
         { label: "Balance Amount", value: formatCurrency(transaction.runBal) },
-        { label: "Description", value: transaction.particulars },
+        { label: "Description", value: transaction.particulars, fullWidth: true },
     ];
+
+    if (isPrintView) {
+        return (
+             <div className="grid grid-cols-1 gap-y-4 text-base">
+                {details.map(detail => (
+                    <div key={detail.label} className={`flex justify-between items-start pb-3 border-b ${detail.fullWidth ? 'flex-col items-start' : ''}`}>
+                        <span className="text-gray-500">{detail.label}</span>
+                        <span className="font-semibold text-right">{detail.value}</span>
+                    </div>
+                ))}
+            </div>
+        )
+    }
 
     return (
         <Card className="shadow-lg">
@@ -45,11 +59,17 @@ export function TransactionDetailsCard({ transaction }: TransactionDetailsCardPr
             <CardContent className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                     {details.map(detail => (
-                        <div key={detail.label} className="flex justify-between items-center text-sm border-b pb-2">
-                            <span className="text-muted-foreground">{detail.label}</span>
-                            <span className="font-semibold text-right">{detail.value}</span>
-                        </div>
+                         !detail.fullWidth && (
+                            <div key={detail.label} className="flex justify-between items-center text-sm border-b pb-2">
+                                <span className="text-muted-foreground">{detail.label}</span>
+                                <span className="font-semibold text-right">{detail.value}</span>
+                            </div>
+                         )
                     ))}
+                     <div className="md:col-span-2 flex justify-between items-center text-sm border-b pb-2">
+                        <span className="text-muted-foreground">Description</span>
+                        <span className="font-semibold text-right">{transaction.particulars}</span>
+                    </div>
                 </div>
             </CardContent>
         </Card>
