@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -74,7 +75,7 @@ function BeneficiaryRow({
 }
 
 export function BeneficiaryList({ beneficiaries }: BeneficiaryListProps) {
-  const [openRow, setOpenRow] = useState<string | null>(beneficiaries.length > 0 ? beneficiaries[0].accountNumber : null);
+  const [openRow, setOpenRow] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   
   const totalPages = Math.ceil(beneficiaries.length / ITEMS_PER_PAGE);
