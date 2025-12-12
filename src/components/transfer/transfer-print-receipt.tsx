@@ -64,7 +64,6 @@ export function TransferPrintReceipt({ activity }: TransferPrintReceiptProps) {
                     alt="UBL Logo"
                     width={100}
                     height={40}
-                    className="filter brightness-0 invert"
                 />
                 <div className="text-right">
                     <p className="font-semibold">Transaction Receipt:</p>
