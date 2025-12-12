@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from "react";
@@ -93,6 +94,7 @@ const BulkDetailRow = ({ detail, onSelect, isSelected }: { detail: BulkDetail; o
                     <TableCell>{detail.beneficiaryName}</TableCell>
                     <TableCell>{detail.accountTitle}</TableCell>
                     <TableCell>{detail.customerUniqueId}</TableCell>
+                    <TableCell>{detail.beneficiaryAccountNo}</TableCell>
                     <TableCell>{detail.localAmount}</TableCell>
                     <TableCell>
                         <span className={cn('px-2 py-1 text-xs rounded-full', {
@@ -175,7 +177,7 @@ const ReviewSummary = ({
                 <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
                     <Table>
                         <TableHeader>
-                            <TableRow className="bg-muted/50">
+                            <TableRow className="bg-muted/50" style={{ backgroundColor: '#ECECEC8C' }}>
                                 <TableHead></TableHead>
                                 <TableHead className="font-bold">Grand Total</TableHead>
                                 <TableHead className="font-bold">Transactions to Hold</TableHead>
@@ -361,34 +363,37 @@ export function BulkTransfer() {
                     {selectedBulkFile ? (
                         <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
                             <ScrollArea style={{ height: '500px' }}>
-                                <Table className="whitespace-nowrap">
-                                    <TableHeader className="sticky top-0 bg-card z-10">
-                                        <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
-                                            <TableHead className="w-12 sticky left-0 bg-card z-10">
-                                                <Checkbox
-                                                    checked={isAllSelected}
-                                                    onCheckedChange={handleSelectAll}
+                                <div className="relative">
+                                    <Table>
+                                        <TableHeader className="sticky top-0 z-10 bg-card">
+                                            <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
+                                                <TableHead>
+                                                    <Checkbox
+                                                        checked={isAllSelected}
+                                                        onCheckedChange={handleSelectAll}
+                                                    />
+                                                </TableHead>
+                                                <TableHead>Beneficiary Name</TableHead>
+                                                <TableHead>Account Title</TableHead>
+                                                <TableHead>Customer Unique ID</TableHead>
+                                                <TableHead>Beneficiary Account No.</TableHead>
+                                                <TableHead>Local Amount</TableHead>
+                                                <TableHead>Status</TableHead>
+                                                <TableHead className="text-right">Actions</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {currentData.map((detail) => (
+                                                <BulkDetailRow
+                                                    key={detail.customerUniqueId}
+                                                    detail={detail}
+                                                    isSelected={selectedRows.includes(detail.customerUniqueId)}
+                                                    onSelect={handleRowSelect}
                                                 />
-                                            </TableHead>
-                                            <TableHead>Beneficiary Name</TableHead>
-                                            <TableHead>Account Title</TableHead>
-                                            <TableHead>Customer Unique ID</TableHead>
-                                            <TableHead>Local Amount</TableHead>
-                                            <TableHead>Status</TableHead>
-                                            <TableHead className="text-right">Actions</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {currentData.map((detail) => (
-                                            <BulkDetailRow
-                                                key={detail.customerUniqueId}
-                                                detail={detail}
-                                                isSelected={selectedRows.includes(detail.customerUniqueId)}
-                                                onSelect={handleRowSelect}
-                                            />
-                                        ))}
-                                    </TableBody>
-                                </Table>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </div>
                             </ScrollArea>
                             <div className="flex items-center justify-between p-4 border-t">
                                 <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
