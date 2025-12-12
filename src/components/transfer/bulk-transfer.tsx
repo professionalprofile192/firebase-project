@@ -140,56 +140,64 @@ export function BulkTransfer() {
                     <TabsTrigger value="history">Bulk Processing History</TabsTrigger>
                 </TabsList>
                 <TabsContent value="details">
-                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-12"><Checkbox /></TableHead>
-                                    <TableHead>File Reference Number</TableHead>
-                                    <TableHead>Beneficiary Name</TableHead>
-                                    <TableHead>Account Title</TableHead>
-                                    <TableHead>Local Amount</TableHead>
-                                    <TableHead>Beneficiary Account No.</TableHead>
-                                    <TableHead>Customer Unique ID</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {bulkProcessingDetails.map((detail, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell><Checkbox /></TableCell>
-                                        <TableCell>{detail.fileReferenceNumber}</TableCell>
-                                        <TableCell>{detail.beneficiaryName}</TableCell>
-                                        <TableCell>{detail.accountTitle}</TableCell>
-                                        <TableCell>{detail.localAmount}</TableCell>
-                                        <TableCell>{detail.beneficiaryAccountNo}</TableCell>
-                                        <TableCell>{detail.customerUniqueId}</TableCell>
+                    {selectedBulkFile ? (
+                        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-12"><Checkbox /></TableHead>
+                                        <TableHead>File Reference Number</TableHead>
+                                        <TableHead>Beneficiary Name</TableHead>
+                                        <TableHead>Account Title</TableHead>
+                                        <TableHead>Local Amount</TableHead>
+                                        <TableHead>Beneficiary Account No.</TableHead>
+                                        <TableHead>Customer Unique ID</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                         <div className="flex items-center justify-between p-4 border-t">
-                            <Button variant="ghost" size="icon" disabled>
-                                <ChevronLeft className="h-5 w-5" />
-                            </Button>
-                            <div className="flex items-center gap-4">
-                                <span className="text-sm text-muted-foreground">Rows per page</span>
-                                <Select value={rowsPerPage} onValueChange={setRowsPerPage}>
-                                    <SelectTrigger className="w-28">
-                                        <SelectValue placeholder="Please select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="50">50</SelectItem>
-                                        <SelectItem value="100">100</SelectItem>
-                                        <SelectItem value="200">200</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                 <span className="text-sm text-muted-foreground">1 - 100 Transactions</span>
+                                </TableHeader>
+                                <TableBody>
+                                    {bulkProcessingDetails.map((detail, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell><Checkbox /></TableCell>
+                                            <TableCell>{detail.fileReferenceNumber}</TableCell>
+                                            <TableCell>{detail.beneficiaryName}</TableCell>
+                                            <TableCell>{detail.accountTitle}</TableCell>
+                                            <TableCell>{detail.localAmount}</TableCell>
+                                            <TableCell>{detail.beneficiaryAccountNo}</TableCell>
+                                            <TableCell>{detail.customerUniqueId}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                            <div className="flex items-center justify-between p-4 border-t">
+                                <Button variant="ghost" size="icon" disabled>
+                                    <ChevronLeft className="h-5 w-5" />
+                                </Button>
+                                <div className="flex items-center gap-4">
+                                    <span className="text-sm text-muted-foreground">Rows per page</span>
+                                    <Select value={rowsPerPage} onValueChange={setRowsPerPage}>
+                                        <SelectTrigger className="w-28">
+                                            <SelectValue placeholder="Please select" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="50">50</SelectItem>
+                                            <SelectItem value="100">100</SelectItem>
+                                            <SelectItem value="200">200</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <span className="text-sm text-muted-foreground">1 - 100 Transactions</span>
+                                </div>
+                                <Button variant="ghost" size="icon">
+                                    <ChevronRight className="h-5 w-5" />
+                                </Button>
                             </div>
-                            <Button variant="ghost" size="icon">
-                                <ChevronRight className="h-5 w-5" />
-                            </Button>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="rounded-lg border bg-card text-card-foreground shadow-sm mt-4">
+                            <div className="h-48 flex items-center justify-center">
+                                <p className="text-muted-foreground">No Record Found</p>
+                            </div>
+                        </div>
+                    )}
                 </TabsContent>
                 <TabsContent value="history">
                      <div className="p-6 text-center text-muted-foreground border rounded-lg">
