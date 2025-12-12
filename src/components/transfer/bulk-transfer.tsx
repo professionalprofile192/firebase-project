@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from "react";
@@ -68,6 +67,7 @@ export function BulkTransfer() {
     const handleAccountChange = (acctNo: string) => {
         const account = accounts.find(a => a.acctNo === acctNo);
         setSelectedAccount(account || null);
+        setSelectedBulkFile(undefined);
     }
     
     const handleTypeSelect = (title: string) => {
