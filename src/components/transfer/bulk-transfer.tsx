@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from "react";
@@ -45,8 +46,27 @@ const bulkProcessingDetails = [
     }
 ];
 
+const accounts = [
+    { acctNo: '253237095', acctName: 'BUYIRABHPTIJBGGVBLAVMBLQINKV' },
+    { acctNo: '060510224211', acctName: 'NAWAZ ALI' },
+    { acctNo: '060510224212', acctName: 'IDREES APPROVER' },
+];
+
+const bulkFiles = [
+    { fileId: '0016249076386172', fileName: '17-oct-25-01 0016249076386172' },
+    { fileId: '0016249076386173', fileName: '18-oct-25-02 0016249076386173' },
+    { fileId: '0016249076386174', fileName: '19-oct-25-03 0016249076386174' },
+];
+
+
 export function BulkTransfer() {
     const [selectedType, setSelectedType] = useState(transferTypes[0].title);
+    const [selectedAccount, setSelectedAccount] = useState<typeof accounts[0] | null>(null);
+
+    const handleAccountChange = (acctNo: string) => {
+        const account = accounts.find(a => a.acctNo === acctNo);
+        setSelectedAccount(account || null);
+    }
 
     return (
         <div className="mt-4 space-y-6">
@@ -73,25 +93,33 @@ export function BulkTransfer() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                         <div>
                             <label className="text-sm text-muted-foreground">Account Number</label>
-                            <Select defaultValue="253237095">
+                            <Select onValueChange={handleAccountChange} value={selectedAccount?.acctNo || ''}>
                                 <SelectTrigger>
-                                    <SelectValue />
+                                    <SelectValue placeholder="Select Account"/>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="253237095">253237095</SelectItem>
+                                    {accounts.map(account => (
+                                        <SelectItem key={account.acctNo} value={account.acctNo}>{account.acctNo}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>
                         <div>
                              <label className="text-sm text-muted-foreground">Account Name</label>
-                            <Input disabled value="BUYIRABHPTIJBGGVBLAVMBLQINKV" />
+                            <Input disabled value={selectedAccount?.acctName || ''} placeholder="Account name will appear here" />
                         </div>
                         <div>
                              <label className="text-sm text-muted-foreground">Bulk File</label>
-                             <div className="flex items-center justify-between border rounded-md px-3 py-2 bg-muted/50">
-                                <span>17-oct-25-01 0016249076386172</span>
-                                <ChevronRight className="h-5 w-5 text-muted-foreground"/>
-                             </div>
+                             <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select Bulk File" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {bulkFiles.map(file => (
+                                        <SelectItem key={file.fileId} value={file.fileId}>{file.fileName}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
                 </CardContent>
