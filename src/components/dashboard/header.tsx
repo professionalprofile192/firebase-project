@@ -1,4 +1,3 @@
-
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -93,6 +92,7 @@ const SidebarNav = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             label: 'Transfers', 
             icon: ArrowRightLeft, 
             subItems: [
+                { label: 'Initiate Transfer', href: '/transfer' },
                 { label: 'Bulk Transfers', href: '#' },
                 { label: 'Transfer History', href: '#' }
             ] 
@@ -300,7 +300,7 @@ export function Header() {
                     Payments
                 </Link>
                 <Link
-                    href="#"
+                    href="/transfer"
                     className="transition-colors hover:text-primary/80"
                 >
                     Transfer
