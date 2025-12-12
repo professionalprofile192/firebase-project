@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -10,7 +11,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BarChart2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { ScrollArea } from '../ui/scroll-area';
 
 export type TransferActivity = {
   transactionDate: string;
@@ -26,6 +29,19 @@ interface TransferActivityTableProps {
 }
 
 const ITEMS_PER_PAGE = 20;
+
+const StatusIndicator = ({ status }: { status: TransferActivity['status'] }) => {
+    return (
+        <div className="flex items-center gap-2">
+            <span className={cn('h-2 w-2 rounded-full', {
+                'bg-green-500': status === 'Completed',
+                'bg-red-500': status === 'Failed',
+                'bg-yellow-500': status === 'In Progress'
+            })}></span>
+            <span>{status}</span>
+        </div>
+    )
+}
 
 export function TransferActivityTable({ activities }: TransferActivityTableProps) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -45,42 +61,48 @@ export function TransferActivityTable({ activities }: TransferActivityTableProps
   return (
     <>
         <div className="rounded-lg border bg-card text-card-foreground shadow-sm mt-4">
-            <Table>
-                <TableHeader>
-                <TableRow>
-                    <TableHead>Transaction Date</TableHead>
-                    <TableHead>Transaction Number</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Beneficiary Title</TableHead>
-                    <TableHead>Account Number</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead className="text-center">Actions</TableHead>
-                </TableRow>
-                </TableHeader>
-                <TableBody>
-                {currentData.length > 0 ? (
-                    currentData.map((activity, index) => (
-                    <TableRow key={index}>
-                        <TableCell>{activity.transactionDate}</TableCell>
-                        <TableCell>{activity.transactionNumber}</TableCell>
-                        <TableCell>{activity.status}</TableCell>
-                        <TableCell>{activity.beneficiaryTitle}</TableCell>
-                        <TableCell>{activity.accountNumber}</TableCell>
-                        <TableCell>PKR {activity.amount}</TableCell>
-                        <TableCell className="text-center">
-                            <Button variant="outline" size="sm">View</Button>
-                        </TableCell>
-                    </TableRow>
-                    ))
-                ) : (
+            <ScrollArea>
+                <Table>
+                    <TableHeader>
                     <TableRow>
-                        <TableCell colSpan={7} className="h-48 text-center text-muted-foreground">
-                            No Record Found
-                        </TableCell>
+                        <TableHead>Transaction Date</TableHead>
+                        <TableHead>Transaction Number</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Beneficiary Title</TableHead>
+                        <TableHead>Account Number</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead className="text-center">Actions</TableHead>
                     </TableRow>
-                )}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                    {currentData.length > 0 ? (
+                        currentData.map((activity, index) => (
+                        <TableRow key={index}>
+                            <TableCell>{activity.transactionDate}</TableCell>
+                            <TableCell>{activity.transactionNumber}</TableCell>
+                            <TableCell>
+                                <StatusIndicator status={activity.status} />
+                            </TableCell>
+                            <TableCell>{activity.beneficiaryTitle}</TableCell>
+                            <TableCell>{activity.accountNumber}</TableCell>
+                            <TableCell>PKR {activity.amount}</TableCell>
+                            <TableCell className="text-center">
+                                <Button variant="outline" size="sm">
+                                    Print <BarChart2 className="ml-2 h-4 w-4" />
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                        ))
+                    ) : (
+                        <TableRow>
+                            <TableCell colSpan={7} className="h-48 text-center text-muted-foreground">
+                                No Record Found
+                            </TableCell>
+                        </TableRow>
+                    )}
+                    </TableBody>
+                </Table>
+            </ScrollArea>
         </div>
         <div className="flex items-center justify-between mt-4">
              <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>

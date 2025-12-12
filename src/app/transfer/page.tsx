@@ -79,7 +79,32 @@ const beneficiaries: Beneficiary[] = [
 ];
 
 // Dummy data for Transfer Activity
-const transferActivities: TransferActivity[] = [];
+const transferActivities: TransferActivity[] = [
+    {
+        transactionDate: '10/12/2025 12:41 PM',
+        transactionNumber: '191772940950887',
+        status: 'Failed',
+        beneficiaryTitle: 'SHAISTA SIDDIQUI',
+        accountNumber: '2000258949',
+        amount: '16.00'
+    },
+    {
+        transactionDate: '10/11/2025 10:20 AM',
+        transactionNumber: '191772940950888',
+        status: 'Completed',
+        beneficiaryTitle: 'JOHN DOE',
+        accountNumber: '1234567890',
+        amount: '500.00'
+    },
+    {
+        transactionDate: '10/10/2025 03:15 PM',
+        transactionNumber: '191772940950889',
+        status: 'In Progress',
+        beneficiaryTitle: 'JANE SMITH',
+        accountNumber: '0987654321',
+        amount: '1200.50'
+    }
+];
 
 
 function InitiateTransferContent() {
@@ -118,7 +143,7 @@ function InitiateTransferContent() {
                 </div>
                 <Select>
                     <SelectTrigger className="w-full sm:w-[180px]">
-                        <SelectValue placeholder="Select Category" />
+                        <SelectValue placeholder="Please select" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="cat1">Category 1</SelectItem>
@@ -146,7 +171,7 @@ function InitiateTransferContent() {
                 </div>
                 <Select>
                     <SelectTrigger className="w-full sm:w-[180px]">
-                        <SelectValue placeholder="Select Account" />
+                        <SelectValue placeholder="Please select" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="acc1">Account 1</SelectItem>
@@ -155,7 +180,7 @@ function InitiateTransferContent() {
                 </Select>
                  <Select>
                     <SelectTrigger className="w-full sm:w-[180px]">
-                        <SelectValue placeholder="View" />
+                        <SelectValue placeholder="Please select" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">All</SelectItem>
