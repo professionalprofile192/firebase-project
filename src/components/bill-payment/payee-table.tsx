@@ -8,7 +8,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TableFooter,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
@@ -18,6 +17,7 @@ import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '../ui/checkbox';
 import { Skeleton } from '../ui/skeleton';
+import { AlertTriangle } from 'lucide-react';
 
 
 export type Payee = {
@@ -249,34 +249,27 @@ export function PayeeTable({ data, multiPayMode, loading }: PayeeTableProps) {
             ))
           ) : (
              <TableRow>
-                 <TableCell colSpan={multiPayMode ? 5 : 5} className="h-24" />
+                 <TableCell colSpan={multiPayMode ? 5 : 5} className="h-48">
+                    <div className="flex flex-col items-center justify-center gap-4 py-10 h-full">
+                        <AlertTriangle className="h-10 w-10 text-red-500" />
+                        <p className="font-semibold text-lg text-muted-foreground">No Payees Found</p>
+                    </div>
+                </TableCell>
              </TableRow>
           )}
         </TableBody>
-        <TableFooter>
-            <TableRow>
-                <TableCell colSpan={multiPayMode ? 5 : 5}>
-                    {data.length > 0 ? (
-                        <div className="flex items-center justify-center p-2">
-                            <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
-                                <ChevronLeft className="h-4 w-4" />
-                            </Button>
-                            <span className="text-sm text-muted-foreground mx-4">
-                                {startIndex + 1} - {endIndex} of {data.length} Payees
-                            </span>
-                            <Button variant="ghost" size="icon" onClick={handleNextPage} disabled={currentPage === totalPages}>
-                                <ChevronRight className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    ) : (
-                         <div className="text-center text-muted-foreground py-4">
-                            No Payees Found
-                        </div>
-                    )}
-                </TableCell>
-            </TableRow>
-        </TableFooter>
       </Table>
+       <div className="flex items-center justify-center p-4 border-t">
+            <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
+                <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm text-muted-foreground mx-4">
+                {data.length > 0 ? `${startIndex + 1} - ${endIndex} of ${data.length} Payees` : '0 Payees'}
+            </span>
+            <Button variant="ghost" size="icon" onClick={handleNextPage} disabled={currentPage === totalPages || data.length === 0}>
+                <ChevronRight className="h-4 w-4" />
+            </Button>
+        </div>
     </div>
   );
 }

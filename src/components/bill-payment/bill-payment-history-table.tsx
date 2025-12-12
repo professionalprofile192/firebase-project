@@ -8,7 +8,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TableFooter
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -76,35 +75,27 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="h-24" />
+              <TableCell colSpan={7} className="h-48">
+                <div className="flex flex-col items-center justify-center gap-4 py-10 h-full">
+                    <AlertTriangle className="h-10 w-10 text-red-500" />
+                    <p className="font-semibold text-lg text-muted-foreground">No Record Found</p>
+                </div>
+              </TableCell>
             </TableRow>
           )}
         </TableBody>
-        <TableFooter>
-            <TableRow>
-            <TableCell colSpan={7}>
-                {data.length > 0 ? (
-                    <div className="flex items-center justify-center p-2">
-                        <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <span className="text-sm text-muted-foreground mx-4">
-                            {startIndex + 1} - {endIndex} of {data.length} Transactions
-                        </span>
-                        <Button variant="ghost" size="icon" onClick={handleNextPage} disabled={currentPage === totalPages}>
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                    </div>
-                ) : (
-                    <div className="flex flex-col items-center justify-center gap-4 py-10">
-                        <AlertTriangle className="h-10 w-10 text-red-500" />
-                        <p className="font-semibold text-lg text-muted-foreground">No Record Found</p>
-                    </div>
-                )}
-            </TableCell>
-            </TableRow>
-        </TableFooter>
       </Table>
+      <div className="flex items-center justify-center p-4 border-t">
+        <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
+            <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <span className="text-sm text-muted-foreground mx-4">
+            {data.length > 0 ? `${startIndex + 1} - ${endIndex} of ${data.length} Transactions` : '0 Transactions'}
+        </span>
+        <Button variant="ghost" size="icon" onClick={handleNextPage} disabled={currentPage === totalPages || data.length === 0}>
+            <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 }
