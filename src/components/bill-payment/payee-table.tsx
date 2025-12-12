@@ -246,11 +246,7 @@ export function PayeeTable({ data, multiPayMode, loading }: PayeeTableProps) {
               />
             ))
           ) : (
-             <TableRow>
-                <TableCell colSpan={multiPayMode ? 5 : 5} className="h-48 text-center text-muted-foreground">
-                    No Record Found
-                </TableCell>
-             </TableRow>
+             null
           )}
         </TableBody>
       </Table>
