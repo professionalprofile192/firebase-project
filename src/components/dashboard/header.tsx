@@ -94,7 +94,7 @@ const SidebarNav = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             subItems: [
                 { label: 'Initiate Transfer', href: '/transfer' },
                 { label: 'Bulk Transfers', href: '#' },
-                { label: 'Transfer History', href: '#' }
+                { label: 'Transfer History', href: '/transfer?tab=activity' }
             ] 
         },
         { 
