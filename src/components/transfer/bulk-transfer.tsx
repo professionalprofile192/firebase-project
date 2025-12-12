@@ -93,6 +93,8 @@ const BulkDetailRow = ({ detail, onSelect, isSelected }: { detail: BulkDetail; o
                     </TableCell>
                     <TableCell>{detail.beneficiaryName}</TableCell>
                     <TableCell>{detail.beneficiaryAccountNo}</TableCell>
+                    <TableCell>{detail.accountTitle}</TableCell>
+                    <TableCell>{detail.customerUniqueId}</TableCell>
                     <TableCell>{detail.localAmount}</TableCell>
                     <TableCell>
                         <span className={cn('px-2 py-1 text-xs rounded-full', {
@@ -111,11 +113,9 @@ const BulkDetailRow = ({ detail, onSelect, isSelected }: { detail: BulkDetail; o
                 </TableRow>
                 <CollapsibleContent asChild>
                     <TableRow>
-                        <TableCell colSpan={6} className="p-0">
+                        <TableCell colSpan={8} className="p-0">
                             <div className="bg-muted/50 p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <DetailRow label="File Reference" value={detail.fileReferenceNumber} />
-                                <DetailRow label="Account Title" value={detail.accountTitle} />
-                                <DetailRow label="Customer Unique ID" value={detail.customerUniqueId} />
                                 <DetailRow label="Beneficiary Email" value={detail.beneficiaryEmail} />
                                 <DetailRow label="Beneficiary Phone" value={detail.beneficiaryPhone} />
                                 <DetailRow label="Bank Code" value={detail.beneficiaryBankCode} />
@@ -259,10 +259,10 @@ export function BulkTransfer() {
                     {selectedBulkFile ? (
                         <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
                             <ScrollArea style={{ height: '500px' }}>
-                                <Table>
-                                    <TableHeader>
+                                <Table className="whitespace-nowrap">
+                                    <TableHeader className="sticky top-0 bg-card z-10">
                                         <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
-                                            <TableHead className="w-12">
+                                            <TableHead className="w-12 sticky left-0 bg-card">
                                                 <Checkbox
                                                     checked={isAllSelected}
                                                     onCheckedChange={handleSelectAll}
@@ -270,6 +270,8 @@ export function BulkTransfer() {
                                             </TableHead>
                                             <TableHead>Beneficiary Name</TableHead>
                                             <TableHead>Beneficiary Account No.</TableHead>
+                                            <TableHead>Account Title</TableHead>
+                                            <TableHead>Customer Unique ID</TableHead>
                                             <TableHead>Local Amount</TableHead>
                                             <TableHead>Status</TableHead>
                                             <TableHead className="text-right">Actions</TableHead>
