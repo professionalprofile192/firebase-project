@@ -362,7 +362,7 @@ export function BulkTransfer() {
                 <TabsContent value="details">
                     {selectedBulkFile ? (
                         <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                            <div className="overflow-auto h-[450px]">
+                            <div className="overflow-auto h-[330px]">
                                 <Table>
                                     <TableHeader className="sticky top-0 z-10 bg-card" style={{ backgroundColor: '#ECECEC8C' }}>
                                         <TableRow>
