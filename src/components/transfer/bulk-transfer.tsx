@@ -175,7 +175,7 @@ export function BulkTransfer() {
                             <ScrollArea>
                                 <Table>
                                     <TableHeader>
-                                        <TableRow>
+                                        <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
                                             <TableHead className="w-12">
                                                 <Checkbox
                                                     checked={isAllSelected}

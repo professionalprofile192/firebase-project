@@ -22,7 +22,7 @@ export function TradeRequestHistoryTable({ data }: TradeRequestHistoryTableProps
     <Card>
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
             <TableHead>File Reference Number</TableHead>
             <TableHead>Product Type</TableHead>
             <TableHead>Request Type</TableHead>

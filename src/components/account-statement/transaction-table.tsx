@@ -20,7 +20,7 @@ export function TransactionTable({ transactions, loading }: TransactionTableProp
         return (
              <Table>
                 <TableHeader>
-                    <TableRow>
+                    <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
                         <TableHead>Transaction Date</TableHead>
                         <TableHead>Description</TableHead>
                         <TableHead className="text-right">Debit Amount</TableHead>
@@ -49,7 +49,7 @@ export function TransactionTable({ transactions, loading }: TransactionTableProp
         <ScrollArea className="h-full w-full">
             <Table>
                 <TableHeader>
-                    <TableRow>
+                    <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
                         <TableHead>Transaction Date</TableHead>
                         <TableHead>Description</TableHead>
                         <TableHead className="text-right">Debit Amount</TableHead>

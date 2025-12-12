@@ -20,7 +20,7 @@ export function RequestHistoryTable({ data }: RequestHistoryTableProps) {
     <div className="rounded-lg border bg-card text-card-foreground shadow-sm mt-4">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
             <TableHead>Transaction Number</TableHead>
             <TableHead>Transaction Type</TableHead>
             <TableHead>Request Type</TableHead>

@@ -39,7 +39,7 @@ export function BulkFileHistoryTable({ data }: BulkFileHistoryTableProps) {
     <div className="rounded-lg border bg-card text-card-foreground shadow-sm mt-4">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
             <TableHead>File Name</TableHead>
             <TableHead>Upload Date</TableHead>
             <TableHead>Reference Number</TableHead>

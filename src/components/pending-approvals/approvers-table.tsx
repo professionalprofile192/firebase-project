@@ -59,7 +59,7 @@ export function ApproversTable({ approval, userProfile }: ApproversTableProps) {
             <div className="rounded-lg border">
                 <Table>
                     <TableHeader>
-                    <TableRow>
+                    <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
                         <TableHead>Username</TableHead>
                         <TableHead>Role</TableHead>
                         <TableHead>Status</TableHead>

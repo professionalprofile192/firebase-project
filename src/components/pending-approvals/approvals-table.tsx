@@ -216,7 +216,7 @@ export function ApprovalsTable({ data, userProfile, onReject }: ApprovalsTablePr
       <div className="rounded-lg border bg-card text-card-foreground shadow-sm mt-4">
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
               <TableHead className="w-12"></TableHead>
               <TableHead>Transaction Number</TableHead>
               <TableHead>Transaction Type</TableHead>

@@ -70,7 +70,7 @@ export function TransferActivityTable({ activities }: TransferActivityTableProps
             <ScrollArea>
                 <Table>
                     <TableHeader>
-                    <TableRow>
+                    <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
                         <TableHead>Transaction Date</TableHead>
                         <TableHead>Transaction Number</TableHead>
                         <TableHead>Status</TableHead>

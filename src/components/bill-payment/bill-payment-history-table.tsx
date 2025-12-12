@@ -48,7 +48,7 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
     <div className="rounded-lg border bg-card text-card-foreground shadow-sm mt-6">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
             <TableHead>Consumer Number</TableHead>
             <TableHead>Transaction ID</TableHead>
             <TableHead>Transaction Date</TableHead>

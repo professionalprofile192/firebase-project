@@ -188,7 +188,7 @@ export function PayeeTable({ data, multiPayMode, loading }: PayeeTableProps) {
     <div className="rounded-lg border bg-card text-card-foreground shadow-sm mt-4">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
             {multiPayMode && (
               <TableHead className="w-12 text-center">
                 <Checkbox 

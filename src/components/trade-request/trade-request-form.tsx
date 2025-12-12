@@ -386,7 +386,7 @@ export function TradeRequestForm() {
                           <h3 className="text-lg font-semibold mb-2">File Details</h3>
                           <Table>
                               <TableHeader>
-                                  <TableRow>
+                                  <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
                                       <TableHead>File Name</TableHead>
                                       <TableHead>Request Type</TableHead>
                                       <TableHead>Product Type</TableHead>

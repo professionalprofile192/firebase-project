@@ -200,7 +200,7 @@ export function ApprovalsHistoryTable({ data }: ApprovalsHistoryTableProps) {
     <div className="rounded-lg border bg-card text-card-foreground shadow-sm mt-4">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
             <TableHead className="w-12"></TableHead>
             <TableHead className="w-[15%] whitespace-nowrap">Transaction Number</TableHead>
             <TableHead className="w-[25%]">Transaction Type</TableHead>
