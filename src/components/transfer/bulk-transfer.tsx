@@ -63,15 +63,7 @@ export function BulkTransfer() {
     const [selectedType, setSelectedType] = useState(transferTypes[0].title);
     const [selectedAccount, setSelectedAccount] = useState<typeof accounts[0] | null>(null);
     const [selectedBulkFile, setSelectedBulkFile] = useState<string>('');
-
-    useEffect(() => {
-        if (accounts.length > 0) {
-            setSelectedAccount(accounts[0]);
-        }
-        if (bulkFiles.length > 0) {
-            setSelectedBulkFile(bulkFiles[0].fileId);
-        }
-    }, []);
+    const [rowsPerPage, setRowsPerPage] = useState<string>('');
 
     const handleAccountChange = (acctNo: string) => {
         const account = accounts.find(a => a.acctNo === acctNo);
@@ -105,9 +97,10 @@ export function BulkTransfer() {
                             <label className="text-sm text-muted-foreground">Account Number</label>
                             <Select onValueChange={handleAccountChange} value={selectedAccount?.acctNo || ''}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select Account"/>
+                                    <SelectValue placeholder="Please select"/>
                                 </SelectTrigger>
                                 <SelectContent>
+                                    <SelectItem value="placeholder" disabled>Please select</SelectItem>
                                     {accounts.map(account => (
                                         <SelectItem key={account.acctNo} value={account.acctNo}>{account.acctNo}</SelectItem>
                                     ))}
@@ -122,9 +115,10 @@ export function BulkTransfer() {
                              <label className="text-sm text-muted-foreground">Bulk File</label>
                              <Select value={selectedBulkFile} onValueChange={setSelectedBulkFile}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select Bulk File" />
+                                    <SelectValue placeholder="Please select" />
                                 </SelectTrigger>
                                 <SelectContent>
+                                    <SelectItem value="placeholder" disabled>Please select</SelectItem>
                                     {bulkFiles.map(file => (
                                         <SelectItem key={file.fileId} value={file.fileId}>{file.fileName}</SelectItem>
                                     ))}
@@ -174,11 +168,12 @@ export function BulkTransfer() {
                             </Button>
                             <div className="flex items-center gap-4">
                                 <span className="text-sm text-muted-foreground">Rows per page</span>
-                                <Select defaultValue="50">
-                                    <SelectTrigger className="w-20">
-                                        <SelectValue />
+                                <Select value={rowsPerPage} onValueChange={setRowsPerPage}>
+                                    <SelectTrigger className="w-28">
+                                        <SelectValue placeholder="Please select" />
                                     </SelectTrigger>
                                     <SelectContent>
+                                        <SelectItem value="placeholder" disabled>Please select</SelectItem>
                                         <SelectItem value="50">50</SelectItem>
                                         <SelectItem value="100">100</SelectItem>
                                         <SelectItem value="200">200</SelectItem>
