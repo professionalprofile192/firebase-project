@@ -17,8 +17,6 @@ import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '../ui/checkbox';
 import { Skeleton } from '../ui/skeleton';
-import { AlertTriangle } from 'lucide-react';
-
 
 export type Payee = {
   consumerName: string;
@@ -249,11 +247,8 @@ export function PayeeTable({ data, multiPayMode, loading }: PayeeTableProps) {
             ))
           ) : (
              <TableRow>
-                 <TableCell colSpan={multiPayMode ? 5 : 5} className="h-48">
-                    <div className="flex flex-col items-center justify-center gap-4 py-10 h-full">
-                        <AlertTriangle className="h-10 w-10 text-red-500" />
-                        <p className="font-semibold text-lg text-muted-foreground">No Payees Found</p>
-                    </div>
+                <TableCell colSpan={multiPayMode ? 5 : 5} className="h-48 text-center text-muted-foreground">
+                    No Record Found
                 </TableCell>
              </TableRow>
           )}
