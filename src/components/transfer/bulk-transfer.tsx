@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -62,6 +62,16 @@ const bulkFiles = [
 export function BulkTransfer() {
     const [selectedType, setSelectedType] = useState(transferTypes[0].title);
     const [selectedAccount, setSelectedAccount] = useState<typeof accounts[0] | null>(null);
+    const [selectedBulkFile, setSelectedBulkFile] = useState<string>('');
+
+    useEffect(() => {
+        if (accounts.length > 0) {
+            setSelectedAccount(accounts[0]);
+        }
+        if (bulkFiles.length > 0) {
+            setSelectedBulkFile(bulkFiles[0].fileId);
+        }
+    }, []);
 
     const handleAccountChange = (acctNo: string) => {
         const account = accounts.find(a => a.acctNo === acctNo);
@@ -106,11 +116,11 @@ export function BulkTransfer() {
                         </div>
                         <div>
                              <label className="text-sm text-muted-foreground">Account Name</label>
-                            <Input disabled value={selectedAccount?.acctName || ''} placeholder="Account name will appear here" />
+                            <Input disabled value={selectedAccount?.acctName || ''} placeholder="" />
                         </div>
                         <div>
                              <label className="text-sm text-muted-foreground">Bulk File</label>
-                             <Select>
+                             <Select value={selectedBulkFile} onValueChange={setSelectedBulkFile}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select Bulk File" />
                                 </SelectTrigger>
@@ -164,7 +174,7 @@ export function BulkTransfer() {
                             </Button>
                             <div className="flex items-center gap-4">
                                 <span className="text-sm text-muted-foreground">Rows per page</span>
-                                <Select defaultValue="100">
+                                <Select defaultValue="50">
                                     <SelectTrigger className="w-20">
                                         <SelectValue />
                                     </SelectTrigger>
