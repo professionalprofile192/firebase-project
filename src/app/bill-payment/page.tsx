@@ -80,39 +80,43 @@ function BillPaymentContent() {
     try {
         const userProfile = JSON.parse(userProfileString);
 
-        const [payeeData, categoryData] = await Promise.all([
-            // Fetch Payees
-            fetch("/api/get-payee-list", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    token: sessionToken,
-                    kuid: userProfile.UserName,
-                    payload: {
-                        id: "",
-                        offset: 0,
-                        limit: 100,
-                        sortBy: "createdOn",
-                        order: "desc",
-                        payeeId: userProfile.userid,
-                        searchString: ""
-                    }
-                })
-            }).then(res => res.json()),
+        // const [payeeData, categoryData] = await Promise.all([
+        //     // Fetch Payees
+        //     fetch("/api/get-payee-list", {
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify({
+        //             token: sessionToken,
+        //             kuid: userProfile.UserName,
+        //             payload: {
+        //                 id: "",
+        //                 offset: 0,
+        //                 limit: 100,
+        //                 sortBy: "createdOn",
+        //                 order: "desc",
+        //                 payeeId: userProfile.userid,
+        //                 searchString: ""
+        //             }
+        //         })
+        //     }).then(res => res.json()),
 
-            // Fetch Categories
-            fetch("/api/get-bill-categories", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    token: sessionToken,
-                    kuid: userProfile.UserName,
-                })
-            }).then(res => res.json())
-        ]);
+        //     // Fetch Categories
+        //     fetch("/api/get-bill-categories", {
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify({
+        //             token: sessionToken,
+        //             kuid: userProfile.UserName,
+        //         })
+        //     }).then(res => res.json())
+        // ]);
+      
+      const payeeData = { opstatus: -1 }; // Mocking failure to prevent processing
+      const categoryData = { opstatus: -1 };
 
-      if (payeeData.opstatus === 0 && payeeData.payee) {
-        const mappedPayees: Payee[] = payeeData.payee.map((p: any) => {
+
+      if (payeeData.opstatus === 0 && (payeeData as any).payee) {
+        const mappedPayees: Payee[] = (payeeData as any).payee.map((p: any) => {
           let notes = {};
           try {
             notes = JSON.parse(p.notes || '{}');
@@ -139,14 +143,18 @@ function BillPaymentContent() {
       } else {
         setAllPayees([]);
         setFilteredPayees([]);
-        toast({ variant: "destructive", title: "Failed to fetch payees", description: payeeData.errmsg || payeeData.error || 'Could not load payee data.' });
+        if (payeeData.opstatus !== -1) { // Only toast if it wasn't our mocked failure
+            toast({ variant: "destructive", title: "Failed to fetch payees", description: (payeeData as any).errmsg || (payeeData as any).error || 'Could not load payee data.' });
+        }
       }
 
-      if (categoryData.opstatus === 0 && categoryData.PaymentService) {
-          setCategories(categoryData.PaymentService);
+      if (categoryData.opstatus === 0 && (categoryData as any).PaymentService) {
+          setCategories((categoryData as any).PaymentService);
       } else {
           setCategories([]);
-          toast({ variant: "destructive", title: "Failed to fetch categories", description: categoryData.errmsg || categoryData.error || 'Could not load category data.' });
+           if (categoryData.opstatus !== -1) {
+            toast({ variant: "destructive", title: "Failed to fetch categories", description: (categoryData as any).errmsg || (categoryData as any).error || 'Could not load category data.' });
+           }
       }
 
     } catch (error) {
@@ -344,5 +352,3 @@ export default function BillPaymentPage() {
     </Suspense>
   )
 }
-
-    
