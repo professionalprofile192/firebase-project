@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronRight, ChevronLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Checkbox } from "../ui/checkbox";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import { ScrollArea } from "../ui/scroll-area";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 
 const transferTypes = [
     { title: "Funds Transfer", description: "Own & Internal" },
@@ -20,7 +21,24 @@ const transferTypes = [
     { title: "Omni Payment", description: "All Omni Accounts" },
 ];
 
-const generateBulkDetails = (count: number) => {
+type BulkDetail = {
+    fileReferenceNumber: string;
+    beneficiaryName: string;
+    accountTitle: string;
+    localAmount: string;
+    beneficiaryAccountNo: string;
+    customerUniqueId: string;
+    beneficiaryEmail: string;
+    beneficiaryPhone: string;
+    beneficiaryBankCode: string;
+    beneficiaryBankName: string;
+    status: 'Processed' | 'Failed' | 'Pending';
+    titleFetch: 'Success' | 'Failed';
+    reasonOfFailure: string;
+};
+
+
+const generateBulkDetails = (count: number): BulkDetail[] => {
     return Array.from({ length: count }, (_, i) => ({
         fileReferenceNumber: '0016249076386172',
         beneficiaryName: ['ali akber', 'shahzain', 'Jatoi', 'Ahmed', 'Fatima', 'Bilal'][i % 6],
@@ -47,21 +65,82 @@ const accounts = [
 ];
 
 const bulkFiles = [
-    { fileId: '0016249076386172', fileName: '17-oct-25-01 0016249076386172' },
-    { fileId: '0016249076386173', fileName: '18-oct-25-02 0016249076386173' },
-    { fileId: '0016249076386174', fileName: '19-oct-25-03 0016249076386174' },
+    { fileId: '0016249_A', fileName: '17-oct-25-01 0016249_A' },
+    { fileId: '0016249_B', fileName: '18-oct-25-02 0016249_B' },
+    { fileId: '0016249_C', fileName: '19-oct-25-03 0016249_C' },
 ];
+
+const DetailRow = ({ label, value }: { label: string, value: React.ReactNode }) => (
+    <div>
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-sm font-medium">{value}</p>
+    </div>
+);
+
+
+const BulkDetailRow = ({ detail, onSelect, isSelected }: { detail: BulkDetail; onSelect: (id: string, checked: boolean) => void; isSelected: boolean }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+         <Collapsible asChild open={isOpen} onOpenChange={setIsOpen}>
+            <>
+                <TableRow>
+                    <TableCell>
+                        <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={(checked) => onSelect(detail.customerUniqueId, !!checked)}
+                        />
+                    </TableCell>
+                    <TableCell>{detail.beneficiaryName}</TableCell>
+                    <TableCell>{detail.beneficiaryAccountNo}</TableCell>
+                    <TableCell>{detail.localAmount}</TableCell>
+                    <TableCell>
+                        <span className={cn('px-2 py-1 text-xs rounded-full', {
+                            'bg-green-100 text-green-800': detail.status === 'Processed',
+                            'bg-red-100 text-red-800': detail.status === 'Failed',
+                            'bg-yellow-100 text-yellow-800': detail.status === 'Pending',
+                        })}>
+                            {detail.status}
+                        </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                        <CollapsibleTrigger asChild>
+                            <Button variant="ghost" size="sm">View {isOpen ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />}</Button>
+                        </CollapsibleTrigger>
+                    </TableCell>
+                </TableRow>
+                <CollapsibleContent asChild>
+                    <TableRow>
+                        <TableCell colSpan={6} className="p-0">
+                            <div className="bg-muted/50 p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <DetailRow label="File Reference" value={detail.fileReferenceNumber} />
+                                <DetailRow label="Account Title" value={detail.accountTitle} />
+                                <DetailRow label="Customer Unique ID" value={detail.customerUniqueId} />
+                                <DetailRow label="Beneficiary Email" value={detail.beneficiaryEmail} />
+                                <DetailRow label="Beneficiary Phone" value={detail.beneficiaryPhone} />
+                                <DetailRow label="Bank Code" value={detail.beneficiaryBankCode} />
+                                <DetailRow label="Bank Name" value={detail.beneficiaryBankName} />
+                                <DetailRow label="Title Fetch" value={detail.titleFetch} />
+                                {detail.reasonOfFailure && <DetailRow label="Reason of Failure" value={detail.reasonOfFailure} />}
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                </CollapsibleContent>
+            </>
+        </Collapsible>
+    )
+}
 
 
 export function BulkTransfer() {
     const [selectedType, setSelectedType] = useState(transferTypes[0].title);
     const [selectedAccount, setSelectedAccount] = useState<typeof accounts[0] | null>(null);
     const [selectedBulkFile, setSelectedBulkFile] = useState<string | undefined>(undefined);
-    const [rowsPerPage, setRowsPerPage] = useState<string | undefined>(undefined);
+    const [rowsPerPage, setRowsPerPage] = useState('50');
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
-    const rows = rowsPerPage ? parseInt(rowsPerPage) : bulkProcessingDetails.length;
+    const rows = parseInt(rowsPerPage);
     const totalPages = Math.ceil(bulkProcessingDetails.length / rows);
     const startIndex = (currentPage - 1) * rows;
     const endIndex = Math.min(startIndex + rows, bulkProcessingDetails.length);
@@ -81,7 +160,7 @@ export function BulkTransfer() {
         setSelectedType(title);
         setSelectedAccount(null);
         setSelectedBulkFile(undefined);
-        setRowsPerPage(undefined);
+        setRowsPerPage('50');
         setCurrentPage(1);
     }
     
@@ -179,58 +258,34 @@ export function BulkTransfer() {
                 <TabsContent value="details">
                     {selectedBulkFile ? (
                         <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                            <ScrollArea className="w-full whitespace-nowrap" style={{ height: '400px' }}>
+                            <ScrollArea style={{ height: '500px' }}>
                                 <Table>
-                                    <TableHeader className='sticky top-0 z-20'>
-                                        <TableRow style={{ backgroundColor: '#ECECEC8C' }} className="bg-card">
-                                            <TableHead className="w-12 sticky left-0 z-20" style={{ backgroundColor: '#ECECEC8C' }}>
+                                    <TableHeader>
+                                        <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
+                                            <TableHead className="w-12">
                                                 <Checkbox
                                                     checked={isAllSelected}
                                                     onCheckedChange={handleSelectAll}
                                                 />
                                             </TableHead>
-                                            <TableHead>File Reference Number</TableHead>
                                             <TableHead>Beneficiary Name</TableHead>
-                                            <TableHead>Account Title</TableHead>
-                                            <TableHead>Local Amount</TableHead>
                                             <TableHead>Beneficiary Account No.</TableHead>
-                                            <TableHead>Customer Unique ID</TableHead>
-                                            <TableHead>Beneficiary Email Id</TableHead>
-                                            <TableHead>Beneficiary Phone Number</TableHead>
-                                            <TableHead>Beneficiary Bank Code</TableHead>
-                                            <TableHead>Beneficiary Bank Name</TableHead>
+                                            <TableHead>Local Amount</TableHead>
                                             <TableHead>Status</TableHead>
-                                            <TableHead>Title fetch</TableHead>
-                                            <TableHead>Reason of Failure</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {currentData.map((detail) => (
-                                            <TableRow key={detail.customerUniqueId}>
-                                                <TableCell className="sticky left-0 bg-card z-10">
-                                                    <Checkbox
-                                                        checked={selectedRows.includes(detail.customerUniqueId)}
-                                                        onCheckedChange={(checked) => handleRowSelect(detail.customerUniqueId, checked)}
-                                                    />
-                                                </TableCell>
-                                                <TableCell>{detail.fileReferenceNumber}</TableCell>
-                                                <TableCell>{detail.beneficiaryName}</TableCell>
-                                                <TableCell>{detail.accountTitle}</TableCell>
-                                                <TableCell>{detail.localAmount}</TableCell>
-                                                <TableCell>{detail.beneficiaryAccountNo}</TableCell>
-                                                <TableCell>{detail.customerUniqueId}</TableCell>
-                                                <TableCell>{detail.beneficiaryEmail}</TableCell>
-                                                <TableCell>{detail.beneficiaryPhone}</TableCell>
-                                                <TableCell>{detail.beneficiaryBankCode}</TableCell>
-                                                <TableCell>{detail.beneficiaryBankName}</TableCell>
-                                                <TableCell>{detail.status}</TableCell>
-                                                <TableCell>{detail.titleFetch}</TableCell>
-                                                <TableCell>{detail.reasonOfFailure}</TableCell>
-                                            </TableRow>
+                                            <BulkDetailRow
+                                                key={detail.customerUniqueId}
+                                                detail={detail}
+                                                isSelected={selectedRows.includes(detail.customerUniqueId)}
+                                                onSelect={handleRowSelect}
+                                            />
                                         ))}
                                     </TableBody>
                                 </Table>
-                                <ScrollBar orientation="horizontal" />
                             </ScrollArea>
                             <div className="flex items-center justify-between p-4 border-t">
                                 <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
@@ -240,7 +295,7 @@ export function BulkTransfer() {
                                     <span className="text-sm text-muted-foreground">Rows per page</span>
                                     <Select value={rowsPerPage} onValueChange={handleRowsPerPageChange}>
                                         <SelectTrigger className="w-28">
-                                            <SelectValue placeholder="100" />
+                                            <SelectValue placeholder="50" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="50">50</SelectItem>
