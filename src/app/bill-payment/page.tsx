@@ -78,42 +78,38 @@ function BillPaymentContent() {
     }
     
     try {
-        const userProfile = JSON.parse(userProfileString);
+      const userProfile = JSON.parse(userProfileString);
 
-        // const [payeeData, categoryData] = await Promise.all([
-        //     // Fetch Payees
-        //     fetch("/api/get-payee-list", {
-        //         method: "POST",
-        //         headers: { "Content-Type": "application/json" },
-        //         body: JSON.stringify({
-        //             token: sessionToken,
-        //             kuid: userProfile.UserName,
-        //             payload: {
-        //                 id: "",
-        //                 offset: 0,
-        //                 limit: 100,
-        //                 sortBy: "createdOn",
-        //                 order: "desc",
-        //                 payeeId: userProfile.userid,
-        //                 searchString: ""
-        //             }
-        //         })
-        //     }).then(res => res.json()),
+      const [payeeData, categoryData] = await Promise.all([
+          // Fetch Payees
+          fetch("/api/get-payee-list", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                  token: sessionToken,
+                  kuid: userProfile.UserName,
+                  payload: {
+                      id: "",
+                      offset: 0,
+                      limit: 100,
+                      sortBy: "createdOn",
+                      order: "desc",
+                      payeeId: userProfile.userid, 
+                      searchString: ""
+                  }
+              })
+          }).then(res => res.json()),
 
-        //     // Fetch Categories
-        //     fetch("/api/get-bill-categories", {
-        //         method: "POST",
-        //         headers: { "Content-Type": "application/json" },
-        //         body: JSON.stringify({
-        //             token: sessionToken,
-        //             kuid: userProfile.UserName,
-        //         })
-        //     }).then(res => res.json())
-        // ]);
-      
-      const payeeData = { opstatus: -1 }; // Mocking failure to prevent processing
-      const categoryData = { opstatus: -1 };
-
+          // Fetch Categories
+          fetch("/api/get-bill-categories", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                  token: sessionToken,
+                  kuid: userProfile.UserName,
+              })
+          }).then(res => res.json())
+      ]);
 
       if (payeeData.opstatus === 0 && (payeeData as any).payee) {
         const mappedPayees: Payee[] = (payeeData as any).payee.map((p: any) => {
@@ -123,14 +119,15 @@ function BillPaymentContent() {
           } catch (e) { console.error("Failed to parse payee notes", e); }
           
           const billStatus = (notes as any).billStatus;
-          let status: Payee['status'] = 'Not Payable';
+          let status: Payee['status'] = 'Not Available';
           if (billStatus === 'Unpaid') status = 'Unpaid';
           else if (billStatus === 'Paid') status = 'Paid';
 
           return {
-            consumerName: p.payeeNickName || 'N/A',
-            payeeName: p.payeeName || 'N/A',
-            billerType: p.nameOnBill || p.companyName || 'N/A',
+            consumerName: p.payeeName || 'N/A', // full name
+            payeeNickName: p.payeeNickName || 'N/A', // shorter name
+            billerType: p.nameOnBill || 'N/A',
+            companyName: p.companyName || 'N/A',
             consumerNumber: p.accountNumber,
             status: status,
             amountDue: (notes as any).billAmount,
@@ -144,7 +141,7 @@ function BillPaymentContent() {
       } else {
         setAllPayees([]);
         setFilteredPayees([]);
-        if (payeeData.opstatus !== -1) { // Only toast if it wasn't our mocked failure
+        if (payeeData.opstatus !== -1) { 
             toast({ variant: "destructive", title: "Failed to fetch payees", description: (payeeData as any).errmsg || (payeeData as any).error || 'Could not load payee data.' });
         }
       }
@@ -166,7 +163,7 @@ function BillPaymentContent() {
   }, [toast, router]);
 
   useEffect(() => {
-    // fetchData();
+    fetchData();
   }, [fetchData]);
 
 
@@ -353,5 +350,3 @@ export default function BillPaymentPage() {
     </Suspense>
   )
 }
-
-    

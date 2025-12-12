@@ -11,8 +11,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Edit, Trash2, BarChart2, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Edit, Trash2, BarChart2, AlertTriangle } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '../ui/checkbox';
@@ -20,10 +19,11 @@ import { Skeleton } from '../ui/skeleton';
 
 export type Payee = {
   consumerName: string;
-  payeeName: string;
+  payeeNickName: string;
   billerType: string;
+  companyName: string;
   consumerNumber: string;
-  status: 'Unpaid' | 'Not Payable' | 'Paid';
+  status: 'Unpaid' | 'Not Available' | 'Paid';
   amountDue?: string;
   dueDate?: string;
   amountAfterDueDate?: string;
@@ -53,18 +53,6 @@ function PayeeRow({
   isSelected: boolean,
   onSelectionChange: (checked: boolean) => void
 }) {
-
-  const getStatusClass = (status: string) => {
-    switch(status) {
-      case 'Unpaid': return 'text-red-600';
-      case 'Paid': return 'text-green-600';
-      default: return 'text-gray-500';
-    }
-  }
-
-  const handlePayNowClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
   
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -88,37 +76,28 @@ function PayeeRow({
           </TableCell>
         )}
         <TableCell className="font-medium">
-          <div>{payee.consumerName}</div>
-          <div className="text-muted-foreground text-xs">{payee.payeeName}</div>
+          <div>{payee.payeeNickName.toUpperCase()}</div>
+          <div className="text-muted-foreground text-xs">{payee.consumerName.toUpperCase()}</div>
         </TableCell>
         <TableCell>
-            <Link href="#" className="text-primary hover:underline" onClick={stopPropagation}>{payee.billerType}</Link>
+            <a href="#" className="text-primary hover:underline" onClick={stopPropagation}>{`${payee.billerType} ${payee.companyName}`}</a>
         </TableCell>
         <TableCell>{payee.consumerNumber}</TableCell>
         <TableCell>
-          <span className={cn("font-semibold", getStatusClass(payee.status))}>{payee.status}</span>
+          <span className="text-foreground">{payee.status}</span>
         </TableCell>
-        {!multiPayMode && (
-          <TableCell className="text-right">
+        <TableCell className="text-right">
               <div className='flex items-center justify-end gap-2' onClick={stopPropagation}>
-                {payee.status === 'Unpaid' && 
-                  <Button asChild size="sm" variant="ghost" className="hover:bg-primary/10 text-primary" onClick={handlePayNowClick}>
-                      <Link href={{ pathname: '/bill-payment/pay', query: { payee: JSON.stringify(payee) } }}>
-                        Pay Now <ArrowRight className="h-4 w-4 ml-1" />
-                      </Link>
-                  </Button>
-                }
                 <Button variant="ghost" size="icon" className="p-2 h-auto w-auto" onClick={onToggle}>
                     {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
                     <span className="sr-only">Toggle Details</span>
                 </Button>
               </div>
           </TableCell>
-        )}
       </TableRow>
-      {!multiPayMode && isOpen && (
+      {isOpen && (
         <TableRow>
-          <TableCell colSpan={5} className="p-0">
+          <TableCell colSpan={multiPayMode ? 6 : 5} className="p-0">
             <div className="bg-muted/50 p-4 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
                 <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
                   {payee.amountDue && (
@@ -222,14 +201,14 @@ export function PayeeTable({ data, multiPayMode, loading }: PayeeTableProps) {
             <TableHead>Biller Type</TableHead>
             <TableHead>Consumer / Account Number</TableHead>
             <TableHead>Status</TableHead>
-            {!multiPayMode && <TableHead className="text-right">Actions</TableHead>}
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {loading ? (
             [...Array(ITEMS_PER_PAGE)].map((_, i) => (
               <TableRow key={i}>
-                <TableCell colSpan={multiPayMode ? 5 : 5}>
+                <TableCell colSpan={multiPayMode ? 6 : 5}>
                   <Skeleton className="h-10 w-full" />
                 </TableCell>
               </TableRow>
@@ -248,8 +227,10 @@ export function PayeeTable({ data, multiPayMode, loading }: PayeeTableProps) {
             ))
           ) : (
              <TableRow>
-              <TableCell colSpan={multiPayMode ? 5 : 5} className="h-24 text-center">
-                No Record Found
+              <TableCell colSpan={multiPayMode ? 6 : 5} className="h-48">
+                 <div className="flex flex-col items-center justify-center gap-4 py-10 h-full">
+                    <p className="font-semibold text-lg text-muted-foreground">No Payees Found</p>
+                </div>
               </TableCell>
             </TableRow>
           )}
@@ -269,5 +250,3 @@ export function PayeeTable({ data, multiPayMode, loading }: PayeeTableProps) {
     </div>
   );
 }
-
-    
