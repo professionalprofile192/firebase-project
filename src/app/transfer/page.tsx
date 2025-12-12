@@ -78,28 +78,42 @@ const beneficiaries: Beneficiary[] = [
     },
 ];
 
-// Dummy data for Transfer Activity
 const transferActivities: TransferActivity[] = [
     {
+        postDate: '10/12/2025 12:41 PM',
         transactionDate: '10/12/2025 12:41 PM',
-        transactionNumber: '191772940950887',
+        transactionNumber: '1917729409508887',
+        transactionType: 'FT',
         status: 'Failed',
+        fromAccountName: 'BUYIRABHPTIJBGGVBLAVMBLQINKV',
+        fromAccount: '253237095',
+        toAccountName: 'SHAISTA SIDDIQUI',
         beneficiaryTitle: 'SHAISTA SIDDIQUI',
         accountNumber: '2000258949',
         amount: '16.00'
     },
     {
+        postDate: '10/11/2025 10:20 AM',
         transactionDate: '10/11/2025 10:20 AM',
-        transactionNumber: '191772940950888',
+        transactionNumber: '1917729409508888',
+        transactionType: 'FT',
         status: 'Completed',
+        fromAccountName: 'BUYIRABHPTIJBGGVBLAVMBLQINKV',
+        fromAccount: '253237095',
+        toAccountName: 'JOHN DOE',
         beneficiaryTitle: 'JOHN DOE',
         accountNumber: '1234567890',
         amount: '500.00'
     },
     {
+        postDate: '10/10/2025 03:15 PM',
         transactionDate: '10/10/2025 03:15 PM',
-        transactionNumber: '191772940950889',
+        transactionNumber: '1917729409508889',
+        transactionType: 'FT',
         status: 'In Progress',
+        fromAccountName: 'BUYIRABHPTIJBGGVBLAVMBLQINKV',
+        fromAccount: '253237095',
+        toAccountName: 'JANE SMITH',
         beneficiaryTitle: 'JANE SMITH',
         accountNumber: '0987654321',
         amount: '1200.50'

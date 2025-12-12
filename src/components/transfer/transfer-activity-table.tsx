@@ -14,13 +14,19 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, BarChart2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '../ui/scroll-area';
+import Link from 'next/link';
 
 export type TransferActivity = {
+  postDate: string;
   transactionDate: string;
   transactionNumber: string;
+  transactionType: string;
   status: 'Completed' | 'Failed' | 'In Progress';
+  fromAccountName: string;
+  fromAccount: string;
+  toAccountName: string;
   beneficiaryTitle: string;
-  accountNumber: string;
+  accountNumber: string; // This is 'To Account'
   amount: string;
 };
 
@@ -76,8 +82,8 @@ export function TransferActivityTable({ activities }: TransferActivityTableProps
                     </TableHeader>
                     <TableBody>
                     {currentData.length > 0 ? (
-                        currentData.map((activity, index) => (
-                        <TableRow key={index}>
+                        currentData.map((activity) => (
+                        <TableRow key={activity.transactionNumber}>
                             <TableCell>{activity.transactionDate}</TableCell>
                             <TableCell>{activity.transactionNumber}</TableCell>
                             <TableCell>
@@ -87,9 +93,14 @@ export function TransferActivityTable({ activities }: TransferActivityTableProps
                             <TableCell>{activity.accountNumber}</TableCell>
                             <TableCell>PKR {activity.amount}</TableCell>
                             <TableCell className="text-center">
-                                <Button variant="outline" size="sm">
-                                    Print <BarChart2 className="ml-2 h-4 w-4" />
-                                </Button>
+                                <Link href={{
+                                    pathname: '/transfer/review',
+                                    query: { activity: JSON.stringify(activity) }
+                                }} passHref>
+                                    <Button variant="outline" size="sm">
+                                        Print <BarChart2 className="ml-2 h-4 w-4" />
+                                    </Button>
+                                </Link>
                             </TableCell>
                         </TableRow>
                         ))
