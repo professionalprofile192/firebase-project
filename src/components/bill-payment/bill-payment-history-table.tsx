@@ -27,9 +27,26 @@ interface BillPaymentHistoryTableProps {
   data: HistoryItem[];
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, data.length);
+  const currentData = data.slice(startIndex, endIndex);
+
+  const handlePreviousPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  }
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  }
+
   return (
-    <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+    <div className="rounded-lg border bg-card text-card-foreground shadow-sm mt-6">
       <Table>
         <TableHeader>
           <TableRow>
@@ -43,8 +60,8 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.length > 0 ? (
-            data.map((item) => (
+          {currentData.length > 0 ? (
+            currentData.map((item) => (
               <TableRow key={item.transactionId}>
                 <TableCell>{item.consumerNumber}</TableCell>
                 <TableCell>{item.transactionId}</TableCell>
@@ -59,34 +76,34 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="h-64 text-center">
-                <div className="flex flex-col items-center justify-center gap-4">
-                    <AlertTriangle className="h-10 w-10 text-red-500" />
-                    <p className="font-semibold text-lg text-muted-foreground">No Record Found</p>
-                </div>
-              </TableCell>
+              <TableCell colSpan={7} className="h-64 text-center" />
             </TableRow>
           )}
         </TableBody>
-        {data.length > 0 && (
-             <TableFooter>
-                <TableRow>
-                <TableCell colSpan={7}>
-                    <div className="flex items-center justify-between p-2">
-                        <Button variant="ghost" size="icon">
+        <TableFooter>
+            <TableRow>
+            <TableCell colSpan={7}>
+                {data.length > 0 ? (
+                    <div className="flex items-center justify-center p-2">
+                        <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
-                        <span className="text-sm text-muted-foreground">
-                            1 - {data.length > 10 ? 10 : data.length} of {data.length} Transactions
+                        <span className="text-sm text-muted-foreground mx-4">
+                            {startIndex + 1} - {endIndex} of {data.length} Transactions
                         </span>
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" onClick={handleNextPage} disabled={currentPage === totalPages}>
                             <ChevronRight className="h-4 w-4" />
                         </Button>
                     </div>
-                </TableCell>
-                </TableRow>
-            </TableFooter>
-        )}
+                ) : (
+                    <div className="flex flex-col items-center justify-center gap-4 py-10">
+                        <AlertTriangle className="h-10 w-10 text-red-500" />
+                        <p className="font-semibold text-lg text-muted-foreground">No Record Found</p>
+                    </div>
+                )}
+            </TableCell>
+            </TableRow>
+        </TableFooter>
       </Table>
     </div>
   );

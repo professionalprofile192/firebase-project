@@ -248,32 +248,34 @@ export function PayeeTable({ data, multiPayMode, loading }: PayeeTableProps) {
               />
             ))
           ) : (
-            <TableRow>
-              <TableCell colSpan={multiPayMode ? 5 : 5} className="h-24 text-center">
-                No Payees Found
-              </TableCell>
-            </TableRow>
+             <TableRow>
+                 <TableCell colSpan={multiPayMode ? 5 : 5} className="h-24" />
+             </TableRow>
           )}
         </TableBody>
-        {data.length > 0 && (
-          <TableFooter>
-             <TableRow>
+        <TableFooter>
+            <TableRow>
                 <TableCell colSpan={multiPayMode ? 5 : 5}>
-                    <div className="flex items-center justify-center p-2">
-                        <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <span className="text-sm text-muted-foreground mx-4">
-                            {startIndex + 1} - {endIndex} of {data.length} Payees
-                        </span>
-                        <Button variant="ghost" size="icon" onClick={handleNextPage} disabled={currentPage === totalPages}>
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                    </div>
+                    {data.length > 0 ? (
+                        <div className="flex items-center justify-center p-2">
+                            <Button variant="ghost" size="icon" onClick={handlePreviousPage} disabled={currentPage === 1}>
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <span className="text-sm text-muted-foreground mx-4">
+                                {startIndex + 1} - {endIndex} of {data.length} Payees
+                            </span>
+                            <Button variant="ghost" size="icon" onClick={handleNextPage} disabled={currentPage === totalPages}>
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ) : (
+                         <div className="text-center text-muted-foreground py-4">
+                            No Payees Found
+                        </div>
+                    )}
                 </TableCell>
-              </TableRow>
-          </TableFooter>
-        )}
+            </TableRow>
+        </TableFooter>
       </Table>
     </div>
   );
