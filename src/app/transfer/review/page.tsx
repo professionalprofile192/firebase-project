@@ -29,7 +29,7 @@ function TransferReviewContent() {
   
   return (
     <div className="bg-muted/40">
-        <main className="flex flex-1 flex-col p-4 sm:px-6 sm:py-4 gap-6 max-w-4xl mx-auto printable-container">
+        <main className="flex flex-1 flex-col p-4 sm:px-6 sm:py-4 gap-6 max-w-4xl md:ml-[60px] printable-container">
             <h1 className="text-2xl font-semibold no-print">
                 Please review the following transaction details.
             </h1>
