@@ -364,7 +364,7 @@ export function BulkTransfer() {
                         <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
                             <div className="h-[500px] overflow-auto">
                                 <Table>
-                                    <TableHeader className="sticky top-0 z-10" style={{ backgroundColor: '#ECECEC8C' }}>
+                                    <TableHeader className="sticky top-0 z-10 bg-card" style={{ backgroundColor: '#ECECEC8C' }}>
                                         <TableRow>
                                             <TableHead>
                                                 <Checkbox
@@ -436,5 +436,3 @@ export function BulkTransfer() {
         </div>
     )
 }
-
-    
