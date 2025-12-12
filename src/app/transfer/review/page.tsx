@@ -36,12 +36,14 @@ function TransferReviewContent() {
             <div className="printable">
                 <TransferReviewDetails activity={activity} />
             </div>
-            <div className="flex justify-end gap-2 mt-6 no-print">
+        </main>
+        <footer className="sticky bottom-0 bg-transparent py-4 px-4 sm:px-6 no-print">
+            <div className="max-w-4xl flex justify-end gap-2 md:ml-[60px] md:pr-[60px]">
                 <Button variant="outline" onClick={() => router.back()}>Back</Button>
                 <Button variant="outline" onClick={handlePrint}>Print</Button>
                 <Button>Download</Button>
             </div>
-        </main>
+        </footer>
     </div>
   );
 }
