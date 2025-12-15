@@ -12,6 +12,32 @@ export async function login(values: any) {
       body.append('rememberMe', 'true');
       body.append('loginOptions', '{"isOfflineEnabled":false,"isSSOEnabled":true}');
       body.append('provider', 'DbxUserLogin');
+
+      // Reporting params must be unique per request.
+      const reportingParams = JSON.stringify({
+        os: "142.0.0.0",
+        dm: "",
+        did: crypto.randomUUID(),
+        ua: "Mozilla/5.0",
+        aid: "OnlineBanking",
+        aname: "OnlineBanking",
+        chnl: "desktop",
+        plat: "web",
+        aver: "1.0.0",
+        atype: "spa",
+        stype: "b2c",
+        kuid: "",
+        mfaid: "",
+        mfbaseid: "",
+        mfaname: "",
+        sdkversion: "9.6.19",
+        sdktype: "js",
+        fid: "frmLoginDCP",
+        sessiontype: "I",
+        clientUUID: crypto.randomUUID(),
+        rsid: crypto.randomUUID(),
+        svcid: 'auth'
+      });
   
       const response = await fetch(
         'https://prodpk.ubldigital.com/authService/100000002/login?provider=DbxUserLogin',
@@ -20,15 +46,21 @@ export async function login(values: any) {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json',
+            'x-kony-app-key': "cd45f4095d093055b91a5ebbcd7b71b4",
+            'x-kony-app-secret': "d69d7f4912713a97a04cebb9a0eb53e0",
+            'x-kony-app-version': "1.0.0",
+            'x-kony-platform-type': "web",
+            'x-kony-reportingparams': reportingParams,
           },
           body: body.toString(),
         }
       );
   
       if (!response.ok) {
+        const errorData = await response.json();
         return {
           success: false,
-          message: `API Error: ${response.status}`
+          ...errorData,
         };
       }
   
