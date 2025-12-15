@@ -361,25 +361,27 @@ export function BulkTransfer() {
                 <TabsContent value="details">
                     {selectedBulkFile ? (
                         <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                            <div className="overflow-auto" style={{ height: '330px' }}>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
+                                        <TableHead>
+                                            <Checkbox
+                                                checked={isAllSelected}
+                                                onCheckedChange={handleSelectAll}
+                                            />
+                                        </TableHead>
+                                        <TableHead>Beneficiary Name</TableHead>
+                                        <TableHead>Account Title</TableHead>
+                                        <TableHead>Customer Unique ID</TableHead>
+                                        <TableHead>Beneficiary Account No.</TableHead>
+                                        <TableHead>Local Amount</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                            </Table>
+                            <div className="overflow-y-auto" style={{ height: '330px' }}>
                                 <Table>
-                                    <TableHeader className="sticky top-0 z-10" style={{ backgroundColor: '#ECECEC8C' }}>
-                                        <TableRow>
-                                            <TableHead className="sticky top-0">
-                                                <Checkbox
-                                                    checked={isAllSelected}
-                                                    onCheckedChange={handleSelectAll}
-                                                />
-                                            </TableHead>
-                                            <TableHead className="sticky top-0">Beneficiary Name</TableHead>
-                                            <TableHead className="sticky top-0">Account Title</TableHead>
-                                            <TableHead className="sticky top-0">Customer Unique ID</TableHead>
-                                            <TableHead className="sticky top-0">Beneficiary Account No.</TableHead>
-                                            <TableHead className="sticky top-0">Local Amount</TableHead>
-                                            <TableHead className="sticky top-0">Status</TableHead>
-                                            <TableHead className="text-right sticky top-0">Actions</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
                                     <TableBody>
                                         {currentData.map((detail) => (
                                             <BulkDetailRow
