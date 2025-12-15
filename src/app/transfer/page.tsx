@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { Button } from '@/components/ui/button';
@@ -123,7 +123,14 @@ const transferActivities: TransferActivity[] = [
 
 function InitiateTransferContent() {
     const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'transfer');
+    const tabFromUrl = searchParams.get('tab');
+    const [activeTab, setActiveTab] = useState(tabFromUrl || 'transfer');
+    
+    useEffect(() => {
+        if (tabFromUrl && tabFromUrl !== activeTab) {
+            setActiveTab(tabFromUrl);
+        }
+    }, [tabFromUrl, activeTab]);
     
     const getPageTitle = () => {
         switch (activeTab) {
