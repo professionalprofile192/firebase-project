@@ -1,3 +1,4 @@
+
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -92,7 +93,7 @@ const SidebarNav = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             label: 'Transfers', 
             icon: ArrowRightLeft, 
             subItems: [
-                { label: 'Initiate Transfer', href: '/transfer' },
+                { label: 'Initiate Transfer', href: '/transfer?tab=transfer' },
                 { label: 'Bulk Transfers', href: '/transfer?tab=bulk' },
                 { label: 'Transfer History', href: '/transfer?tab=activity' }
             ] 
