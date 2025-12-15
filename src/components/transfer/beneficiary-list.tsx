@@ -50,9 +50,13 @@ function BeneficiaryRow({
         </div>
         <div className="flex-1 w-1/3 text-sm">{beneficiary.bankName}</div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={onToggle}>
-            Transfer Now {isOpen ? <ChevronUp className="h-4 w-4 ml-2" /> : <ChevronDown className="h-4 w-4 ml-2" />}
-          </Button>
+            <Button variant="outline" size="sm">
+                Transfer Now
+            </Button>
+            <Button variant="outline" size="icon" className="h-9 w-9" onClick={onToggle}>
+                {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                <span className="sr-only">Toggle Details</span>
+            </Button>
         </div>
       </div>
       {isOpen && (
