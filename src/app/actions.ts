@@ -46,8 +46,8 @@ export async function login(values: any) {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json',
-            'x-kony-app-key': "cd45f4095d093055b91a5ebbcd7b71b4",
-            'x-kony-app-secret': "d69d7f4912713a97a04cebb9a0eb53e0",
+            'x-kony-app-key': "20211116035921",
+            'x-kony-app-secret': "3b8a3424a25c17b1848b37537b92f7f9",
             'x-kony-app-version': "1.0.0",
             'x-kony-platform-type': "web",
             'x-kony-reportingparams': reportingParams,
@@ -962,6 +962,8 @@ export async function updateBulkRecordsStatus(payload: {
 
 
 
+
+    
 
     
 
