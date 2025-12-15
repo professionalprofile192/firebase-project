@@ -28,9 +28,7 @@ import {
 import { EyeOff, Eye, User, Lock } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { sendOtpForUsernameRecovery, validateUser, verifyOtp, forgotUsername, getLastLoginTime, getAccounts } from '@/app/actions';
-
-import { loginClient } from '@/app/login-client';  
+import { login, sendOtpForUsernameRecovery, validateUser, verifyOtp, forgotUsername, getAccounts } from '@/app/actions';
 
 import { cn } from '@/lib/utils';
 import { OtpDialog } from './otp-dialog';
@@ -478,15 +476,7 @@ export function LoginForm() {
     setIsSubmitting(true);
   
     try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(values)
-      });
-  
-      const data = await res.json();
+      const data = await login(values);
       console.log("LOGIN API RESPONSE:", data);
  
       console.log("🧑‍💼 Logged in user:", data.profile);
@@ -831,7 +821,3 @@ console.log("GET PAYEE LIST RESPONSE:", payeeData);
     </>
   );
 }
-
-    
-
-    

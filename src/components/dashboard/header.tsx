@@ -19,7 +19,7 @@ import { LogoutDialog } from '../auth/logout-dialog';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
 import { cn } from '@/lib/utils';
-import { logout } from '@/app/login/route';
+import { logout } from '@/lib/logout';
 
 
 type UserProfile = {
@@ -202,8 +202,7 @@ export function Header() {
 
   const confirmLogout = async () => {
     setShowLogoutDialog(false);
-    sessionStorage.clear();
-    router.push('/');
+    logout();
   };
 
   return (
