@@ -13,6 +13,7 @@ import {
   BarChart2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 export type Beneficiary = {
   name: string;
@@ -62,8 +63,10 @@ function BeneficiaryRow({
       {isOpen && (
         <div className="bg-muted/50 px-4 py-3">
           <div className="flex justify-end items-center gap-2">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
-                  <BarChart2 className="h-4 w-4 mr-1" /> View Activity
+              <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
+                  <Link href="/transfer?tab=activity">
+                    <BarChart2 className="h-4 w-4 mr-1" /> View Activity
+                  </Link>
               </Button>
               <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
                   <Edit className="h-4 w-4" />
