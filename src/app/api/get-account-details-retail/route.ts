@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { token, kuid, accountNumber, branchCode, tranCount, channel } = await req.json();
+    const { token, kuid, accountNumber } = await req.json();
 
-    if (!token || !accountNumber || !branchCode) {
+    if (!token || !accountNumber) {
       return NextResponse.json(
-        { error: "Missing required parameters" },
+        { error: "Missing token or accountNumber" },
         { status: 400 }
       );
     }
@@ -33,11 +33,11 @@ export async function POST(req: Request) {
       sessiontype: "I",
       clientUUID: crypto.randomUUID(),
       rsid: crypto.randomUUID(),
-      svcid: "payments",
+      svcid: "Accounts",
     });
 
     const res = await fetch(
-      "https://prodpk.ubldigital.com/services/data/v1/ArrangmentSOA_Object/operations/payments/recentTransaction",
+      "https://prodpk.ubldigital.com/services/data/v1/DCPSOAPaymentsService/operations/Accounts/getAccountDetails_retail",
       {
         method: "POST",
         headers: {
@@ -49,21 +49,17 @@ export async function POST(req: Request) {
           "x-kony-reportingparams": reportingParams,
         },
         body: JSON.stringify({
-          channelDesc: channel,
-          acctNo: accountNumber,
-          branchCode: branchCode,
-          tranCount: tranCount,
+          accountNumber: accountNumber,
         }),
       }
     );
 
     const data = await res.json();
     return NextResponse.json(data);
-
   } catch (err) {
-    console.error("RECENT TRANSACTIONS ERROR →", err);
+    console.error("ACCOUNT DETAILS RETAIL ERROR →", err);
     return NextResponse.json(
-      { error: "Failed to fetch recent transactions" },
+      { error: "Failed to fetch account details" },
       { status: 500 }
     );
   }

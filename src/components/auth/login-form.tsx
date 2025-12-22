@@ -567,31 +567,175 @@ export function LoginForm() {
       const usersData = await usersRes.json();
       console.log("USERS API DATA:", usersData);
 
-      // === EXTRACT TOKEN & KUID FOR PAYEE LIST ===
+      // === EXTRACT TOKEN & KUID===
       const token = data?.claims_token?.value;
-      const kuid = data?.profile?.UserName; // Corrected path for username
+      const kuid = data?.profile?.user_attributes?.UserName;
+      const customerId = data?.profile?.user_attributes?.customer_id;
+      const userId = data?.profile?.user_attributes?.user_id;
+ // Corrected path for username
       
       console.log("TOKEN:", token);
       console.log("KUID:", kuid);
 
+      if (!token || !customerId) {
+        console.error("Missing token or customer id");
+        return;
+      }
 //fetch accounts
 
       const resAccounts = await fetch("/api/fetch-accounts", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
-          cif: data.profile.userid,
-          token: data.claimsToken,  
-          kuid: data.profile.UserName
+          customer_id: customerId,
+          token: token,
+          kuid: kuid
         })
       });
       
       const result = await resAccounts.json();
       console.log(result);
-      
-     
 
-  // ⭐ 5) GET USER PROFILE IMAGE
+     //get user group
+
+      if (!token || !customerId) {
+        console.error("Missing token or userID for getUserGroup");
+        return;
+      }
+      
+      const resUserGroup = await fetch("/api/get-user-group", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userID: customerId,
+          token: token,
+          kuid: kuid,
+        }),
+      });
+      
+      const userGroupData = await resUserGroup.json();
+      console.log("USER GROUP RESPONSE:", userGroupData);
+      
+      //Group_id extract
+      const groupId =
+        userGroupData?.LoginServices?.[0]?.Group_id;
+      
+      console.log("GROUP ID:", groupId);
+
+      
+      // get account details retail
+
+      //taking account number from fetchaccountbyCIF api
+      const accountNumber = result?.payments?.[0]?.ACCT_NO;
+
+      console.log("ACCOUNT NUMBER:", accountNumber);
+
+      if (!accountNumber) {
+        console.error("Account number not found");
+        return;
+      }
+
+      const resAccountDetails = await fetch(
+        "/api/get-account-details-retail",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            token: token,
+            kuid: kuid,
+            accountNumber: accountNumber //  payments[0].ACCT_NO
+          })
+        }
+      );
+
+      const accountDetails = await resAccountDetails.json();
+      console.log("ACCOUNT DETAILS RETAIL:", accountDetails);
+
+      //get accounts statements
+      if (!accountNumber) {
+        console.error("Account number not found");
+        return;
+      }
+      
+      const resAccountStatements = await fetch("/api/account-statement", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          accountNumber: accountNumber,
+          token: token,
+          kuid: kuid,
+        }),
+      });
+      
+      const accountStatements = await resAccountStatements.json();
+      console.log("ACCOUNT STATEMENTS:", accountStatements);
+      
+      //Fetch all user approvals
+
+    if (!token || !userId) {
+      console.error("Missing token or userId");
+      return;
+    }
+
+
+    const resApprovals = await fetch("/api/fetch-all-user-approvals", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: token,
+        kuid: kuid,
+        userId: userId,
+        limit: "10",      // optional, default 10
+        offset: "0",      // optional, default 0
+        sortBy: "modifydate",  // optional
+        sortOrder: "desc",     // optional
+      }),
+    });
+
+    const approvalsData = await resApprovals.json();
+    console.log("USER APPROVALS:", approvalsData);
+
+
+    //Recent Transactions
+
+
+  const branchCode = accountDetails?.Accounts?.[0]?.branchCode;
+
+    if (!accountNumber || !branchCode) {
+      console.error("Account number or branch code not found");
+      return;
+    }
+
+// Recent Transactions API call
+    const resRecentTransactions = await fetch("/api/recent-transactions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: token,
+        kuid: kuid,
+        accountNumber: accountNumber,
+        branchCode: branchCode,
+        tranCount: "3",        // hardcoded
+        channel: "DCPRTL",     // hardcoded
+      }),
+    });
+
+    const recentTransactions = await resRecentTransactions.json();
+    console.log("Recent Transactions:", recentTransactions);
+
+  //  5) GET USER PROFILE IMAGE
 
 // const imageRes = await fetch("/api/get-user-profile-image", {
 //   method: "POST",

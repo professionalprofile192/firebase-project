@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { token, kuid, accountNumber, branchCode, tranCount, channel } = await req.json();
+    const { userID, token, kuid } = await req.json();
 
-    if (!token || !accountNumber || !branchCode) {
+    if (!userID || !token) {
       return NextResponse.json(
-        { error: "Missing required parameters" },
+        { error: "Missing userID or token" },
         { status: 400 }
       );
     }
@@ -33,11 +33,11 @@ export async function POST(req: Request) {
       sessiontype: "I",
       clientUUID: crypto.randomUUID(),
       rsid: crypto.randomUUID(),
-      svcid: "payments",
+      svcid: "LoginServices",
     });
 
     const res = await fetch(
-      "https://prodpk.ubldigital.com/services/data/v1/ArrangmentSOA_Object/operations/payments/recentTransaction",
+      "https://prodpk.ubldigital.com/services/data/v1/dcp_custom/operations/LoginServices/getUserGroup",
       {
         method: "POST",
         headers: {
@@ -49,21 +49,17 @@ export async function POST(req: Request) {
           "x-kony-reportingparams": reportingParams,
         },
         body: JSON.stringify({
-          channelDesc: channel,
-          acctNo: accountNumber,
-          branchCode: branchCode,
-          tranCount: tranCount,
+          userID: userID,
         }),
       }
     );
 
     const data = await res.json();
     return NextResponse.json(data);
-
   } catch (err) {
-    console.error("RECENT TRANSACTIONS ERROR →", err);
+    console.error("GET USER GROUP ERROR →", err);
     return NextResponse.json(
-      { error: "Failed to fetch recent transactions" },
+      { error: "Failed to fetch user group" },
       { status: 500 }
     );
   }
