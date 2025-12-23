@@ -3,7 +3,6 @@
 
 import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
-import { getRecentTransactions } from '../actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
@@ -44,25 +43,27 @@ function AccountStatementContent() {
   const [transactionsLoading, setTransactionsLoading] = useState(false);
   const router = useRouter();
 
-  const fetchTransactionsForAccount = useCallback(async (acctNo: string) => {
-    setTransactionsLoading(true);
+  const fetchTransactionsForAccount = useCallback((acctNo: string) => {
+    // Get raw data from sessionStorage
+    const allTxRaw = sessionStorage.getItem("allTransactions");
+    let allTx: Transaction[] = [];
+
     try {
-        const statementsData = await getRecentTransactions(acctNo); 
-        if (statementsData.opstatus === 0) {
-            setAllTransactions(statementsData.payments);
-            setDisplayedTransactions(statementsData.payments); // Initially display all
-        } else {
-            setAllTransactions([]);
-            setDisplayedTransactions([]);
-        }
+        const parsed = JSON.parse(allTxRaw || "[]");
+        // Ensure parsed is an array, fallback to empty array
+        allTx = Array.isArray(parsed) ? parsed : [];
     } catch (error) {
-        console.error("Failed to fetch transactions for account", error);
-        setAllTransactions([]);
-        setDisplayedTransactions([]);
-    } finally {
-        setTransactionsLoading(false);
+        console.error("Failed to parse allTransactions from sessionStorage", error);
+        allTx = [];
     }
-  }, []);
+
+    // Filter transactions for the selected account
+    const filtered = allTx.filter(tx => tx.ACCT_NO === acctNo);
+
+    // Set state
+    setAllTransactions(filtered);
+    setDisplayedTransactions(filtered.slice(0, 3)); // show 3 by default
+}, []);
 
   useEffect(() => {
     // We get the user profile and accounts from session storage which is set on dashboard load.

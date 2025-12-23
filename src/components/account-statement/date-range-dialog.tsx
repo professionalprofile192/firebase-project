@@ -36,50 +36,50 @@ export function DateRangeDialog({ open, onOpenChange, mode, fileType, accountNum
     }
     
     if (mode === 'download') {
-        if (!fileType || !accountNumber) {
-            toast({
-                variant: 'destructive',
-                title: 'Missing information',
-                description: 'Please select a file type and account.',
-            });
-            return;
-        }
+        // if (!fileType || !accountNumber) {
+        //     toast({
+        //         variant: 'destructive',
+        //         title: 'Missing information',
+        //         description: 'Please select a file type and account.',
+        //     });
+        //     return;
+        // }
 
-        setIsDownloading(true);
-        try {
-            const response = await downloadStatement({
-                fileType,
-                fromDate: format(fromDate, 'yyyy-MM-dd'),
-                toDate: format(toDate, 'yyyy-MM-dd'),
-                accountNumber,
-            });
+        // setIsDownloading(true);
+        // try {
+        //     const response = await downloadStatement({
+        //         fileType,
+        //         fromDate: format(fromDate, 'yyyy-MM-dd'),
+        //         toDate: format(toDate, 'yyyy-MM-dd'),
+        //         accountNumber,
+        //     });
 
-            if (response.success && response.base64 && response.mimeType) {
-                const byteCharacters = atob(response.base64);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: response.mimeType });
+        //     if (response.success && response.base64 && response.mimeType) {
+        //         const byteCharacters = atob(response.base64);
+        //         const byteNumbers = new Array(byteCharacters.length);
+        //         for (let i = 0; i < byteCharacters.length; i++) {
+        //             byteNumbers[i] = byteCharacters.charCodeAt(i);
+        //         }
+        //         const byteArray = new Uint8Array(byteNumbers);
+        //         const blob = new Blob([byteArray], { type: response.mimeType });
                 
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `statement.${fileType}`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+        //         const link = document.createElement('a');
+        //         link.href = URL.createObjectURL(blob);
+        //         link.download = `statement.${fileType}`;
+        //         document.body.appendChild(link);
+        //         link.click();
+        //         document.body.removeChild(link);
                 
-                toast({ title: 'Download Started', description: `Your statement is downloading as a ${fileType.toUpperCase()} file.` });
-                onOpenChange(false);
-            } else {
-                 toast({ variant: 'destructive', title: 'Download Failed', description: response.message });
-            }
-        } catch (error) {
-            toast({ variant: 'destructive', title: 'Error', description: 'An unexpected error occurred during download.' });
-        } finally {
-            setIsDownloading(false);
-        }
+        //         toast({ title: 'Download Started', description: `Your statement is downloading as a ${fileType.toUpperCase()} file.` });
+        //         onOpenChange(false);
+        //     } else {
+        //          toast({ variant: 'destructive', title: 'Download Failed', description: response.message });
+        //     }
+        // } catch (error) {
+        //     toast({ variant: 'destructive', title: 'Error', description: 'An unexpected error occurred during download.' });
+        // } finally {
+        //     setIsDownloading(false);
+        // }
 
     } else if (mode === 'view' && onDateRangeSelect) {
         onDateRangeSelect(fromDate, toDate);
