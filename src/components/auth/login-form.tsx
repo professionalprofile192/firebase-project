@@ -28,7 +28,6 @@ import {
 import { EyeOff, Eye, User, Lock } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { login, sendOtpForUsernameRecovery, validateUser, verifyOtp, forgotUsername, getAccounts } from '@/app/actions';
 
 import { cn } from '@/lib/utils';
 import { OtpDialog } from './otp-dialog';
@@ -476,7 +475,16 @@ export function LoginForm() {
     setIsSubmitting(true);
   
     try {
-      const data = await login(values);
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+      
+      const data = await res.json();
+      
       console.log("LOGIN API RESPONSE:", data);
  
       console.log("🧑‍💼 Logged in user:", data.profile);
@@ -596,7 +604,9 @@ export function LoginForm() {
       });
       
       const result = await resAccounts.json();
-      console.log(result);
+      if (result && Array.isArray(result.payments)) {
+        sessionStorage.setItem("accounts", JSON.stringify(result.payments));
+      }
 
      //get user group
 
@@ -734,7 +744,16 @@ export function LoginForm() {
 
     const recentTransactions = await resRecentTransactions.json();
     console.log("Recent Transactions:", recentTransactions);
-
+    
+    sessionStorage.setItem(
+      "allTransactions",
+      JSON.stringify(recentTransactions?.payments || [])
+    );
+    
+    sessionStorage.setItem(
+      "recentTransactions",
+      JSON.stringify((recentTransactions?.payments || []).slice(0, 3))
+    );
   //  5) GET USER PROFILE IMAGE
 
 // const imageRes = await fetch("/api/get-user-profile-image", {

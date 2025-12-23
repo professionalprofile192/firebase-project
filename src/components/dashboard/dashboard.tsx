@@ -8,7 +8,6 @@ import { Notifications } from '@/components/dashboard/notifications';
 import { ChartCard } from '@/components/dashboard/chart-card';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { getRecentTransactions, getAccounts, getApprovalHistory, getPendingApprovals } from '@/app/actions';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 
 type Account = {
@@ -51,66 +50,30 @@ export function Dashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    const profileString = sessionStorage.getItem('userProfile');
-    if (!profileString) {
-      router.push('/');
-    } else {
-        const profile = JSON.parse(profileString);
-        setUserProfile(profile);
-        
-        async function fetchData() {
-            try {
-                const accountsData = await getAccounts(profile.userid, profile.CIF_NO);
-                const fetchedAccounts = accountsData.opstatus === 0 ? accountsData.payments : [];
-                setAccounts(fetchedAccounts);
-                sessionStorage.setItem('accounts', JSON.stringify(fetchedAccounts));
-
-                if (fetchedAccounts.length > 0) {
-                    const recentTxData = await getRecentTransactions(fetchedAccounts[0].ACCT_NO);
-                    if (recentTxData.opstatus === 0) {
-                        setRecentTransactions(recentTxData.payments.slice(0, 3));
-                        setAllTransactions(recentTxData.payments);
-                    }
-                }
-
-                const [historyData, pendingData] = await Promise.all([
-                    getApprovalHistory(profile.userid),
-                    getPendingApprovals(profile.userid)
-                ]);
-
-                const historyNotifications = historyData.opstatus === 0 ? historyData.ApprovalMatrix : [];
-                const pendingNotifications = pendingData.opstatus === 0 ? pendingData.ApprovalMatrix : [];
-
-                const combinedNotifications = [...historyNotifications, ...pendingNotifications]
-                    .sort((a, b) => new Date(b.assignedDate || b.lastModifiedAt!).getTime() - new Date(a.assignedDate || a.lastModifiedAt!).getTime());
-                setNotifications(combinedNotifications);
-
-            } catch (error) {
-                console.error("Failed to fetch dashboard data", error);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchData();
+    const profile = sessionStorage.getItem("userProfile");
+    if (!profile) {
+      router.push("/");
+      return;
     }
-  }, [router]);
+  
+    setUserProfile(JSON.parse(profile));
+    setAccounts(JSON.parse(sessionStorage.getItem("accounts") || "[]"));
+    setRecentTransactions(JSON.parse(sessionStorage.getItem("recentTransactions") || "[]"));
+    setNotifications(JSON.parse(sessionStorage.getItem("approvals") || "[]"));
+    setLoading(false);
+  }, []);
 
-  const fetchTransactionsForAccount = useCallback(async (acctNo: string) => {
-    try {
-        const recentTransactionsData = await getRecentTransactions(acctNo);
-        if (recentTransactionsData.opstatus === 0) {
-            setRecentTransactions(recentTransactionsData.payments.slice(0, 3));
-            setAllTransactions(recentTransactionsData.payments);
-        } else {
-            setRecentTransactions([]);
-            setAllTransactions([]);
-        }
-    } catch (error) {
-        console.error("Failed to fetch transactions for account", error);
-        setRecentTransactions([]);
-        setAllTransactions([]);
-    }
+  const fetchTransactionsForAccount = useCallback((acctNo: string) => {
+    const allTx = JSON.parse(
+      sessionStorage.getItem("allTransactions") || "[]"
+    );
+  
+    const filtered = allTx.filter(
+      (tx: any) => tx.ACCT_NO === acctNo
+    );
+  
+    setRecentTransactions(filtered.slice(0, 3));
+    setAllTransactions(filtered);
   }, []);
 
   if (loading || !userProfile) {
