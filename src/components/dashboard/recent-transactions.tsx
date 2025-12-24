@@ -37,7 +37,7 @@ export function RecentTransactions({ transactions, accounts, onAccountChange }: 
 
     return (
       <Card className={cn("h-[350px] flex flex-col")}>
-        <CardHeader className="bg-primary/90 text-primary-foreground rounded-t-lg">
+        <CardHeader className="bg-primary/90 text-primary-foreground rounded-t-lg p-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-white">Recent Transactions</CardTitle>
             <Select 
@@ -67,7 +67,10 @@ export function RecentTransactions({ transactions, accounts, onAccountChange }: 
                                 <div className="text-lg font-bold">{format(date, 'dd')}</div>
                             </div>
                             <div className={`flex-1 border-l-2 ${tx.CRDR === 'D' ? 'border-destructive' : 'border-primary'} pl-4`}>
-                                <p className="font-semibold text-sm">{tx.particulars}</p>
+                                <p className="font-semibold text-sm">{tx.particulars.length > 30 
+                                  ? `${tx.particulars.slice(0, 30)}...` 
+                                  : tx.particulars
+                                }</p>
                                 <p className="text-xs text-muted-foreground">
                                     {tx.seqno}
                                 </p>
@@ -92,7 +95,7 @@ export function RecentTransactions({ transactions, accounts, onAccountChange }: 
             )}
             </CardContent>
         </ScrollArea>
-        <CardFooter className="justify-center">
+        <CardFooter className="flex justify-center p-1 bg-gray-100">
           <Link href="/account-statement">
             <Button variant="link">See all</Button>
           </Link>

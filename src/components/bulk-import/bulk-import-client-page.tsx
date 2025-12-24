@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -14,13 +13,7 @@ import { UploadStatusDialog } from '@/components/bulk-import/upload-status-dialo
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { BulkFileHistoryTable } from './bulk-file-history-table';
-import { getAccounts, getBulkFiles, uploadBulkFile } from '@/app/actions';
 import { format } from 'date-fns';
-
-type Account = {
-    ACCT_NO: string;
-    ACCT_TITLE: string;
-};
 
 export type BulkFile = {
     fileName: string;
@@ -30,16 +23,28 @@ export type BulkFile = {
     comment: string;
 };
 
-const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey, formResetKey }: { id: string, label: string, onFileSelect: (key: string, file: File | null) => void, acceptedFormats: string, fileKey: string, formResetKey: number }) => {
+const FileInput = ({
+    id,
+    label,
+    onFileSelect,
+    acceptedFormats,
+    fileKey,
+    formResetKey
+}: {
+    id: string;
+    label: string;
+    onFileSelect: (key: string, file: File | null) => void;
+    acceptedFormats: string;
+    fileKey: string;
+    formResetKey: number;
+}) => {
     const [fileName, setFileName] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (formResetKey > 0) {
             setFileName('');
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
+            if (fileInputRef.current) fileInputRef.current.value = '';
         }
     }, [formResetKey]);
 
@@ -48,11 +53,8 @@ const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey, formRese
         setFileName(file ? file.name : '');
         onFileSelect(fileKey, file);
     };
-    
-    const handleButtonClick = () => {
-        fileInputRef.current?.click();
-    };
 
+    const handleButtonClick = () => fileInputRef.current?.click();
 
     return (
         <div className="space-y-2">
@@ -75,7 +77,13 @@ const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey, formRese
                     onChange={handleFileChange}
                     accept={acceptedFormats}
                 />
-                <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={handleButtonClick}>
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2"
+                    onClick={handleButtonClick}
+                >
                     <Paperclip className="h-5 w-5 text-primary" />
                 </Button>
             </div>
@@ -83,29 +91,35 @@ const FileInput = ({ id, label, onFileSelect, acceptedFormats, fileKey, formRese
     );
 };
 
-
 export function BulkImportClientPage() {
     const searchParams = useSearchParams();
     const tab = searchParams.get('tab');
-    
-    const [accounts, setAccounts] = useState<Account[]>([]);
+
     const [bulkFiles, setBulkFiles] = useState<BulkFile[]>([]);
-    const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-    const [files, setFiles] = useState<{ bulkFile: File | null, chequeInvoiceFile: File | null }>({ bulkFile: null, chequeInvoiceFile: null });
+    const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
+    const [files, setFiles] = useState<{ bulkFile: File | null; chequeInvoiceFile: File | null }>({
+        bulkFile: null,
+        chequeInvoiceFile: null
+    });
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [dialogContent, setDialogContent] = useState<{ status: 'success' | 'error'; title: string; message: string; refNumber?: string }>({ status: 'success', title: '', message: '' });
+    const [dialogContent, setDialogContent] = useState<{
+        status: 'success' | 'error';
+        title: string;
+        message: string;
+        refNumber?: string;
+    }>({ status: 'success', title: '', message: '' });
     const [isUploading, setIsUploading] = useState(false);
-    const { toast } = useToast();
-    const router = useRouter();
     const [formResetKey, setFormResetKey] = useState(0);
     const [userProfile, setUserProfile] = useState<any>(null);
-
     const [dateFilter, setDateFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [commentFilter, setCommentFilter] = useState('');
     const [activeTab, setActiveTab] = useState(tab || 'upload');
     const [loading, setLoading] = useState(true);
+    const { toast } = useToast();
+    const router = useRouter();
 
+    // AUTOMATIC API CALL ON PAGE LOAD
     useEffect(() => {
         const profileString = sessionStorage.getItem('userProfile');
         if (!profileString) {
@@ -116,115 +130,57 @@ export function BulkImportClientPage() {
         const profile = JSON.parse(profileString);
         setUserProfile(profile);
 
-        async function fetchData() {
-            setLoading(true);
+        async function fetchBulkFiles() {
             try {
-                const accountsData = await getAccounts(profile.userid, profile.CIF_NO);
-                setAccounts(accountsData.opstatus === 0 ? accountsData.payments : []);
+                const res = await fetch('/api/get-bulk-files', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: 'TOKEN_FROM_LOGIN',
+                        kuid: 'KUID_FROM_LOGIN',
+                        userId: profile.userid
+                    })
+                });
 
-                const bulkFilesData = await getBulkFiles(profile.userid);
-                setBulkFiles(bulkFilesData.opstatus === 0 ? bulkFilesData.NDC_BulkPayments : []);
-            } catch (error) {
-                console.error("Failed to fetch bulk import data", error);
-                toast({ variant: 'destructive', title: 'Error', description: 'Could not fetch data.' });
+                const data = await res.json();
+                if (data?.opstatus === 0 && data?.NDC_BulkPayments) {
+                    setBulkFiles(data.NDC_BulkPayments);
+                } else {
+                    console.error('Failed to fetch bulk files', data);
+                }
+            } catch (err) {
+                console.error('Error fetching bulk files:', err);
             } finally {
                 setLoading(false);
             }
         }
-        fetchData();
-    }, [router, toast]);
+
+        fetchBulkFiles();
+    }, [router]);
 
     const handleFileSelect = (key: string, file: File | null) => {
-        setFiles(prev => ({...prev, [key]: file}));
-    }
-    
-    const handleAccountChange = (acctNo: string) => {
-        const account = accounts.find(a => a.ACCT_NO === acctNo);
-        setSelectedAccount(account || null);
+        setFiles((prev) => ({ ...prev, [key]: file }));
     };
 
     const handleCancel = () => {
         setSelectedAccount(null);
         setFiles({ bulkFile: null, chequeInvoiceFile: null });
-        setFormResetKey(prevKey => prevKey + 1);
-    };
-    
-    const handleSuccessfulUpload = (file: File, refNumber: string) => {
-        const newFileEntry: BulkFile = {
-            fileName: file.name,
-            uploadDate: new Date().toISOString(),
-            fileReferenceNumber: refNumber,
-            status: '1', // '1' for success
-            comment: 'FILE UPLOADED SUCCESS',
-        };
-        setBulkFiles(prevFiles => [newFileEntry, ...prevFiles]);
-    };
-    
-    const handleUpload = async () => {
-        if (!selectedAccount) {
-            toast({ variant: 'destructive', title: 'Error', description: 'Please select an account.' });
-            return;
-        }
-        const fileToUpload = files.bulkFile || files.chequeInvoiceFile;
-        if (!fileToUpload) {
-            toast({ variant: 'destructive', title: 'Error', description: 'Please upload at least one file.' });
-            return;
-        }
-
-        setIsUploading(true);
-
-        try {
-            const response = await uploadBulkFile(selectedAccount.ACCT_NO, fileToUpload);
-            
-            if (response.opstatus === 0) {
-                const refNumber = `008${Date.now().toString().slice(-12)}`;
-                setDialogContent({
-                    status: 'success',
-                    title: 'Single Bulk Upload',
-                    message: 'Bulk file has been uploaded and is being validated by the system. Please refer to the Bulk History Tab in case of any errors.',
-                    refNumber
-                });
-                handleSuccessfulUpload(fileToUpload, refNumber);
-            } else {
-                setDialogContent({
-                    status: 'error',
-                    title: 'Upload Failed',
-                    message: response.message || 'An unknown error occurred.'
-                });
-            }
-        } catch (error) {
-            setDialogContent({
-                status: 'error',
-                title: 'Upload Failed',
-                message: 'An unexpected error occurred during upload.'
-            });
-        } finally {
-            setIsUploading(false);
-            setDialogOpen(true);
-        }
+        setFormResetKey((prevKey) => prevKey + 1);
     };
 
-    const closeDialog = () => {
-        setDialogOpen(false);
-        if (dialogContent.status === 'success') {
-            handleCancel();
-        }
-    }
+    const closeDialog = () => setDialogOpen(false);
 
-    const uniqueDates = [...new Set(bulkFiles.map(file => format(new Date(file.uploadDate), 'dd/MM/yyyy')))];
+    const uniqueDates = [...new Set(bulkFiles.map((file) => format(new Date(file.uploadDate), 'dd/MM/yyyy')))];
 
-    const filteredBulkFiles = bulkFiles.filter(file => {
+    const filteredBulkFiles = bulkFiles.filter((file) => {
         const formattedDate = format(new Date(file.uploadDate), 'dd/MM/yyyy');
         const statusLabel = file.status === '1' ? 'Success' : file.status === '0' ? 'Failed' : 'In Progress';
         const isSuccessComment = file.comment.toLowerCase().includes('success');
         const isFailedComment = !isSuccessComment;
-        
+
         let commentMatch = true;
-        if (commentFilter.toLowerCase() === 'success') {
-            commentMatch = isSuccessComment;
-        } else if (commentFilter.toLowerCase() === 'failed') {
-            commentMatch = isFailedComment;
-        }
+        if (commentFilter.toLowerCase() === 'success') commentMatch = isSuccessComment;
+        else if (commentFilter.toLowerCase() === 'failed') commentMatch = isFailedComment;
 
         return (
             (dateFilter === '' || dateFilter.toLowerCase() === 'all' || formattedDate.includes(dateFilter)) &&
@@ -237,8 +193,8 @@ export function BulkImportClientPage() {
         <div>
             <Card>
                 <CardHeader className="flex flex-row items-center gap-4 p-4 border-b">
-                     <Filter className="h-5 w-5 text-muted-foreground" />
-                     <h3 className="text-lg font-semibold">Filters</h3>
+                    <Filter className="h-5 w-5 text-muted-foreground" />
+                    <h3 className="text-lg font-semibold">Filters</h3>
                 </CardHeader>
                 <CardContent className="p-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -248,8 +204,10 @@ export function BulkImportClientPage() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">All</SelectItem>
-                                {uniqueDates.map(date => (
-                                    <SelectItem key={date} value={date}>{date}</SelectItem>
+                                {uniqueDates.map((date) => (
+                                    <SelectItem key={date} value={date}>
+                                        {date}
+                                    </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
@@ -279,7 +237,7 @@ export function BulkImportClientPage() {
             <BulkFileHistoryTable data={filteredBulkFiles} />
         </div>
     );
-     
+
     if (loading) {
         return (
             <DashboardLayout>
@@ -307,59 +265,41 @@ export function BulkImportClientPage() {
                             <Card className="w-full max-w-4xl shadow-md">
                                 <CardContent className="p-6">
                                     <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6" onSubmit={(e) => e.preventDefault()}>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="account-number">Account Number</Label>
-                                            <Select onValueChange={handleAccountChange} value={selectedAccount?.ACCT_NO || ''}>
-                                                <SelectTrigger id="account-number">
-                                                    <SelectValue placeholder="Select Account" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {accounts.map(account => (
-                                                        <SelectItem key={account.ACCT_NO} value={account.ACCT_NO}>
-                                                            {account.ACCT_NO}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="account-name">Account Name</Label>
-                                            <Input 
-                                                id="account-name"
-                                                placeholder="Enter Name"
-                                                value={selectedAccount?.ACCT_TITLE || ''}
-                                                disabled
-                                                className="bg-gray-100"
-                                            />
-                                        </div>
-                                        
-                                        <FileInput id="bulk-file" label="Bulk File Upload" onFileSelect={handleFileSelect} acceptedFormats=".csv,.txt" fileKey="bulkFile" formResetKey={formResetKey} />
+                                        <FileInput
+                                            id="bulk-file"
+                                            label="Bulk File Upload"
+                                            onFileSelect={handleFileSelect}
+                                            acceptedFormats=".csv,.txt"
+                                            fileKey="bulkFile"
+                                            formResetKey={formResetKey}
+                                        />
 
-                                        <FileInput id="cheque-invoice-file" label="Upload Cheque Invoice File" onFileSelect={handleFileSelect} acceptedFormats=".csv,.txt" fileKey="chequeInvoiceFile" formResetKey={formResetKey} />
+                                        <FileInput
+                                            id="cheque-invoice-file"
+                                            label="Upload Cheque Invoice File"
+                                            onFileSelect={handleFileSelect}
+                                            acceptedFormats=".csv,.txt"
+                                            fileKey="chequeInvoiceFile"
+                                            formResetKey={formResetKey}
+                                        />
 
                                         <div className="md:col-span-2">
                                             <p className="text-sm text-muted-foreground">
                                                 Note: The file size must be less than 5 MB and the supported formats are .csv and .txt.
                                             </p>
                                         </div>
-
-                                        <div className="md:col-span-2 flex items-center gap-4 mt-4">
-                                            <Button type="button" variant="outline" onClick={handleCancel} disabled={isUploading}>Cancel</Button>
-                                            <Button type="button" onClick={handleUpload} disabled={isUploading}>
-                                                {isUploading ? 'Uploading...' : 'Upload'}
-                                            </Button>
-                                        </div>
                                     </form>
                                 </CardContent>
                             </Card>
                         </TabsContent>
                         <TabsContent value="history" className="w-full">
-                           {historyView}
+                            {historyView}
                         </TabsContent>
                     </Tabs>
                 )}
             </main>
-            <UploadStatusDialog 
+
+            <UploadStatusDialog
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
                 status={dialogContent.status}
@@ -371,4 +311,3 @@ export function BulkImportClientPage() {
         </DashboardLayout>
     );
 }
-

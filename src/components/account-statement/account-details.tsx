@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { format } from 'date-fns';
 
 type Account = {
     ACCT_TITLE: string;
@@ -40,9 +41,11 @@ export function AccountDetails({ account }: AccountDetailsProps) {
                             <p className="font-semibold">{formatCurrency(account.LEDGER_BAL)}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-muted-foreground">Amount as of</p>
-                            <p className="font-semibold">28/10/2020 at 11:12:25 PM</p>
-                        </div>
+                            <p className="text-sm text-muted-foreground"> Amount as of </p>
+                            <p className="font-semibold">
+                              {format(new Date(), 'dd/MM/yyyy')} at {format(new Date(), 'hh:mm:ss a')}
+                            </p>
+                            </div>
                         <div>
                             <p className="text-sm text-muted-foreground">Total Reserved Amount</p>
                             <p className="font-semibold">PKR 0.00</p>
