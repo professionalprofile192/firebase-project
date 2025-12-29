@@ -1,65 +1,57 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+// src/app/api/get-bulk-files/route.ts
+import { NextRequest, NextResponse } from "next/server";
 
-type Data = {
-  NDC_BulkPayments?: any[];
-  opstatus: number;
-  httpStatusCode: number;
-  message?: string;
-};
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ opstatus: 1, httpStatusCode: 405, message: 'Method Not Allowed' });
-  }
-
+export async function POST(req: NextRequest) {
   try {
-    const { token, kuid, userId } = req.body;
+    const { userId, token, kuid } = await req.json(); // frontend se ye 3 values aayengi
 
-    if (!userId) {
-      return res.status(400).json({ opstatus: 1, httpStatusCode: 400, message: 'userId is required' });
-    }
-
-    const payload = {
-      fromAccountNumber: "",    // Hardcoded
-      userId,                   // Dynamic from login/user-attributes
-      searchString: "",         // Hardcoded
+    const payloadObj = {
+      fromAccountNumber: "",
+      userId: userId,          // dynamic
+      searchString: "",
       limit: 10,
-      offset: 0
+      offset: 0,
     };
+    const payload = `jsondata=${encodeURIComponent(JSON.stringify(payloadObj))}`;
 
-    const response = await fetch(
-      'https://prodpk.ubldigital.com/services/data/v1/DCP_BULKFILE_OBJ/operations/NDC_BulkPayments/getBulkFiles',
+    const res = await fetch(
+      "https://prodpk.ubldigital.com/services/data/v1/DCP_BULKFILE_OBJ/operations/NDC_BulkPayments/getBulkFiles",
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-kony-authorization': token,
-          'x-kony-deviceid': 'C41D72D1-E664-4D19-991E-B15F1F3A3C27',  // Static for now
-          'x-kony-api-version': '1.0',
-          'x-kony-requestid': `${Date.now()}-bulkfiles`,
-          'x-kony-reportingparams': JSON.stringify({
-            os: '142.0.0.0',
-            did: 'C41D72D1-E664-4D19-991E-B15F1F3A3C27',
-            kuid,
-            svcid: 'NDC_BulkPayments'
-          }),
+          "Content-Type": "application/json",
+          "x-kony-authorization": token,
+          "x-kony-deviceid": "01EBDE25-E32D-4C9B-8AAF-45A3FD12BEFA", // static ya dynamic
+          "x-kony-api-version": "1.0",
         },
-        body: JSON.stringify({ jsondata: JSON.stringify(payload) }),
+        body: JSON.stringify({
+          jsondata: payload,
+        }),
       }
     );
+    console.log("SENDING PAYLOAD:", payload);
+ 
+    // response text read
+    const text = await res.text();
+    console.log("RAW RESPONSE FROM KONY:", text);
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON from upstream", raw: text },
+        { status: 502 }
+      );
+    }
 
-    const data = await response.json();
+    // ✅ IMPORTANT: yahin se REAL RESPONSE frontend ko bhejo
+    return NextResponse.json(data, { status: res.status });
 
-    res.status(200).json({
-      NDC_BulkPayments: data?.NDC_BulkPayments || [],
-      opstatus: data?.opstatus ?? 1,
-      httpStatusCode: data?.httpStatusCode ?? 500
-    });
-  } catch (error) {
-    console.error("GetBulkFiles API error:", error);
-    res.status(500).json({ opstatus: 1, httpStatusCode: 500, message: 'Internal Server Error' });
+  } catch (err) {
+    console.error("Error hitting Bulk Files API:", err);
+    return NextResponse.json(
+      { success: false, message: "API hit failed", error: err },
+      { status: 500 }
+    );
   }
 }

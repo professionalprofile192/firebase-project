@@ -482,22 +482,23 @@ export function LoginForm() {
         },
         body: JSON.stringify(values),
       });
-      
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       
       console.log("LOGIN API RESPONSE:", data);
  
       console.log("🧑‍💼 Logged in user:", data.profile);
       console.log("📦 Attributes:", data.profile?.user_attributes);
 
+  
+
       if (!data?.profile || !data?.claims_token) {
-        console.error("❌ Login failed, missing profile or claims_token:", data);
-        toast({
-          variant: 'destructive',
-          title: 'Login Failed',
-          description: data.message || "Invalid login response",
-        });
-        return;
+          console.error("❌ Login failed, missing profile or claims_token:", data);
+          toast({ 
+              variant: 'destructive',
+              title: 'Login Failed',
+              description: data?.message || "Invalid login response",
+          });
+          return;
       }
       
       // Save user profile

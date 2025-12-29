@@ -23,6 +23,15 @@ export type BulkFile = {
     comment: string;
 };
 
+type Account = {
+    ACCT_NO: string;
+    ACCT_TITLE: string;
+    AVAIL_BAL: string;
+    DEPOSIT_TYPE: string;
+  };
+  
+ 
+
 const FileInput = ({
     id,
     label,
@@ -94,9 +103,9 @@ const FileInput = ({
 export function BulkImportClientPage() {
     const searchParams = useSearchParams();
     const tab = searchParams.get('tab');
-
     const [bulkFiles, setBulkFiles] = useState<BulkFile[]>([]);
-    const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
+    const [accounts, setAccounts] = useState<Account[]>([]);
+    const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
     const [files, setFiles] = useState<{ bulkFile: File | null; chequeInvoiceFile: File | null }>({
         bulkFile: null,
         chequeInvoiceFile: null
@@ -120,53 +129,241 @@ export function BulkImportClientPage() {
     const router = useRouter();
 
     // AUTOMATIC API CALL ON PAGE LOAD
-    useEffect(() => {
-        const profileString = sessionStorage.getItem('userProfile');
-        if (!profileString) {
-            router.push('/');
+    const hitBulkFiles = async (profile: any, token: string, kuid: string) => {
+        try {
+          const res = await fetch("/api/get-bulk-files", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: profile.userid, // ✅ correct key
+              token,
+              kuid,
+            }),
+          });
+
+        
+          console.log("Bulk Files API HIT, status:", res.status);
+        } catch (err) {
+            console.error("Error hitting API route:", err);
+            
+        } 
+        finally {
+            setLoading(false);
+          }
+      };
+      const hitRemitterFileType = async (
+        accountNumber: string,
+        token:string
+      ) => {
+        try {
+          const res = await fetch("/api/get-remitter-file-type", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              accountNumber,
+              token
+            })
+          });
+      
+          const result = await res.json();
+          const bulkPayments = result?.NDC_BulkPayments || [];
+            console.log("Bulk Payments:", bulkPayments);
+          console.log("Remitter File Type response:", result);
+        } catch (err) {
+          console.error("Remitter File Type error:", err);
+        }
+        finally {
+            setLoading(false);
+          }
+      };
+      // Example useEffect
+      useEffect(() => {
+        const init = async () => {
+          const profileStr = sessionStorage.getItem("userProfile");
+          const claimsToken = sessionStorage.getItem("claimsToken");
+          const accountsStr = sessionStorage.getItem("accounts");
+      
+          if (!profileStr || !claimsToken) {
+            router.push("/login");
             return;
-        }
-
-        const profile = JSON.parse(profileString);
-        setUserProfile(profile);
-
-        async function fetchBulkFiles() {
-            try {
-                const res = await fetch('/api/get-bulk-files', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        token: 'TOKEN_FROM_LOGIN',
-                        kuid: 'KUID_FROM_LOGIN',
-                        userId: profile.userid
-                    })
-                });
-
-                const data = await res.json();
-                if (data?.opstatus === 0 && data?.NDC_BulkPayments) {
-                    setBulkFiles(data.NDC_BulkPayments);
-                } else {
-                    console.error('Failed to fetch bulk files', data);
-                }
-            } catch (err) {
-                console.error('Error fetching bulk files:', err);
-            } finally {
-                setLoading(false);
+          }
+      
+          const profile = JSON.parse(profileStr);
+          setUserProfile(profile);
+      
+          const token = claimsToken;
+          const kuid = profile?.user_attributes?.UserName;
+      
+          if (!profile?.userid || !token || !kuid) {
+            setLoading(false);
+            return;
+          }
+      
+          // Hit Bulk Files API first
+          await hitBulkFiles(profile, token, kuid);
+      
+          // Then hit Remitter File Type API using first account
+          if (accountsStr) {
+            const accounts = JSON.parse(accountsStr);
+            setAccounts(accounts);
+      
+            const accountNumber = accounts[0]?.ACCT_NO; // first account ka ACCT_NO
+            if (accountNumber) {
+              await hitRemitterFileType(accountNumber, token); 
             }
-        }
+          }
+      
+          setLoading(false);
+        };
+      
+        init();
+      }, []);
+      
 
-        fetchBulkFiles();
-    }, [router]);
+        const handleAccountChange = (acctNo: string) => {
+        const account = accounts.find(a => a.ACCT_NO === acctNo) || null;
+        setSelectedAccount(account);
+        };
 
     const handleFileSelect = (key: string, file: File | null) => {
         setFiles((prev) => ({ ...prev, [key]: file }));
     };
 
     const handleCancel = () => {
-        setSelectedAccount(null);
-        setFiles({ bulkFile: null, chequeInvoiceFile: null });
-        setFormResetKey((prevKey) => prevKey + 1);
+        router.push("/dashboard");
     };
+
+    const handleUpload = async () => {
+        if (!files.bulkFile) {
+            toast({
+                title: "File required",
+                description: "Please select a bulk file to upload",
+                variant: "destructive",
+            });
+            return;
+        }
+    
+        if (!selectedAccount) {
+            toast({
+                title: "Select account",
+                description: "Please select an account to upload the file",
+                variant: "destructive",
+            });
+            return;
+        }
+    
+        setIsUploading(true);
+    
+        try {
+            const file = files.bulkFile;
+    
+            const arrayBuffer = await file.arrayBuffer(); // modern approach
+            const fileData = btoa(
+                new Uint8Array(arrayBuffer)
+                    .reduce((data, byte) => data + String.fromCharCode(byte), '')
+            );
+    
+            const profileStr = sessionStorage.getItem("userProfile");
+            const token = sessionStorage.getItem("claimsToken");
+    
+            if (!profileStr || !token) {
+                toast({
+                    title: "Session expired",
+                    description: "Please login again",
+                    variant: "destructive",
+                });
+                setIsUploading(false);
+                return;
+            }
+    
+            const profile = JSON.parse(profileStr);
+    
+            const payload = {
+                fileName: file.name,
+                accountName: selectedAccount.ACCT_TITLE,
+                accountNo: selectedAccount.ACCT_NO,
+                fileData,
+                user: profile.userid,
+                token
+            };
+    
+            const res = await fetch("/api/upload-file", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              
+              const apiResponse = await res.json();
+              console.log("UPLOAD RAW RESPONSE:", apiResponse);
+              
+              // 🔑 backend ne data STRING me bheja hai
+              const parsedData =
+                typeof apiResponse?.data === "string"
+                  ? JSON.parse(apiResponse.data)
+                  : apiResponse.data;
+              
+              console.log("UPLOAD PARSED DATA:", parsedData);
+              
+              const dataObj =
+                            typeof parsedData.data === "string"
+                                ? JSON.parse(parsedData.data)
+                                : parsedData.data;
+             
+
+              if (dataObj?.errMsg) {
+                toast({
+                    variant: "destructive",
+                    title: "Upload Failed",
+                    description: dataObj.errMsg, // 
+                  });
+              
+                console.log("FILE ID:", parsedData.fileId);
+              
+                // reset form etc
+                setFiles({ bulkFile: null, chequeInvoiceFile: null });
+                setSelectedAccount(null);
+                setFormResetKey((prev) => prev + 1);
+              }
+              // ❌ CASE 2: errMsg present → popup with message
+              else {
+                
+                toast({
+                    title: "Upload Successful",
+                    description: "File uploaded successfully",
+                  });
+
+                  const profileStr = sessionStorage.getItem("userProfile");
+                    const token = sessionStorage.getItem("claimsToken");
+
+                    if (profileStr && token) {
+                        const profile = JSON.parse(profileStr);
+                        const kuid = profile?.user_attributes?.UserName;
+
+                        if (profile?.userid && kuid) {
+                        await hitBulkFiles(profile, token, kuid);
+                        }
+                    }
+
+                    // reset form
+                    setFiles({ bulkFile: null, chequeInvoiceFile: null });
+                    setSelectedAccount(null);
+                    setFormResetKey((prev) => prev + 1);
+}
+                
+            } catch (error) {
+                console.error("UPLOAD ERROR:", error);
+                toast({
+                    variant: "destructive",
+                    title: "Upload Error",
+                    description: "Something went wrong while uploading file",
+                });
+            } finally {
+                setIsUploading(false);
+            }
+        };
+    
+    
+    
 
     const closeDialog = () => setDialogOpen(false);
 
@@ -265,6 +462,32 @@ export function BulkImportClientPage() {
                             <Card className="w-full max-w-4xl shadow-md">
                                 <CardContent className="p-6">
                                     <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6" onSubmit={(e) => e.preventDefault()}>
+                                       
+                                    <div className="space-y-2">
+                                            <Label htmlFor="account-number">Account Number</Label>
+                                            <Select onValueChange={handleAccountChange} value={selectedAccount?.ACCT_NO || ''}>
+                                                <SelectTrigger id="account-number">
+                                                    <SelectValue placeholder="Select Account" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {accounts.map(account => (
+                                                        <SelectItem key={account.ACCT_NO} value={account.ACCT_NO}>
+                                                            {account.ACCT_NO}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="account-name">Account Name</Label>
+                                            <Input 
+                                                id="account-name"
+                                                placeholder="Enter Name"
+                                                value={selectedAccount?.ACCT_TITLE || ''}
+                                                disabled
+                                                className="bg-gray-100"
+                                            />
+                                        </div>
                                         <FileInput
                                             id="bulk-file"
                                             label="Bulk File Upload"
@@ -287,6 +510,13 @@ export function BulkImportClientPage() {
                                             <p className="text-sm text-muted-foreground">
                                                 Note: The file size must be less than 5 MB and the supported formats are .csv and .txt.
                                             </p>
+                                        </div>
+
+                                        <div className="md:col-span-2 flex items-center gap-4 mt-4">
+                                            <Button type="button" variant="outline" onClick={handleCancel} disabled={isUploading}>Cancel</Button>
+                                            <Button type="button" onClick={handleUpload} disabled={isUploading}>
+                                                {isUploading ? 'Uploading...' : 'Upload'}
+                                            </Button>
                                         </div>
                                     </form>
                                 </CardContent>
