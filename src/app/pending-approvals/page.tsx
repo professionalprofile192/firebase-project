@@ -209,6 +209,83 @@ function PendingApprovalsContent() {
     }
   };
 
+  //accpet abhi hum isko bhi integrate nhi kar rahy hain 
+
+  const handleApprove = async (approval: any, remarks: string) => {
+    const token = sessionStorage.getItem('claimsToken');
+    const userProfileString = sessionStorage.getItem('userProfile');
+    
+    if (!token || !userProfileString) return false;
+    const profile = JSON.parse(userProfileString);
+  
+    const kuid = profile?.user_attributes?.UserName;
+
+    try {
+      const res = await fetch('/api/approve-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          
+          accountNo: approval.fromAccountNumber || "",
+          approverId: profile.userid,
+          contractId: approval.contractId,
+          referenceNo: approval.referenceNo,
+          remarks: `Approved by user ID ${profile.userid}`,
+          token,
+          kuid
+         }),
+      });
+  
+      const result = await res.json();
+  
+      if (result?.opstatus === 0) {
+        alert("Request Approved Successfully!");
+        // Yahan aap transaction status update call kar sakti hain refresh ke liye
+      } else {
+        alert("Approval failed");
+      }
+    } catch (error) {
+      console.error("Error during approval:", error);
+    }
+  };
+
+  // ye hai approval ki last service jo upr wali k bad chalygi abhi hum isko bhi nhi9 laga rahy 
+  const handleBulkPosting = async (approval: any) => {
+    const token = sessionStorage.getItem('claimsToken');
+    const userProfileString = sessionStorage.getItem('userProfile');
+  
+    if (!token || !userProfileString) return;
+  
+    const profile = JSON.parse(userProfileString);
+  
+    // Payload structure as per your log
+    const bulkData = {
+      customerId: profile.userid || "", // Log mein 8528902206 tha
+      transactionId: approval.referenceNo, // Log mein 21728 tha
+      CIF: profile.user_attributes?.CIF || "" // Profile se CIF nikalna
+    };
+  
+    try {
+      const res = await fetch('/api/bulkposting-approve-last', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, bulkData }),
+      });
+  
+      const result = await res.json();
+  
+      if (result?.opstatus === 0 && result?.responseCode === "00") {
+        console.log("Bulk Posting Success:", result.responseMessage);
+        return true;
+      } else {
+        console.error("Bulk Posting failed:", result);
+        return false;
+      }
+    } catch (error) {
+      console.error("Error in Bulk Posting:", error);
+      return false;
+    }
+  };
   return (
     <DashboardLayout>
       <main className="flex-1 p-4 flex flex-col gap-6">
