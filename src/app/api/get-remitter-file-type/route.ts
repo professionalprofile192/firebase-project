@@ -11,9 +11,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const payload = {
+    const payloadObj = {
       accountnumbers: `${accountNumber},`
     };
+
+    const body = `jsondata=${encodeURIComponent(
+      JSON.stringify(payloadObj)
+    )}`;
 
     const res = await fetch(
       "https://prodpk.ubldigital.com/services/data/v1/NDC_BulkPayments/operations/NDC_BulkPayments/ndc_getRemmiterFileType",
@@ -25,7 +29,7 @@ export async function POST(req: NextRequest) {
           "x-kony-authorization": token,
           "x-kony-deviceid": "98FBE349-6DE8-4034-84D8-F953C702B055"
         },
-        body: JSON.stringify({ jsondata: payload })
+        body
       }
     );
 

@@ -34,47 +34,67 @@ export function BulkFileHistoryTable({ data }: BulkFileHistoryTableProps) {
       default: return 'In Progress';
     }
   }
-
   return (
     <div className="rounded-lg border bg-card text-card-foreground shadow-sm mt-4">
-      <Table>
-        <TableHeader>
-          <TableRow style={{ backgroundColor: '#ECECEC8C' }}>
-            <TableHead>File Name</TableHead>
-            <TableHead>Upload Date</TableHead>
-            <TableHead>Reference Number</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Comment</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.length > 0 ? (
-            data.map((file) => (
-              <TableRow key={file.fileReferenceNumber}>
-                <TableCell className="font-medium">{file.fileName}</TableCell>
-                <TableCell>{format(new Date(file.uploadDate), 'dd/MM/yyyy h:mm a')}</TableCell>
-                <TableCell>{file.fileReferenceNumber}</TableCell>
-                <TableCell>
-                  <Badge variant={getStatusVariant(file.status) as any} className={cn({
-                    'bg-green-100 text-green-800': file.status === '1',
-                    'bg-red-100 text-red-800': file.status === '0',
-                    'bg-yellow-100 text-yellow-800': file.status !== '1' && file.status !== '0',
-                  })}>
-                    {getStatusLabel(file.status)}
-                  </Badge>
-                </TableCell>
-                <TableCell>{file.comment}</TableCell>
+      {/* Scrollable container */}
+      <div className="overflow-x-auto">
+        <div className="inline-block min-w-[1200px]"> {/* Table width large enough for all columns */}
+          <Table className="w-full table-auto">
+            <TableHeader>
+              <TableRow className="bg-gray-200">
+                <TableHead className="px-4 py-2">File Reference Number</TableHead>
+                <TableHead className="px-4 py-2">File Name</TableHead>
+                <TableHead className="px-4 py-2">Upload Date</TableHead>
+                <TableHead className="px-4 py-2">Status</TableHead>
+                <TableHead className="px-4 py-2">Account Number</TableHead>
+                <TableHead className="px-4 py-2">Account Name</TableHead>
+                <TableHead className="px-4 py-2">Uploaded By</TableHead>
+                <TableHead className="px-4 py-2">File Type</TableHead>
+                <TableHead className="px-4 py-2">Comment</TableHead>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={5} className="h-24 text-center">
-                No Record Found
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            </TableHeader>
+            <TableBody>
+              {data.length > 0 ? (
+                data.map((file) => (
+                  <TableRow key={file.fileReferenceNumber} className="hover:bg-gray-50 transition">
+                    <TableCell className="px-4 py-2">{file.fileReferenceNumber}</TableCell>
+                    <TableCell className="font-medium px-4 py-2">{file.fileName}</TableCell>
+                    <TableCell className="px-4 py-2">{format(new Date(file.uploadDate), 'dd/MM/yyyy h:mm a')}</TableCell>
+                    <TableCell className="px-4 py-2">
+                      <Badge
+                        variant={getStatusVariant(file.status) as any}
+                        className={cn({
+                          'bg-green-100 text-green-800': file.status === '1',
+                          'bg-red-100 text-red-800': file.status === '0',
+                          'bg-yellow-100 text-yellow-800':
+                            file.status !== '1' && file.status !== '0',
+                        })}
+                      >
+                        {getStatusLabel(file.status)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="px-4 py-2">{file.accountNumber}</TableCell>
+                    <TableCell className="px-4 py-2">{file.accountName}</TableCell>
+                    <TableCell className="px-4 py-2">{file.uploadedBy}</TableCell>
+                    <TableCell className="px-4 py-2">{file.fileType}</TableCell>
+                    <TableCell className="px-4 py-2">{file.comment}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={9} className="h-24 text-center">
+                    No Record Found
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
     </div>
   );
+  
+  
+  
+  
 }

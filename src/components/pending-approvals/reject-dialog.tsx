@@ -24,6 +24,7 @@ interface RejectDialogProps {
 
 export function RejectDialog({ open, onOpenChange, onConfirm }: RejectDialogProps) {
   const [comment, setComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false); // Loading state
   const { toast } = useToast();
 
   const handleConfirm = () => {
@@ -35,7 +36,9 @@ export function RejectDialog({ open, onOpenChange, onConfirm }: RejectDialogProp
       });
       return;
     }
-    onConfirm(comment);
+    
+    // onConfirm basically approvals-table ka 'handleConfirmReject' hai
+    onConfirm(comment); 
     setComment('');
   };
 
@@ -67,7 +70,9 @@ export function RejectDialog({ open, onOpenChange, onConfirm }: RejectDialogProp
           <Button variant="outline" onClick={handleClose}>
             No
           </Button>
-          <Button onClick={handleConfirm}>Yes</Button>
+         <Button onClick={handleConfirm} disabled={isSubmitting}>
+    {isSubmitting ? "Processing..." : "Yes"}
+  </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

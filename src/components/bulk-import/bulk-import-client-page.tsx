@@ -106,6 +106,8 @@ export function BulkImportClientPage() {
     const [bulkFiles, setBulkFiles] = useState<BulkFile[]>([]);
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [referenceNumber, setReferenceNumber] = useState<string | null>(null);
     const [files, setFiles] = useState<{ bulkFile: File | null; chequeInvoiceFile: File | null }>({
         bulkFile: null,
         chequeInvoiceFile: null
@@ -141,6 +143,14 @@ export function BulkImportClientPage() {
             }),
           });
 
+          const result = await res.json();
+
+          console.log("GET BULK FILES RESPONSE:", result);
+      
+          const list = result?.NDC_BulkPayments || [];
+      
+          //  YAHAN TABLE DATA SET HO RHA HAI
+          setBulkFiles(list);
         
           console.log("Bulk Files API HIT, status:", res.status);
         } catch (err) {
@@ -176,9 +186,15 @@ export function BulkImportClientPage() {
             setLoading(false);
           }
       };
+
+      const hasRun = useRef(false);
+  
       // Example useEffect
       useEffect(() => {
+        if (hasRun.current) return;
+        hasRun.current = true;
         const init = async () => {
+           
           const profileStr = sessionStorage.getItem("userProfile");
           const claimsToken = sessionStorage.getItem("claimsToken");
           const accountsStr = sessionStorage.getItem("accounts");
@@ -198,7 +214,7 @@ export function BulkImportClientPage() {
             setLoading(false);
             return;
           }
-      
+         
           // Hit Bulk Files API first
           await hitBulkFiles(profile, token, kuid);
       
@@ -324,13 +340,11 @@ export function BulkImportClientPage() {
                 setSelectedAccount(null);
                 setFormResetKey((prev) => prev + 1);
               }
-              // ❌ CASE 2: errMsg present → popup with message
+              // CASE 2: errMsg present → popup with message
               else {
                 
-                toast({
-                    title: "Upload Successful",
-                    description: "File uploaded successfully",
-                  });
+                setReferenceNumber(dataObj.fileId);
+setShowSuccessModal(true);
 
                   const profileStr = sessionStorage.getItem("userProfile");
                     const token = sessionStorage.getItem("claimsToken");
@@ -418,16 +432,6 @@ export function BulkImportClientPage() {
                                 <SelectItem value="Failed">Failed</SelectItem>
                             </SelectContent>
                         </Select>
-                        <Select value={commentFilter} onValueChange={setCommentFilter}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Filter by Comment..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All</SelectItem>
-                                <SelectItem value="Success">Success</SelectItem>
-                                <SelectItem value="Failed">Failed</SelectItem>
-                            </SelectContent>
-                        </Select>
                     </div>
                 </CardContent>
             </Card>
@@ -446,6 +450,7 @@ export function BulkImportClientPage() {
     }
 
     return (
+<>
         <DashboardLayout>
             <main className="flex-1 p-4 sm:px-6 sm:py-4 flex flex-col gap-6">
                 <h1 className="text-2xl font-semibold">Bulk Import</h1>
@@ -454,15 +459,13 @@ export function BulkImportClientPage() {
                     historyView
                 ) : (
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col">
-                        <TabsList className="grid w-full max-w-md grid-cols-2">
+                        <TabsList className="grid w-full max-w-md grid-cols-1">
                             <TabsTrigger value="upload">Single Bulk Upload</TabsTrigger>
-                            <TabsTrigger value="history">Bulk Import History</TabsTrigger>
                         </TabsList>
                         <TabsContent value="upload" className="w-full">
                             <Card className="w-full max-w-4xl shadow-md">
                                 <CardContent className="p-6">
-                                    <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6" onSubmit={(e) => e.preventDefault()}>
-                                       
+                                    <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6" onSubmit={(e) => e.preventDefault()}>    
                                     <div className="space-y-2">
                                             <Label htmlFor="account-number">Account Number</Label>
                                             <Select onValueChange={handleAccountChange} value={selectedAccount?.ACCT_NO || ''}>
@@ -539,5 +542,77 @@ export function BulkImportClientPage() {
                 onDone={closeDialog}
             />
         </DashboardLayout>
+        {showSuccessModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="bg-white rounded-2xl shadow-xl w-[420px] p-6 text-center animate-fadeIn">
+      
+      {/* Header decoration instead of icon */}
+      <div className="flex justify-center mb-4">
+        <div className="h-2 w-16 bg-blue-500 rounded-full animate-pulse"></div>
+      </div>
+
+      {/* Title */}
+      <h2 className="text-xl font-semibold mb-2 text-gray-800">
+        Single Bulk Upload
+      </h2>
+
+      {/* Description */}
+      <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+        Bulk file has been uploaded and is being validated by the system.
+        Please refer to the Bulk History tab in case of any errors.
+      </p>
+
+      {/* Reference */}
+      <p className="text-sm font-medium mb-2 text-gray-700">
+        Your Transaction Reference is:
+      </p>
+      <div className="bg-gray-100 rounded-lg px-3 py-2 text-sm font-mono mb-5 text-gray-800">
+        {referenceNumber}
+      </div>
+
+      {/* Buttons */}
+      <div className="flex justify-center gap-3">
+        <button
+          className="px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium transition duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          onClick={() => {
+            navigator.clipboard.writeText(referenceNumber || "");
+            toast({ title: "Copied to clipboard" });
+          }}
+        >
+          Copy
+        </button>
+
+        <button
+          className="px-5 py-2 rounded-lg bg-gray-200 text-sm font-medium transition duration-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300"
+          onClick={async () => {
+            setShowSuccessModal(false);
+
+            const profileStr = sessionStorage.getItem("userProfile");
+            const token = sessionStorage.getItem("claimsToken");
+
+            if (profileStr && token) {
+              const profile = JSON.parse(profileStr);
+              const kuid = profile?.user_attributes?.UserName;
+
+              if (profile?.userid && kuid) {
+                await hitBulkFiles(profile, token, kuid);
+              }
+            }
+
+            setActiveTab("history");
+            router.push("/bulk-import?tab=history");
+            setFiles({ bulkFile: null, chequeInvoiceFile: null });
+            setSelectedAccount(null);
+            setFormResetKey((prev) => prev + 1);
+          }}
+        >
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+       </>
     );
 }

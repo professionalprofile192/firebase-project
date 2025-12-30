@@ -62,7 +62,7 @@ function ApprovalRow({ approval, isOpen, onToggle, onRejectClick }: { approval: 
             {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </TableCell>
         <TableCell className="font-medium">{approval.referenceNo}</TableCell>
-        <TableCell>{approval.transactionType2}</TableCell>
+        <TableCell>{approval.transactionType}</TableCell>
         <TableCell>{approval.featureActionId}</TableCell>
         <TableCell>{approval.requesterName}</TableCell>
         <TableCell className="text-right">
@@ -199,16 +199,17 @@ export function ApprovalsTable({ data, userProfile, onReject }: ApprovalsTablePr
   }
 
   const handleConfirmReject = async (remarks: string) => {
-    if (!selectedApproval) {
-        toast({ variant: 'destructive', title: 'Error', description: 'No approval selected.' });
-        return;
-    }
+    if (!selectedApproval) return;
+  
+    // Ye call page.tsx wale handleReject ko trigger karegi
     const success = await onReject(selectedApproval, remarks);
+    
     if (success) {
+      // Sirf dialog band kar rahe hain, state update (delete) nahi kar rahe
       setShowRejectDialog(false);
       setSelectedApproval(null);
     }
-  }
+  };
 
 
   return (

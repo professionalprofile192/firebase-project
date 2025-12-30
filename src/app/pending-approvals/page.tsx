@@ -1,221 +1,251 @@
-
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { ApprovalsTable } from '@/components/pending-approvals/approvals-table';
+import { ApprovalsHistoryTable } from '@/components/pending-approvals/approvals-history-table';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search } from 'lucide-react';
-import { ApprovalsHistoryTable } from '@/components/pending-approvals/approvals-history-table';
-import { getPendingApprovals, getApprovalHistory, rejectRequest, updateBulkRecordsStatus } from '../actions';
 import { useToast } from '@/hooks/use-toast';
 import { useSearchParams } from 'next/navigation';
-import { CustomAlertDialog } from '@/components/common/custom-alert-dialog';
 
-export type Approval = {
-    approverId: string;
-    contractId: string;
-    referenceNo: string;
-    featureActionId: string;
-    assignedDate: string;
-    sentBy: string;
-    requesterName: string;
-    transactionType2: string;
-    notes2?: string;
-    notes?: string;
-    typeId: string;
-    amount?: string;
-    transactionType?: string;
-    fromAccountNumber?: string;
-    toAccountNumber?: string;
-    status?: string;
-    remarks?: string; // Added for rejection comments
-    rejector?: { id: string; name: string };
-    rejectedAt?: string;
+// --- //********** pending approval */ ---
+async function getPendingApprovals(userId: string, token: string, kuid: string) {
+  const res = await fetch('/api/fetch-pending-approvals', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, token, kuid }),
+  });
+  return res.json();
+}
+
+//********** get approval history */
+async function getApprovalsHistory(userId: string, token: string , kuid: string) {
+  const res = await fetch('/api/fetch-all-pending-users', { // Aapki History API
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, token, kuid}),
+  });
+  return res.json();
+}
+
+//**********reject service */
+async function rejectRequestService(payload: any) {
+  const res = await fetch('/api/reject-approval', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return res.json();
+}
+
+//integration service
+const fetchMetadata = async () => {
+  // 1. Storage se data nikalna
+  const token = sessionStorage.getItem('claimsToken');
+  const userProfileString = sessionStorage.getItem('userProfile');
+
+  if (!token || !userProfileString) return null;
+
+  const profile = JSON.parse(userProfileString);
+  const kuid = profile?.user_attributes?.UserName;
+
+  try {
+    // 2. Backend API ko call karna (Token/KUID Headers mein bhej rahe hain)
+    const res = await fetch('/api/UBL-DCP-Objectserviceapproval', {
+      method: 'GET',
+      headers: {
+        'x-kony-token': token,
+        'x-kony-kuid': kuid || ""
+      },
+    });
+
+    const result = await res.json();
+
+    if (res.ok && result?.Metadata?.opstatus === 0) {
+      console.log("Metadata Received:", result);
+      return result;
+    } else {
+      console.error("Metadata fetch failed", result);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error in fetchMetadata:", error);
+    return null;
+  }
+};
+
+//transaction status update // **abhi ye service lagai nhi hai 
+const handleUpdateTransactionStatus = async (approval: any, status: "REJECTED" | "APPROVED") => {
+  // 1. Session storage se token aur profile nikalna
+  const token = sessionStorage.getItem('claimsToken');
+  const userProfileString = sessionStorage.getItem('userProfile');
+
+  if (!token || !userProfileString) {
+    console.error("Session data missing");
+    return false;
+  }
+  const profile = JSON.parse(userProfileString);
+  const kuid = profile?.user_attributes?.UserName;
+  try {
+    // 2. Backend Route ko call karna
+    // Aapke log ke mutabiq referenceNo hi transactionId hai
+    const res = await fetch('/api/update-transaction-status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token,
+        transactionId: approval.referenceNo, // Jo payload mein 47679 ja raha tha
+        status: status,
+        kuid 
+      }),
+    });
+
+    const result = await res.json();
+
+    // 3. Response check karna (opstatus 0 means success)
+    if (res.ok && result?.opstatus === 0) {
+      console.log("Status Updated Successfully:", result);
+      // Yahan aap success toast ya UI update dikha sakti hain
+      return true;
+    } else {
+      console.error("Failed to update status:", result);
+      return false;
+    }
+  } catch (error) {
+    console.error("Error updating transaction status:", error);
+    return false;
+  }
 };
 
 function PendingApprovalsContent() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'pending');
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [pendingApprovals, setPendingApprovals] = useState<Approval[]>([]);
-  const [approvalHistory, setApprovalHistory] = useState<Approval[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [pendingApprovals, setPendingApprovals] = useState([]);
+  const [approvalHistory, setApprovalHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [successAlertMessage, setSuccessAlertMessage] = useState('');
-  
+
+  // 1. Load Profile on Mount
+  useEffect(() => {
+    const profile = sessionStorage.getItem('userProfile');
+    if (profile) setUserProfile(JSON.parse(profile));
+  }, []);
+
+  // 2. Tab Change par API Hit karna
   useEffect(() => {
     async function fetchData() {
-        setLoading(true);
-        const userProfileString = sessionStorage.getItem('userProfile');
+      if (!userProfile) return;
+      const token = sessionStorage.getItem('claimsToken');
+      const userId = userProfile?.userid;
+      const kuid = userProfile?.user_attributes?.UserName;
 
-        if (userProfileString) {
-            const profile = JSON.parse(userProfileString);
-            setUserProfile(profile);
+      if (!userId || !token) return;
 
-            try {
-                const [pendingData, historyData] = await Promise.all([
-                    getPendingApprovals(profile.userid), 
-                    getApprovalHistory(profile.userid)
-                ]);
-
-                // Use localStorage for permanent client-side state
-                const rejectedInStorageStr = localStorage.getItem('rejectedApprovals');
-                const rejectedInStorage: { [key: string]: Approval } = rejectedInStorageStr ? JSON.parse(rejectedInStorageStr) : {};
-                const rejectedRefNos = Object.keys(rejectedInStorage);
-                
-                const livePendingApprovals = pendingData.opstatus === 0 
-                    ? pendingData.ApprovalMatrix.filter(appr => !rejectedRefNos.includes(appr.referenceNo)) 
-                    : [];
-
-                const sessionRejectedApprovals = Object.values(rejectedInStorage);
-                
-                // Filter history data to exclude items already present in sessionRejectedApprovals
-                const serverHistory = historyData.opstatus === 0 ? historyData.ApprovalMatrix : [];
-                const uniqueServerHistory = serverHistory.filter(item => !rejectedInStorage[item.referenceNo]);
-
-
-                const combinedHistory = [
-                    ...sessionRejectedApprovals,
-                    ...uniqueServerHistory
-                ];
-
-                setPendingApprovals(livePendingApprovals);
-                setApprovalHistory(combinedHistory);
-
-            } catch (error) {
-                console.error("Failed to fetch approvals data", error);
-                toast({ variant: 'destructive', title: 'Error', description: 'Could not load approvals data.' });
-            } finally {
-                setLoading(false);
-            }
-        } else {
-            setLoading(false);
+      setLoading(true);
+      try {
+        if (activeTab === 'pending') {
+          const data = await getPendingApprovals(userId, token, kuid);
+          // Local rejected logic apply karein agar zaroorat ho
+          setPendingApprovals(data?.ApprovalMatrix || []);
+        } else if (activeTab === 'history') {
+          const data = await getApprovalsHistory(userId, token, kuid);
+          setApprovalHistory(data?.ApprovalMatrix || []);
         }
+      } catch (error) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to fetch data' });
+      } finally {
+        setLoading(false);
+      }
     }
+
     fetchData();
-  }, [toast]);
-  
+  }, [activeTab, userProfile]); // activeTab change hone par hi call jayegi
 
-  const handleReject = async (approval: Approval, remarks: string): Promise<boolean> => {
-    if (!userProfile) {
-        toast({ variant: 'destructive', title: 'Error', description: 'User profile not found.' });
-        return false;
-    }
-
-    const rejectPayload = {
-        accountNo: 0, 
-        approverId: approval.approverId,
-        contractId: approval.contractId,
-        referenceNo: approval.referenceNo,
-        rejectorId: userProfile.userid,
-        remarks: remarks
-    };
+  const handleReject = async (approval: Approval, remarks: string) => {
+    const token = sessionStorage.getItem('claimsToken');
+    const userProfileString = sessionStorage.getItem('userProfile');
     
+    if (!token || !userProfileString) return false;
+    const profile = JSON.parse(userProfileString);
+  
+    const kuid = profile?.user_attributes?.UserName;
     try {
-        const rejectResponse = await rejectRequest(rejectPayload);
-        if (rejectResponse.opstatus === 0 && rejectResponse.ApprovalMatrix[0].opstatus === 0) {
-            const rejectedApproval = { 
-                ...approval, 
-                status: 'REJECTED', 
-                remarks: remarks,
-                rejector: { id: userProfile.userid, name: userProfile.firstname + ' ' + userProfile.lastname },
-                rejectedAt: new Date().toISOString(),
-            };
-            
-            // Update localStorage
-            const rejectedInStorageStr = localStorage.getItem('rejectedApprovals');
-            const rejectedInStorage = rejectedInStorageStr ? JSON.parse(rejectedInStorageStr) : {};
-            rejectedInStorage[approval.referenceNo] = rejectedApproval;
-            localStorage.setItem('rejectedApprovals', JSON.stringify(rejectedInStorage));
-            
-            setPendingApprovals(prev => prev.filter(appr => appr.referenceNo !== approval.referenceNo));
-            setApprovalHistory(prev => [rejectedApproval, ...prev]);
-
-            // Call the second service to update status
-            const updateStatusPayload = {
-                customerId: userProfile.userid, // Assuming rejectorId is the customerId
-                transactionId: approval.referenceNo,
-                status: 'REJECTED' as const
-            };
-            
-            const updateStatusResponse = await updateBulkRecordsStatus(updateStatusPayload);
-
-            if (updateStatusResponse.opstatus === 0 && updateStatusResponse.responseMessage) {
-                 setSuccessAlertMessage(updateStatusResponse.responseMessage);
-            } else {
-                 setSuccessAlertMessage(rejectResponse.ApprovalMatrix[0].reqResponse);
-            }
-
-            setShowSuccessAlert(true);
-            return true;
-        } else {
-            toast({ variant: 'destructive', title: 'Rejection Failed', description: rejectResponse.message || "An unknown error occurred." });
-            return false;
-        }
-    } catch (error) {
-        toast({ variant: 'destructive', title: 'Error', description: 'An unexpected error occurred during rejection.' });
+      const res = await fetch('/api/reject-approval', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          
+          accountNo: approval.fromAccountNumber || "",
+          approverId: profile.userid,
+          contractId: approval.contractId,
+          referenceNo: approval.referenceNo,
+          rejectorId: profile.userid,
+          remarks: remarks, // User ka likha hua comment
+          token,
+          kuid,
+        }),
+      });
+  
+      const result = await res.json();
+  
+      // Sirf service hit hone ka check
+      if (result?.opstatus === 0 && result?.ApprovalMatrix?.[0]?.opstatus === 0) {
+        toast({ title: "Success", description: "Service Hit Successfully" });
+        // await fetchMetadata(); ye integartion service hai 
+        //yahn p update transaction bhi call hogi upr function define hia bs call karna hai 
+        return true;
+      } else {
+        toast({ variant: "destructive", title: "Error", description: "Service failed" });
         return false;
+      }
+    } catch (error) {
+      console.error("Error hitting reject service:", error);
+      return false;
     }
-  }
-
-  if (loading) {
-    return (
-        <DashboardLayout>
-            <main className="flex-1 p-4 sm:px-6 sm:py-4">
-                <p>Loading data...</p>
-            </main>
-        </DashboardLayout>
-    );
-  }
+  };
 
   return (
     <DashboardLayout>
-      <main className="flex-1 p-4 sm:px-6 sm:py-4 flex flex-col gap-6">
+      <main className="flex-1 p-4 flex flex-col gap-6">
         <h1 className="text-2xl font-semibold">Approvals & Requests</h1>
-        
-        <div className="relative w-full max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input 
-                placeholder="Search"
-                className="pl-10 bg-muted border-none"
-            />
-        </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="pending">Pending Approvals</TabsTrigger>
             <TabsTrigger value="history">Approvals History</TabsTrigger>
           </TabsList>
-          <TabsContent value="pending">
-             <ApprovalsTable 
-                data={pendingApprovals} 
-                userProfile={userProfile} 
-                onReject={handleReject} 
-              />
-          </TabsContent>
-          <TabsContent value="history">
-             <ApprovalsHistoryTable data={approvalHistory} />
-          </TabsContent>
+
+          {loading ? (
+            <div className="p-10 text-center">Loading {activeTab}...</div>
+          ) : (
+            <>
+              <TabsContent value="pending">
+              <ApprovalsTable 
+              data={pendingApprovals} 
+              userProfile={userProfile} 
+              onReject={handleReject} // rejection prop
+            />
+              </TabsContent>
+              <TabsContent value="history">
+                <ApprovalsHistoryTable data={approvalHistory} />
+              </TabsContent>
+            </>
+          )}
         </Tabs>
       </main>
-      <CustomAlertDialog
-        open={showSuccessAlert}
-        onOpenChange={setShowSuccessAlert}
-        title="Success"
-        description={successAlertMessage}
-        onConfirm={() => setShowSuccessAlert(false)}
-      />
     </DashboardLayout>
   );
 }
 
 export default function PendingApprovalsPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
       <PendingApprovalsContent />
     </Suspense>
-  )
+  );
 }
