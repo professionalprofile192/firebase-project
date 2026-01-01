@@ -249,9 +249,11 @@ export function Header() {
                             <Settings className="mr-2 h-4 w-4" />
                             <span>Profile Settings</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-foreground">
+                        <DropdownMenuItem className="text-foreground " asChild>
+                        <Link href="/Alerts-settings" className="flex w-full items-center">
                             <Settings className="mr-2 h-4 w-4" />
                             <span>Alerts Settings</span>
+                        </Link>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

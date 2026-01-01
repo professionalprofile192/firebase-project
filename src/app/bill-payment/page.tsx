@@ -20,14 +20,12 @@ import { format } from 'date-fns';
 const billPaymentHistory: HistoryItem[] = [];
 
 type Account = {
-  acctNo: string;
-  acctName: string;
-}
+  ACCT_NO: string;
+  ACCT_TITLE: string;
+  AVAIL_BAL: string;
+  DEPOSIT_TYPE: string;
+};
 
-const accounts: Account[] = [
-    { acctNo: '060510224211', acctName: 'NAWAZ ALI' },
-    { acctNo: '060510224212', acctName: 'IDREES APPROVER' },
-];
 
 type Category = {
     id: string;
@@ -39,11 +37,13 @@ function BillPaymentContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'bill-payment');
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [multiPayMode, setMultiPayMode] = useState(false);
   const [payeeSearchTerm, setPayeeSearchTerm] = useState('');
   const [historySearchTerm, setHistorySearchTerm] = useState('');
-
+  const [billPaymentHistory, setBillPaymentHistory] = useState<HistoryItem[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const [allPayees, setAllPayees] = useState<Payee[]>([]);
   const [filteredPayees, setFilteredPayees] = useState<Payee[]>([]);
   const [loadingPayees, setLoadingPayees] = useState(true);
@@ -54,20 +54,142 @@ function BillPaymentContent() {
 
   const tabFromParams = searchParams.get('tab'); 
 
-  useEffect(() => {
-    if (tabFromParams) {
-      setActiveTab(tabFromParams);
+  //bill history
+  const fetchBillHistory = useCallback(async () => {
+    setLoadingHistory(true);
+    try {
+      const token = sessionStorage.getItem("claimsToken");
+      const userProfileString = sessionStorage.getItem('userProfile');
+      
+      if (!token || !userProfileString) return;
+
+      const userProfile = JSON.parse(userProfileString);
+
+      const res = await fetch("/api/get-bill-payment-history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: token,
+          kuid: userProfile?.user_attributes?.UserName,
+            payload: {
+                fromAccountNumber:"",
+                consumerNumber: "",
+                searchString: "",
+                startDate: "",
+                endDate: ""
+            }
+        })
+    });
+
+      const result = await res.json();
+
+      if (result.opstatus === 0) {
+       
+        const historyData = typeof result.getBillHistory === "string" 
+          ? JSON.parse(result.getBillHistory) 
+          : result.getBillHistory;
+        
+        setBillPaymentHistory(historyData?.records || []);
+      } else {
+        toast({ variant: "destructive", title: "History Error", description: result.errmsg || "Failed to fetch history" });
+      }
+    } catch (error) {
+      console.error("Error fetching history:", error);
+    } finally {
+      setLoadingHistory(false);
     }
-  }, [tabFromParams]);
+  }, [selectedAccount, toast]);
 
 
+//for bulk bill payment
+const fetchBulkData = useCallback(async () => {
+  const sessionToken = sessionStorage.getItem("claimsToken");
+  const userProfileStr = sessionStorage.getItem("userProfile");
+
+  if (!sessionToken || !userProfileStr) return;
+  const userProfile = JSON.parse(userProfileStr);
+
+  const requestBody = {
+    token: sessionToken,
+    kuid: userProfile?.user_attributes?.UserName,
+    payload: {
+      remitterType: "UBP",
+      status: 1,
+      fromAccountNumber: selectedAccount?.ACCT_NO || "",
+      userId: userProfile?.userid || ""
+    }
+  };
+
+  try {
+    // 1. Hit Total Transfers Count Service
+    const resCount = await fetch("/api/get-bulk-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody)
+    });
+    const countData = await resCount.json();
+
+    // 2. Hit Payments List Service
+    const resList = await fetch("/api/get-bulk-payment-total", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody)
+    });
+    const listData = await resList.json();
+
+    // Update States
+    if (countData.opstatus === 0) {
+      // e.g. setTotalCount(countData.NDC_BulkPayments[0].noOfTransaactions)
+    }
+    if (listData.opstatus === 0) {
+      // e.g. setBulkList(listData.NDC_BulkPayments)
+    }
+
+  } catch (error) {
+    console.error("Bulk Services Error:", error);
+  }
+}, [selectedAccount]);
+
+
+  //for bill history
+  useEffect(() => {
+    if (activeTab === 'bill-payment-history') {
+      fetchBillHistory();
+    } 
+    else if (activeTab === 'bulk-bill-payment') {
+      fetchBulkData();}
+  }, [activeTab, fetchBillHistory, fetchBulkData]);
+
+  useEffect(() => {
+    // 1. Account Selection Logic
+    const accountsStr = sessionStorage.getItem("accounts");
+    if (accountsStr) {
+        try {
+            const parsedAccounts: Account[] = JSON.parse(accountsStr);
+            setAccounts(parsedAccounts);
+            
+            // Agar pehle se koi account selected nahi hai, tabhi pehla select karein
+            if (parsedAccounts.length > 0 && !selectedAccount) {
+                setSelectedAccount(parsedAccounts[0]);
+            }
+        } catch (err) {
+            console.error("Error parsing accounts from session:", err);
+        }
+    }
+
+    // 2. Tab Selection Logic (Jo URL params se aa raha hai)
+    if (tabFromParams) {
+        setActiveTab(tabFromParams);
+    }
+}, [tabFromParams]); // Jab bhi tab change ho, ye dobara check kare
+   
   const fetchData = useCallback(async () => {
     setLoadingPayees(true);
     setPayeeSearchTerm('');
     setHistorySearchTerm('');
     setSelectedCategory('all');
 
-    const sessionToken = sessionStorage.getItem("sessionToken");
+    const sessionToken = sessionStorage.getItem("claimsToken");
     const userProfileString = sessionStorage.getItem('userProfile');
 
     if (!sessionToken || !userProfileString) {
@@ -79,81 +201,85 @@ function BillPaymentContent() {
     
     try {
       const userProfile = JSON.parse(userProfileString);
-
-      const [payeeData, categoryData] = await Promise.all([
           // Fetch Payees
-          fetch("/api/get-payee-list", {
+          const payeeData = await fetch("/api/get-payee-list", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                   token: sessionToken,
-                  kuid: userProfile.UserName,
+                  kuid: userProfile?.user_attributes?.UserName,
                   payload: {
-                      id: "",
-                      offset: 0,
-                      limit: 100,
-                      sortBy: "createdOn",
-                      order: "desc",
-                      payeeId: userProfile.userid, 
-                      searchString: ""
-                  }
-              })
-          }).then(res => res.json()),
+                    offset: 0,
+                    limit: 10,
+                    sortBy: "createdOn",
+                    order: "desc",
+                    payeeId: userProfile?.userid,
+                    searchString: "",
+                  },
+              }),
+          });
+          const payeeRes = await payeeData.json();
 
           // Fetch Categories
-          fetch("/api/get-bill-categories", {
+          const categoryData = await fetch("/api/get-all-categories", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                   token: sessionToken,
-                  kuid: userProfile.UserName,
+                  kuid: userProfile?.user_attributes?.UserName,
+                  payload: { categorytype: "bill" }
               })
-          }).then(res => res.json())
-      ]);
-
-      if (payeeData.opstatus === 0 && (payeeData as any).payee) {
-        const mappedPayees: Payee[] = (payeeData as any).payee.map((p: any) => {
-          let notes = {};
-          try {
-            notes = JSON.parse(p.notes || '{}');
-          } catch (e) { console.error("Failed to parse payee notes", e); }
+              
+          })
+          const categoryRes = await categoryData.json();
+      
           
-          const billStatus = (notes as any).billStatus;
-          let status: Payee['status'] = 'Not Available';
-          if (billStatus === 'Unpaid') status = 'Unpaid';
-          else if (billStatus === 'Paid') status = 'Paid';
 
-          return {
-            consumerName: p.payeeName || 'N/A', // full name
-            payeeNickName: p.payeeNickName || 'N/A', // shorter name
-            billerType: p.nameOnBill || 'N/A',
-            companyName: p.companyName || 'N/A',
-            consumerNumber: p.accountNumber,
-            status: status,
-            amountDue: (notes as any).billAmount,
-            dueDate: (notes as any).dueDate ? format(new Date((notes as any).dueDate), 'dd/MM/yyyy') : undefined,
-            amountAfterDueDate: (notes as any).lateSurcharge,
-            category: (notes as any).categoryVal || 'Uncategorized'
-          };
-        });
-        setAllPayees(mappedPayees);
-        setFilteredPayees(mappedPayees);
-      } else {
-        setAllPayees([]);
-        setFilteredPayees([]);
-        if (payeeData.opstatus !== -1) { 
-            toast({ variant: "destructive", title: "Failed to fetch payees", description: (payeeData as any).errmsg || (payeeData as any).error || 'Could not load payee data.' });
-        }
-      }
-
-      if (categoryData.opstatus === 0 && (categoryData as any).PaymentService) {
-          setCategories((categoryData as any).PaymentService);
-      } else {
-          setCategories([]);
-           if (categoryData.opstatus !== -1) {
-            toast({ variant: "destructive", title: "Failed to fetch categories", description: (categoryData as any).errmsg || (categoryData as any).error || 'Could not load category data.' });
-           }
-      }
+          if (payeeRes && payeeRes.opstatus === 0 && payeeRes.payee) {
+            const mappedPayees = payeeRes.payee.map((p) => {
+              let notes = {};
+              try {
+                notes = JSON.parse(p.notes || '{}');
+              } catch (e) { console.error("Failed to parse payee notes", e); }
+              
+              const billStatus = notes.billStatus;
+              let status = 'Not Available';
+              if (billStatus === 'Unpaid') status = 'Unpaid';
+              else if (billStatus === 'Paid') status = 'Paid';
+    
+              return {
+                consumerName: p.payeeName || 'N/A',
+                payeeNickName: p.payeeNickName || 'N/A',
+                billerType: p.nameOnBill || 'N/A',
+                companyName: p.companyName || 'N/A',
+                consumerNumber: p.accountNumber,
+                status: status,
+                amountDue: notes.billAmount,
+                // Safety check for date
+                dueDate: notes.dueDate ? format(new Date(notes.dueDate), 'dd/MM/yyyy') : undefined,
+                amountAfterDueDate: notes.lateSurcharge,
+                category: notes.categoryVal || 'Uncategorized'
+              };
+            });
+            setAllPayees(mappedPayees);
+            setFilteredPayees(mappedPayees);
+          } else {
+            setAllPayees([]);
+            setFilteredPayees([]);
+            if (payeeRes?.opstatus !== -1) { 
+                toast({ variant: "destructive", title: "Failed to fetch payees", description: payeeRes?.errmsg || 'Could not load payee data.' });
+            }
+          }
+    
+          // --- Category Response Handling ---
+          if (categoryRes && categoryRes.opstatus === 0 && categoryRes.PaymentService) {
+              setCategories(categoryRes.PaymentService);
+          } else {
+              setCategories([]);
+               if (categoryRes?.opstatus !== -1) {
+                toast({ variant: "destructive", title: "Failed to fetch categories", description: categoryRes?.errmsg || 'Could not load category data.' });
+               }
+          }
 
     } catch (error) {
        toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred while fetching data." });
@@ -188,11 +314,10 @@ function BillPaymentContent() {
 
   }, [payeeSearchTerm, selectedCategory, allPayees]);
 
-
   const handleAccountChange = (acctNo: string) => {
-    const account = accounts.find(a => a.acctNo === acctNo);
+    const account = accounts.find(a => a.ACCT_NO === acctNo);
     setSelectedAccount(account || null);
-  };
+}
   
   const getHeading = () => {
     if (multiPayMode) {
@@ -213,7 +338,7 @@ function BillPaymentContent() {
   const filteredHistory = billPaymentHistory.filter(item => 
     (item.consumerName?.toLowerCase() || '').includes(historySearchTerm.toLowerCase()) ||
     (item.consumerNumber?.toLowerCase() || '').includes(historySearchTerm.toLowerCase()) ||
-    (item.transactionId && item.transactionId.toLowerCase().includes(historySearchTerm.toLowerCase()))
+    (item.transactionId?.toLowerCase() || '').includes(historySearchTerm.toLowerCase())
   );
 
   return (
@@ -238,11 +363,11 @@ function BillPaymentContent() {
         </div>
         
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full max-w-lg grid-cols-3">
-            <TabsTrigger value="bill-payment">Bill Payment</TabsTrigger>
-            <TabsTrigger value="bill-payment-history">Bill Payment History</TabsTrigger>
-            <TabsTrigger value="bulk-bill-payment">Bulk Bill Payment</TabsTrigger>
-          </TabsList>
+        <TabsList className="grid w-full max-w-lg grid-cols-3">
+          <TabsTrigger value="bill-payment">Bill Payment</TabsTrigger>
+          <TabsTrigger value="bill-payment-history">Bill Payment History</TabsTrigger>
+          <TabsTrigger value="bulk-bill-payment">Bulk Bill Payment</TabsTrigger>
+        </TabsList>
 
           <TabsContent value="bill-payment">
             <div className="mt-6 flex items-center gap-4">
@@ -271,7 +396,7 @@ function BillPaymentContent() {
           </TabsContent>
 
           <TabsContent value="bill-payment-history">
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
                 <div className="relative sm:col-span-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <Input 
@@ -287,8 +412,8 @@ function BillPaymentContent() {
                             <SelectValue placeholder="Select Account" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="acc1">Account 1</SelectItem>
-                            <SelectItem value="acc2">Account 2</SelectItem>
+                            <SelectItem value="ACCT_NO">Account</SelectItem>
+                           
                         </SelectContent>
                     </Select>
                     <Select>
@@ -303,7 +428,11 @@ function BillPaymentContent() {
                     </Select>
                 </div>
             </div>
+            {loadingHistory ? (
+            <div className="py-10 text-center">Loading History...</div>
+          ) : (
             <BillPaymentHistoryTable data={filteredHistory} />
+          )}
           </TabsContent>
           <TabsContent value="bulk-bill-payment">
             <Card className="mt-6">
@@ -311,14 +440,14 @@ function BillPaymentContent() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-xl">
                         <div className="space-y-2">
                             <Label htmlFor="account-number">Account Number</Label>
-                             <Select onValueChange={handleAccountChange} value={selectedAccount?.acctNo}>
+                             <Select onValueChange={handleAccountChange} value={selectedAccount?.ACCT_NO || ''}>
                                 <SelectTrigger id="account-number">
                                     <SelectValue placeholder="Select Account" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                     {accounts.map((account) => (
-                                        <SelectItem key={account.acctNo} value={account.acctNo}>
-                                            {account.acctNo}
+                                {accounts.map((account) => (
+                                        <SelectItem key={account.ACCT_NO} value={account.ACCT_NO}>
+                                            {account.ACCT_NO}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -328,7 +457,7 @@ function BillPaymentContent() {
                             <Label htmlFor="account-name">Account Name</Label>
                             <Input 
                                 id="account-name" 
-                                value={selectedAccount?.acctName || ''} 
+                                value={selectedAccount?.ACCT_TITLE || ''}
                                 disabled 
                                 className="bg-gray-100"
                             />

@@ -166,7 +166,7 @@ function PendingApprovalsContent() {
     fetchData();
   }, [activeTab, userProfile]); // activeTab change hone par hi call jayegi
 
-  const handleReject = async (approval: Approval, remarks: string) => {
+  const handleReject = async (approval: Approval,remarks: string) => {
     const token = sessionStorage.getItem('claimsToken');
     const userProfileString = sessionStorage.getItem('userProfile');
     

@@ -2,16 +2,25 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { token, kuid } = await req.json();
+    const { token, kuid, userId } = await req.json();
 
-    const externalApiUrl = "https://prodpk.ubldigital.com/services/data/v1/DCP_BillerObjService/operations/DCP_BillerObj/getBillerCategory";
+    const externalApiUrl = "https://prodpk.ubldigital.com/services/data/v1/DCP_Approvals_OB_Object/operations/ApprovalMatrix/fetchAllpendingRequests";
 
-    // Payload as per your logs (Empty JSON object stringified)
-    const encodedBody = "jsondata=" + encodeURIComponent(JSON.stringify({}));
+    // Payload: userId aur default sorting/pagination
+    const payload = {
+      userId: userId,
+      searchString: "",
+      sortBy: "createdate",
+      sortOrder: "desc",
+      limit: 10,
+      offset: 0
+    };
+
+    const encodedBody = `jsondata=${encodeURIComponent(JSON.stringify(payload))}`;
 
     const reportingParams = JSON.stringify({
-      os: "143.0.0.0",
-      did: "98FBE349-6DE8-4034-84D8-F953C702B055",
+      os: "142.0.0.0",
+      did: "D7383D4E-E193-459E-8B7D-D35D166970FA",
       ua: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36...",
       aid: "OnlineBanking",
       aname: "OnlineBanking",
@@ -20,8 +29,8 @@ export async function POST(req: Request) {
       aver: "1.0.0",
       atype: "spa",
       stype: "b2c",
-      kuid: kuid,// Matched from your logs
-      svcid: "DCP_BillerObj"  // Matched from your logs
+      kuid: kuid,
+      svcid: "ApprovalMatrix"
     });
 
     const response = await fetch(externalApiUrl, {
@@ -31,7 +40,7 @@ export async function POST(req: Request) {
         "x-kony-authorization": token,
         "x-kony-reportingparams": reportingParams,
         "x-kony-api-version": "1.0",
-        "x-kony-deviceid": "98FBE349-6DE8-4034-84D8-F953C702B055",
+        "x-kony-deviceid": "D7383D4E-E193-459E-8B7D-D35D166970FA",
       },
       body: encodedBody,
     });

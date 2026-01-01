@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { token, kuid } = await req.json();
+    const { token, kuid, accessCode } = await req.json();
 
-    const externalApiUrl = "https://prodpk.ubldigital.com/services/data/v1/DCP_BillerObjService/operations/DCP_BillerObj/getBillerCategory";
+    const externalApiUrl = "https://prodpk.ubldigital.com/services/data/v1/DCP_BillerObjService/operations/DCP_BillerObj/getBillerCompany";
 
-    // Payload as per your logs (Empty JSON object stringified)
-    const encodedBody = "jsondata=" + encodeURIComponent(JSON.stringify({}));
+    // Payload format matching PROD logs: jsondata={"accessCode":"ONE_BILL"}
+    const encodedBody = `jsondata=${encodeURIComponent(JSON.stringify({ accessCode }))}`;
 
     const reportingParams = JSON.stringify({
       os: "143.0.0.0",
@@ -20,8 +20,9 @@ export async function POST(req: Request) {
       aver: "1.0.0",
       atype: "spa",
       stype: "b2c",
-      kuid: kuid,// Matched from your logs
-      svcid: "DCP_BillerObj"  // Matched from your logs
+      kuid: kuid,
+      fid: "frmAddPayeeDCP",
+      svcid: "DCP_BillerObj"
     });
 
     const response = await fetch(externalApiUrl, {

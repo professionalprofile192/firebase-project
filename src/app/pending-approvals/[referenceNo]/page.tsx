@@ -36,39 +36,61 @@ function ApprovalReviewContent() {
     return <main className="p-4 text-center">Approval details not found.</main>;
   }
 
-  const confirmReject = async (remarks: string) => {
-    if (!userProfile) return;
+const confirmReject = async (remarks: string) => {
+  const token = sessionStorage.getItem('claimsToken');
+  const userProfileString = sessionStorage.getItem('userProfile');
+  
+  if (!token || !userProfileString || !approval) return;
+  
+  const profile = JSON.parse(userProfileString);
+  const kuid = profile?.user_attributes?.UserName;
 
-    try {
-      const response = await rejectRequest({
-        accountNo: 0,
-        approverId: approval.approverId,
+  try {
+    const res = await fetch('/api/reject-approval', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        // Aapke working code ke mutabiq exact payload
+        accountNo: approval.fromAccountNumber || "",
+        approverId: profile.userid,
         contractId: approval.contractId,
         referenceNo: approval.referenceNo,
-        rejectorId: userProfile.userid,
-        remarks,
-      });
+        rejectorId: profile.userid,
+        remarks: remarks, 
+        token: token,
+        kuid: kuid,
+      }),
+    });
 
-      setShowRejectDialog(false);
+    const result = await res.json();
 
-      if (response.opstatus === 0 && response.ApprovalMatrix[0].opstatus === 0) {
-        setSuccessAlertMessage(response.ApprovalMatrix[0].reqResponse);
-        setShowSuccessAlert(true);
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Rejection Failed',
-          description: response.message,
-        });
-      }
-    } catch {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Unexpected error during rejection.',
+    if (result?.opstatus === 0 && result?.ApprovalMatrix?.[0]?.opstatus === 0) {
+      setShowRejectDialog(false); // Dialog band karein
+      
+      // Success Alert dikhayen jaisa aapke review page mein logic tha
+      const msg = result.ApprovalMatrix[0].reqResponse || "Service Hit Successfully";
+      setSuccessAlertMessage(msg);
+      setShowSuccessAlert(true);
+      
+      return true;
+    } else {
+      toast({ 
+        variant: "destructive", 
+        title: "Error", 
+        description: result?.errmsg || "Service failed" 
       });
+      return false;
     }
-  };
+  } catch (error) {
+    console.error("Error hitting reject service:", error);
+    toast({ 
+      variant: "destructive", 
+      title: "System Error", 
+      description: "Unexpected error during rejection." 
+    });
+    return false;
+  }
+};
 
   const isActionable = !approval.status || approval.status === 'IN PROGRESS';
 

@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   try {
     const { token, kuid, payload } = await req.json();
 
-    if (!token || !payload || !kuid) {
+    if (!token || !kuid || !payload) {
       return NextResponse.json(
         { error: "Missing token, KUID, or payload" },
         { status: 400 }
@@ -32,7 +32,6 @@ export async function POST(req: Request) {
         mfaname: "DigitalBanking-Composite",
         sdkversion: "9.6.19",
         sdktype: "js",
-        fid: "frmManagePayeesDCP",
         sessiontype: "I",
         clientUUID: crypto.randomUUID(),
         rsid: crypto.randomUUID(),
@@ -44,7 +43,7 @@ export async function POST(req: Request) {
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/json",
           "x-kony-api-version": "1.0",
           "x-kony-authorization": token,
           "x-kony-deviceid": "FCA7FB9F-C412-4995-93BD-2CE2D507A467",

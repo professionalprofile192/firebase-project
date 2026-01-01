@@ -2,13 +2,22 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { token, kuid } = await req.json();
+    const { token, kuid, payload } = await req.json();
 
-    const externalApiUrl = "https://prodpk.ubldigital.com/services/data/v1/DCP_BillerObjService/operations/DCP_BillerObj/getBillerCategory";
+    const externalApiUrl = "https://prodpk.ubldigital.com/services/data/v1/DCP_BULKFILE_OBJ/operations/NDC_BulkPayments/getBulkPayments";
 
-    // Payload as per your logs (Empty JSON object stringified)
-    const encodedBody = "jsondata=" + encodeURIComponent(JSON.stringify({}));
+    // 1. JSON Data Payload
+    const jsondata = JSON.stringify({
+      remitterType: payload?.remitterType || "UBP",
+      status: payload?.status || 1,
+      fromAccountNumber: payload?.fromAccountNumber || "",
+      userId: payload?.userId || ""
+    });
 
+    const body = new URLSearchParams();
+    body.append("jsondata", jsondata);
+
+    // 2. Reporting Params (fid: frmBulkPayments)
     const reportingParams = JSON.stringify({
       os: "143.0.0.0",
       did: "98FBE349-6DE8-4034-84D8-F953C702B055",
@@ -19,21 +28,19 @@ export async function POST(req: Request) {
       plat: "web",
       aver: "1.0.0",
       atype: "spa",
-      stype: "b2c",
-      kuid: kuid,// Matched from your logs
-      svcid: "DCP_BillerObj"  // Matched from your logs
+      kuid: kuid,
     });
 
     const response = await fetch(externalApiUrl, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
         "x-kony-authorization": token,
         "x-kony-reportingparams": reportingParams,
         "x-kony-api-version": "1.0",
         "x-kony-deviceid": "98FBE349-6DE8-4034-84D8-F953C702B055",
       },
-      body: encodedBody,
+      body: body.toString(),
     });
 
     const data = await response.json();

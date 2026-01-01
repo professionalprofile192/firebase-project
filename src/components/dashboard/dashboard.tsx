@@ -200,26 +200,6 @@ export default function Dashboard() {
           setRecentTransactions(txArray.slice(0, 3));
         }
 
-        /* ================= PAYEE LIST ================= */
-        // const payeeRes = await fetch("/api/get-payee-list", {
-        //   method: "POST",
-        //   credentials: "include",
-        //   headers: { "Content-Type": "application/json" },
-        //   body: JSON.stringify({
-        //     token,
-        //     kuid,
-        //     payload: {
-        //       offset: 0,
-        //       limit: 10,
-        //       sortBy: "createdOn",
-        //       order: "desc",
-        //       payeeId: profile?.userid,
-        //       searchString: "",
-        //     },
-        //   }),
-        // });
-        // const payeeData = await payeeRes.json();
-
       } catch (err) {
         console.error("DASHBOARD INIT ERROR:", err);
       } finally {
