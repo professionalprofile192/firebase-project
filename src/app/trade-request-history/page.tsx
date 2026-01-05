@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
-import { getTradeRequestHistory } from '../actions';
 import { TradeRequestHistoryTable } from '@/components/trade-request-history/trade-request-history-table';
 import {
   Select,
