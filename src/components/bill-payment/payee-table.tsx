@@ -16,8 +16,10 @@ import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '../ui/checkbox';
 import { Skeleton } from '../ui/skeleton';
+import Link from 'next/link';
 
 export type Payee = {
+  payeeId: string;
   consumerName: string;
   payeeNickName: string;
   billerType: string;
@@ -28,6 +30,7 @@ export type Payee = {
   dueDate?: string;
   amountAfterDueDate?: string;
   category?: string;
+  rawNotes?: any;
 };
 
 interface PayeeTableProps {
@@ -40,7 +43,7 @@ const ITEMS_PER_PAGE = 8;
 
 function PayeeRow({ 
   payee, 
-  isOpen, 
+  isOpen,
   onToggle, 
   multiPayMode,
   isSelected,
@@ -122,7 +125,37 @@ function PayeeRow({
 
                 <div className="flex items-center gap-2 justify-end md:col-start-4">
                     <Button variant="outline" size="sm"><BarChart2 className="h-4 w-4 mr-1" /> View Activity</Button>
-                    <Button variant="outline" size="sm"><Edit className="h-4 w-4 mr-1" /> Edit</Button>
+                    <Button variant="outline" size="sm" asChild>
+                    <Link 
+    // Yahan click par data save karein
+    onClick={() => {
+      if (payee.rawNotes) {
+        // Pura formatted object session mein store kar rahe hain
+        const editData = {
+          payeeId: payee.payeeId,
+          payeeNick: payee.payeeNickName,
+          notes: payee.rawNotes // Yeh wahi object hai jo humne fetchData mein transform kiya tha
+        };
+        sessionStorage.setItem('editPayeeData', JSON.stringify(editData));
+      }
+    }}
+                      href={{
+                        pathname: '/bill-payment/add',
+                       query: { 
+                            id: payee.consumerNumber,
+                            payeeId: payee.payeeId,
+                            name: payee.consumerName,
+                            nickname: payee.payeeNickName,
+                            category: payee.category,
+                            billerType: payee.billerType, 
+                            company: payee.companyName,
+                            isEdit: 'true',// Taake aglay page ko pata ho ye edit mode hai
+                        }
+                      }}
+                    >
+                      <Edit className="h-4 w-4 mr-1" /> Edit
+                    </Link>
+                  </Button>
                     <Button variant="outline" size="icon" className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>
                 </div>
             </div>

@@ -14,10 +14,11 @@ import { AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
 export type HistoryItem = {
-  consumerNumber: string;
+  referenceId: string;
+  consumerNo:string;
   transactionId: string;
-  transactionDate: string;
-  consumerName: string;
+  payDate: string;
+  name: string;
   amount: string;
   status: 'Paid' | 'Failed' | 'In Progress';
 };
@@ -60,14 +61,29 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
         </TableHeader>
         <TableBody>
           {currentData.length > 0 ? (
-            currentData.map((item) => (
-              <TableRow key={item.transactionId}>
-                <TableCell>{item.consumerNumber}</TableCell>
-                <TableCell>{item.transactionId}</TableCell>
-                <TableCell>{item.transactionDate}</TableCell>
-                <TableCell>{item.consumerName}</TableCell>
+            currentData.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell>{item.consumerNo}</TableCell>
+                <TableCell>{item.referenceId}</TableCell>
+                <TableCell>{item.payDate}</TableCell>
+                <TableCell>{item.name}</TableCell>
                 <TableCell>PKR {item.amount}</TableCell>
-                <TableCell>{item.status}</TableCell>
+                <TableCell>
+                  <span
+                    className={`px-3 py-1 rounded-full text-[11px] font-bold inline-flex items-center justify-center ${
+                      item.status === 'Successful'
+                        ? 'bg-[#E7F7EF] text-[#0D9488]' // Green for Success
+                        : 'bg-[#FEE2E2] text-[#DC2626]' // Red for Failed
+                    }`}
+                  >
+                    {/* Status Dot */}
+                    <span className={`mr-1.5 h-1.5 w-1.5 rounded-full ${
+                      item.status === 'Successful' ? 'bg-[#0D9488]' : 'bg-[#DC2626]'
+                    }`} />
+                    
+                    {item.status}
+                  </span>
+                </TableCell>
                 <TableCell className="text-center">
                   <Button variant="outline" size="sm">View</Button>
                 </TableCell>
@@ -83,6 +99,8 @@ export function BillPaymentHistoryTable({ data }: BillPaymentHistoryTableProps) 
               </TableCell>
             </TableRow>
           )}
+
+          
         </TableBody>
       </Table>
       <div className="flex items-center justify-center p-4 border-t">

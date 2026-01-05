@@ -232,50 +232,124 @@ const fetchBulkData = useCallback(async () => {
               
           })
           const categoryRes = await categoryData.json();
-      
-          
 
-          if (payeeRes && payeeRes.opstatus === 0 && payeeRes.payee) {
-            const mappedPayees = payeeRes.payee.map((p) => {
-              let notes = {};
+          // --- Payee Response Handling ---
+        if (payeeRes && payeeRes.opstatus === 0 && payeeRes.payee && payeeRes.payee.length > 0) {
+        
+            const mappedPayees = payeeRes.payee.map((p: any) => {
+              let parsedNotes: any = {};
               try {
-                notes = JSON.parse(p.notes || '{}');
-              } catch (e) { console.error("Failed to parse payee notes", e); }
-              
-              const billStatus = notes.billStatus;
-              let status = 'Not Available';
-              if (billStatus === 'Unpaid') status = 'Unpaid';
-              else if (billStatus === 'Paid') status = 'Paid';
-    
+                parsedNotes = typeof p.notes === 'string' ? JSON.parse(p.notes) : (p.notes || {});
+              } catch (e) {
+                console.error("Failed to parse notes for payee:", p.payeeId, e);
+              }
               return {
+                payeeId: p.payeeId || p.id,
                 consumerName: p.payeeName || 'N/A',
-                payeeNickName: p.payeeNickName || 'N/A',
+                payeeNickName: p.payeeNickName || p.nickName || 'N/A',
                 billerType: p.nameOnBill || 'N/A',
                 companyName: p.companyName || 'N/A',
-                consumerNumber: p.accountNumber,
-                status: status,
-                amountDue: notes.billAmount,
-                // Safety check for date
-                dueDate: notes.dueDate ? format(new Date(notes.dueDate), 'dd/MM/yyyy') : undefined,
-                amountAfterDueDate: notes.lateSurcharge,
-                category: notes.categoryVal || 'Uncategorized'
+                consumerNumber: p.accountNumber || '',
+                status: parsedNotes.billStatus || 'Not Available',
+                amountDue: parsedNotes.billAmount || '0',
+                dueDate: parsedNotes.dueDate ? format(new Date(parsedNotes.dueDate), 'dd/MM/yyyy') : 'N/A',
+                amountAfterDueDate: parsedNotes.lateSurcharge || '0',
+                category: parsedNotes.categoryVal || 'Uncategorized',
+                
+                // Ye key poora parsed object hold karegi taake Edit page par kaam aaye
+                rawNotes: parsedNotes 
               };
             });
-            setAllPayees(mappedPayees);
-            setFilteredPayees(mappedPayees);
-          } else {
-            setAllPayees([]);
-            setFilteredPayees([]);
-            if (payeeRes?.opstatus !== -1) { 
-                toast({ variant: "destructive", title: "Failed to fetch payees", description: payeeRes?.errmsg || 'Could not load payee data.' });
-            }
+
+          setAllPayees(mappedPayees);
+          setFilteredPayees(mappedPayees);
+
+          // Sirf tab chalega jab Payee list ka data aaye ---
+          try {
+              console.log("Payee list found, fetching bill details...");
+              const billData = await fetch("/api/payment-bill-integration", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                      token: sessionToken,
+                      kuid: userProfile?.user_attributes?.UserName,
+                  }),
+              });
+              const billRes = await billData.json();
+              console.log("Integration Bill Response:", billRes);
+
+
+
+          } catch (billError) {
+              console.error("Bill Service failed but continuing with payees:", billError);
           }
-    
-          // --- Category Response Handling ---
-          if (categoryRes && categoryRes.opstatus === 0 && categoryRes.PaymentService) {
-              setCategories(categoryRes.PaymentService);
-          } else {
-              setCategories([]);
+            //bill inquiry service
+
+            if (payeeRes && payeeRes.payee && payeeRes.payee.length > 0) {
+                
+              // 1. Payload Taiyar Karna (Payee List se data map karna)
+              const bulkRequests = payeeRes.payee.map((p) => {
+                  let parsedNotes = {};
+                  try {
+                      parsedNotes = JSON.parse(p.notes || '{}');
+                  } catch (e) { console.error("Notes parse error", e); }
+
+                  return {
+                      billInquiryRequest: {
+                          billDetails: {
+                              // instKey ko companyCode banaya aur accountNumber ko consumerNumber
+                              companyCode: parsedNotes.instKey || "", 
+                              consumerNumber: p.accountNumber || "",
+                              expiryDays: "2" // Jaisa aapke network payload mein tha
+                          }
+                      }
+                  };
+              });
+
+              // Final Object Structure (Jaisa aapne bataya)
+              const bulkInquiryPayload = {
+                  bulkBillInquiryRequest: JSON.stringify({
+                      bulkBillInquiryRequest: bulkRequests
+                  })
+              };
+
+              // 2. Service Call (Just after get-bill)
+              try {
+                  console.log("Fetching Bulk Bill Inquiry...");
+                  const bulkInquiryData = await fetch("/api/payment-bill-inquiry", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                          token: sessionToken,
+                          kuid:  userProfile?.user_attributes?.UserName,
+                          payload: bulkInquiryPayload // Dynamic payload pass ho raha hai
+                      }),
+                  });
+                  const bulkRes = await bulkInquiryData.json();
+                  console.log("Bulk Inquiry Response:", bulkRes);
+              } catch (err) {
+                  console.error("Bulk Inquiry Service Failed:", err);
+              }
+            }
+
+        } else {
+          
+          setFilteredPayees([]);
+          if (payeeRes?.opstatus !== -1) { 
+              toast({ 
+                  variant: "destructive", 
+                  title: "Failed to fetch payees", 
+                  description: payeeRes?.errmsg || 'Could not load payee data.' 
+              });
+          }
+        }
+
+        // --- Category Response Handling ---
+        if (categoryRes && categoryRes.opstatus === 0 && categoryRes.PaymentService) {
+          setCategories(categoryRes.PaymentService);
+        } else {
+          setCategories([]);
+
                if (categoryRes?.opstatus !== -1) {
                 toast({ variant: "destructive", title: "Failed to fetch categories", description: categoryRes?.errmsg || 'Could not load category data.' });
                }
