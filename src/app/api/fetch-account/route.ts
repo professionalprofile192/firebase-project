@@ -2,24 +2,20 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    // frontend se sirf yeh 2 cheezen aayengi
-    const { customer_id, token, kuid } = await req.json();
+    const { CIF, Customer_id, token, kuid } = await req.json();
 
-    if (!customer_id || !token) {
-      return NextResponse.json(
-        { error: "Missing customer_id or token" },
-        { status: 400 }
-      );
+    if (!Customer_id || !token) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // ✅ HARD CODED VALUES (as discussed)
+    // 1. Prod ke mutabiq object banayein
     const payload = {
       appChannel: "DCPCRP",
-      CIF_NO: "20269367",
-      CUSTOMER_ID: customer_id
+      CIF_NO: CIF,        
+      CUSTOMER_ID: Customer_id 
     };
 
-    // ✅ reporting params (kony requirement)
+   
     const reportingParams = JSON.stringify({
       os: "142.0.0.0",
       dm: "",
@@ -42,7 +38,7 @@ export async function POST(req: Request) {
       svcid: "payments"
     });
 
-    // EXTERNAL API CALL
+
     const res = await fetch(
       "https://prodpk.ubldigital.com/services/data/v1/ArrangmentSOA_Object/operations/payments/fetchAccountsByCIF",
       {

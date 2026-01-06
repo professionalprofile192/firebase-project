@@ -10,6 +10,9 @@ import Link from "next/link";
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { CustomPopup } from "@/components/custom-popup/custom-popup";
+
+
 
 // --- Main Content Component ---
 function AddUtilityBillContent() {
@@ -28,6 +31,13 @@ function AddUtilityBillContent() {
     const queryCompany = searchParams.get('company') || "";
     const queryCategory = searchParams.get('category') || "";
     const [nickName, setNickName] = useState(searchParams.get('nickname') || '');
+    const [popupData, setPopupData] = useState({
+        isOpen: false,
+        type: 'success' as 'success' | 'error',
+        title: '',
+        message: '',
+        referenceNo: ''
+    });
 
     useEffect(() => {
         if (isEdit) {
@@ -120,6 +130,38 @@ function AddUtilityBillContent() {
         const found = categories.find((cat: any) => cat.id === queryCategory);
         return found ? found.name : queryCategory;
     };
+    const createNewApprovalRequest = async (referenceNo: string) => {
+        const sessionToken = sessionStorage.getItem("claimsToken");
+        const userProfile = JSON.parse(sessionStorage.getItem('userProfile') || '{}');
+        const userAttr = userProfile?.user_attributes;
+    
+        const approvalPayload = {
+            requesterId: userAttr?.userId,
+            contractId: userAttr?.contractId,
+            coreCustomerId: userAttr?.coreCustomerId,
+            referenceNo: referenceNo,
+            featureActionId: "BILL_PAY_EDIT_PAYEES",
+            remarks: `EDIT BILL REQUEST FROM ${userAttr?.UserName || 'USER'}`,
+        };
+    
+        try {
+            const res = await fetch("/api/payment-bill-createANewRequest", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    token: sessionToken,
+                    payload: approvalPayload
+                })
+            });
+    
+            const data = await res.json();
+            if (data.opstatus === 0) {
+                console.log("Approval Matrix Entry Created:", data.ApprovalMatrix?.[0]?.reqResponse);
+            }
+        } catch (err) {
+            console.error("Approval Request Error:", err);
+        }
+    };
 
     const handleUpdatePayee = async () => {
         if (!existingPayeeData) {
@@ -154,16 +196,48 @@ function AddUtilityBillContent() {
 
             const result = await res.json();
             if (result.opstatus === 0) {
-                alert("Operation completed successfully");
-                sessionStorage.removeItem('editPayeeData');
-                router.push('/bill-payment');
+                const customAction = result.CustomPayeeAction?.[0];
+               
+                if (customAction && customAction.errmsg) {
+                    // Error Popup Case
+                    setPopupData({
+                        isOpen: true,
+                        type: 'error',
+                        title: 'Action Restricted',
+                        message: customAction.responseMessage || customAction.errmsg,
+                        referenceNo: ''
+                    });
+                } else if (customAction && customAction.referenceNo) {
+                    // Success Popup Case with Ref No
+                    setPopupData({
+                        isOpen: true,
+                        type: 'success',
+                        title: 'Update Requested',
+                        message: customAction.responseMessage || "Record has been sent for approval.",
+                        referenceNo: customAction.referenceNo
+                    });
+                }
             }
-        } catch (err) {
+           
+        }catch (err) {
             toast({ variant: "destructive", title: "Network Error", description: "Something went wrong" });
         } finally {
             setLoading(false);
         }
     };
+    const handlePopupClose = async () => {
+        if (popupData.type === 'success' && popupData.referenceNo) { 
+            await createNewApprovalRequest(popupData.referenceNo);//create a new request call
+        }
+    
+        // 2. Popup close
+        setPopupData(prev => ({ ...prev, isOpen: false }));
+    
+        // 3. Cleanup aur Navigation
+        sessionStorage.removeItem('editPayeeData');
+        router.push('/bill-payment');
+    };
+    
 
     return (
         <main className="flex-1 p-4 sm:px-6 sm:py-4 flex flex-col gap-6">
@@ -237,6 +311,15 @@ function AddUtilityBillContent() {
                     </form>
                 </CardContent>
             </Card>
+            <CustomPopup 
+            isOpen={popupData.isOpen}
+            onClose={handlePopupClose}
+            type={popupData.type}
+            title={popupData.title}
+            message={popupData.message}
+            referenceNo={popupData.referenceNo}
+        />
+
         </main>
     );
 }

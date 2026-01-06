@@ -151,6 +151,11 @@ const fetchBulkData = useCallback(async () => {
 }, [selectedAccount]);
 
 
+    //for view activity
+    const handleViewActivity = () => {
+      setActiveTab('bill-payment-history');
+    };
+
   //for bill history
   useEffect(() => {
     if (activeTab === 'bill-payment-history') {
@@ -466,7 +471,7 @@ const fetchBulkData = useCallback(async () => {
                     </SelectContent>
                 </Select>
             </div>
-            <PayeeTable data={filteredPayees} multiPayMode={multiPayMode} loading={loadingPayees}/>
+            <PayeeTable data={filteredPayees} multiPayMode={multiPayMode} loading={loadingPayees} onViewActivity={handleViewActivity}/>
           </TabsContent>
 
           <TabsContent value="bill-payment-history">

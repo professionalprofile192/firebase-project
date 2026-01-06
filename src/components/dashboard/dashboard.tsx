@@ -72,7 +72,7 @@ export default function Dashboard() {
         const kuid = profile?.user_attributes?.UserName;
         const customerId = profile?.user_attributes?.customer_id;
         const userId = profile?.userid;
-
+        let accountNumber="";
         /* ================= USER ATTRIBUTES ================= */
         const sessionRes = await fetch("/api/user-attributes", {
           method: "GET",
@@ -99,33 +99,54 @@ export default function Dashboard() {
         sessionStorage.setItem("sessionToken", sessionToken);
         console.log("SECURITY ATTRIBUTES:", secData);
 
-        /* ================= USERS API ================= */
-        const usersRes = await fetch("/api/users", {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "x-kony-authorization": token,
-            "x-kony-api-version": "1.0",
-            "x-kony-requestid": crypto.randomUUID(),
-            "x-kony-deviceid": crypto.randomUUID(),
-          },
-        });
-        const usersData = await usersRes.json();
-        console.log("USERS API:", usersData);
+    /* ================= FETCH USERS & DECODE ALL IDS ================= */
+   
+    const usersRes = await fetch("/api/users", { 
+       method: "GET",
+      headers: {
+          "x-kony-authorization": token,
+          "x-kony-api-version": "1.0",
+          "x-kony-requestid": crypto.randomUUID(),
+          "x-kony-deviceid": crypto.randomUUID(),
+      },});
+    const usersData = await usersRes.json();
 
-        /* ================= FETCH ACCOUNTS ================= */
-        const accRes = await fetch("/api/fetch-accounts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ customer_id: customerId, token, kuid }),
-        });
-        const accData = await accRes.json();
-        sessionStorage.setItem("accounts", JSON.stringify(accData?.payments || []));
-        setAccounts(accData?.payments || []);
+    const decodeValue = (str: string) => {
+      if (!str) return "";
+      const cleanStr = str.split('=?/')[0]; 
+      return cleanStr.split('').map(char => String.fromCharCode(char.charCodeAt(0) - 3)).join('');
+    };
 
-        const accountNumber = accData?.payments?.[0]?.ACCT_NO;
-        if (!accountNumber) console.warn("No account found");
+    const userRecord = usersData?.records?.[0];
+    const decodedUserId = decodeValue(userRecord?.userId); 
+    const decodedCoreId = decodeValue(userRecord?.CoreCustomers?.[0]?.coreCustomerID);
 
+        /* ================= FETCH ACCOUNTS (Dynamic CIF) ================= */
+      
+        if (decodedCoreId) {
+          const accRes = await fetch("/api/fetch-account", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              CIF: decodedCoreId, 
+              Customer_id: decodedUserId, 
+              token, 
+              kuid 
+            }),
+          });
+          
+          const accData = await accRes.json();
+          const fetchedAccounts = accData?.payments || [];
+          setAccounts(fetchedAccounts);
+          sessionStorage.setItem("accounts", JSON.stringify(fetchedAccounts));
+          setAccounts(accData?.payments || []);
+          accountNumber = fetchedAccounts[0]?.ACCT_NO || "";
+          if (!accountNumber) console.warn("No account found");
+
+        }
+        
+        
+       
         /* ================= USER GROUP ================= */
         const groupRes = await fetch("/api/get-user-group", {
           method: "POST",
