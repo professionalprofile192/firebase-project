@@ -11,7 +11,8 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { CustomPopup } from "@/components/custom-popup/custom-popup";
-
+import ReviewScreen from "@/components/bill-payment/review-screen";
+import { OtpDialog } from '@/components/auth/otp-dialog';
 
 
 // --- Main Content Component ---
@@ -20,17 +21,32 @@ function AddUtilityBillContent() {
     const searchParams = useSearchParams();
     const { toast } = useToast();
 
+    // 1. Pehle saare URL parameters nikal lein
     const isEdit = searchParams.get('isEdit') === 'true';
+    const queryCompany = searchParams.get('company') || "";
+    const queryCategory = searchParams.get('category') || "";
+    const queryBillerType = searchParams.get('billerType') || "";
+    const queryId = searchParams.get('id') || "";
+    const queryNickname = searchParams.get('nickname') || "";
+    const queryCompanyName = searchParams.get('companyName') || queryCompany; 
+    const queryCategoryName = searchParams.get('categoryName') || queryCategory;
+    const queryBillerTypeName = searchParams.get('billerTypeName') || queryBillerType;
+    const [isOtpOpen, setIsOtpOpen] = useState(false);
+    const [otpServiceKey, setOtpServiceKey] = useState('');
     const [categories, setCategories] = useState([]);
     const [billerTypes, setBillerTypes] = useState([]);
     const [billerCompanies, setBillerCompanies] = useState([]);
     const [loading, setLoading] = useState(false);
     const [existingPayeeData, setExistingPayeeData] = useState<any>(null);
-
-    const queryBillerType = searchParams.get('billerType') || "";
-    const queryCompany = searchParams.get('company') || "";
-    const queryCategory = searchParams.get('category') || "";
-    const [nickName, setNickName] = useState(searchParams.get('nickname') || '');
+    
+    const [manualConsumerNo, setManualConsumerNo] = useState('');
+    const [selectedCompanyCode, setSelectedCompanyCode] = useState('');
+    const [selectedBillerType, setSelectedBillerType] = useState(""); 
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedCompany, setSelectedCompany] = useState(queryCompany); 
+    
+    const [nickName, setNickName] = useState(queryNickname);
+    const [billInfo, setBillInfo] = useState(null);
     const [popupData, setPopupData] = useState({
         isOpen: false,
         type: 'success' as 'success' | 'error',
@@ -38,7 +54,15 @@ function AddUtilityBillContent() {
         message: '',
         referenceNo: ''
     });
-
+    const [showReview, setShowReview] = useState(false);
+    const [reviewData, setReviewData] = useState({
+        billerType: "",
+        billerInstitution: "",
+        consumerNumber: "",
+        consumerName: "",
+        payeeNickname: "",
+        category: ""
+    });
     useEffect(() => {
         if (isEdit) {
             const storedData = sessionStorage.getItem('editPayeeData');
@@ -52,7 +76,60 @@ function AddUtilityBillContent() {
             }
         }
     }, [isEdit, toast]);
+    const handleCompanyChange = (value: string) => {
+        // Value yahan 'company_key' (code) hai jo hum SelectItem ki value mein de rahe hain
+        setSelectedCompanyCode(value);
+        console.log("Selected Company Code for Inquiry:", value);
+    };
+    const handleBillInquiry = async () => {
+        const finalConsumer = isEdit ? (searchParams.get('id') || "") : manualConsumerNo;
+        const finalCompany = isEdit ? queryCompany : selectedCompanyCode;
 
+        if (!finalConsumer || !finalCompany) {
+            toast({ variant: "destructive", title: "Missing Info", description: "Please select institution and enter consumer number." });
+            return;
+        }
+    
+        try {
+            setLoading(true);
+            const token = sessionStorage.getItem("claimsToken");
+            const userProfile = JSON.parse(sessionStorage.getItem('userProfile') || '{}');
+            const kuid = userProfile?.user_attributes?.UserName;
+      
+          const res = await fetch("/api/payment-addpayee-billinquiry", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                consumerNumber: finalConsumer,
+                companyCode: finalCompany,          
+              token,
+              kuid
+            }),
+          });
+      
+          const data = await res.json();
+      
+          if (data?.Bill && data.Bill.length > 0) {
+            const bill = data.Bill[0];
+            setBillInfo(bill);
+            
+            // Review Screen ke liye data set karein
+            setReviewData({
+                billerType: isEdit ? getBillerTypeName(queryBillerType) : getBillerTypeName(selectedBillerType),
+                billerInstitution: isEdit ? selectedCompanyCode : getCompanyName(selectedCompanyCode),
+                consumerNumber: isEdit ? (searchParams.get('id') || "") : manualConsumerNo,
+                consumerName: bill.consumerName,
+                payeeNickname: nickName,
+                category: isEdit ? getCategoryName(queryCategory) : getCategoryName(selectedCategory)
+            });
+            setShowReview(true); // Review Screen dikhao
+        }else {
+            toast({ variant: "destructive", description: "Bill not found." });
+        }
+     } catch (error) {
+          console.error("Inquiry Function Error:", error);
+        }
+      };
     const fetchCompanies = useCallback(async (selectedAccessCode: string) => {
         if (!selectedAccessCode) return;
         const sessionToken = sessionStorage.getItem("claimsToken");
@@ -110,25 +187,33 @@ function AddUtilityBillContent() {
     }, [toast]);
 
     useEffect(() => {
-        fetchInitialData();
-        if (queryBillerType) {
+       
+        if (!isEdit) {
+            fetchInitialData();
+        }
+    
+ 
+        if (queryBillerType && !isEdit) {
             fetchCompanies(queryBillerType);
         }
-    }, [fetchInitialData, fetchCompanies, queryBillerType]);
+    }, [fetchInitialData, fetchCompanies, queryBillerType, isEdit]);
 
-    const getBillerTypeName = () => {
-        const found = billerTypes.find((b: any) => b.accessCode === queryBillerType);
-        return found ? found.displayName : queryBillerType;
+    const getBillerTypeName = (code: string) => {
+        if (!code || billerTypes.length === 0) return "Loading..."; 
+        const found = billerTypes.find((b: any) => b.accessCode === code);
+        return found ? found.displayName : code; 
     };
-
-    const getCompanyName = () => {
-        const found = billerCompanies.find((c: any) => c.company_key === queryCompany);
-        return found ? found.display_name : queryCompany;
+    
+    const getCategoryName = (id: string) => {
+        if (!id || categories.length === 0) return "Loading...";
+        const found = categories.find((cat: any) => cat.id === id);
+        return found ? found.name : id;
     };
-
-    const getCategoryName = () => {
-        const found = categories.find((cat: any) => cat.id === queryCategory);
-        return found ? found.name : queryCategory;
+    
+    const getCompanyName = (code: string) => {
+        if (!code || billerCompanies.length === 0) return "Loading...";
+        const found = billerCompanies.find((c: any) => c.company_key === code);
+        return found ? found.display_name : code;
     };
     const createNewApprovalRequest = async (referenceNo: string) => {
         const sessionToken = sessionStorage.getItem("claimsToken");
@@ -237,7 +322,148 @@ function AddUtilityBillContent() {
         sessionStorage.removeItem('editPayeeData');
         router.push('/bill-payment');
     };
+
+    const handleSendOTP = async () => {
+        setLoading(true);
+        const sessionToken = sessionStorage.getItem("claimsToken");
+        const userProfile = JSON.parse(sessionStorage.getItem('userProfile') || '{}');
+        
+        const customerId = userProfile?.user_attributes?.customer_id;        ; 
+        const kuid = userProfile?.user_attributes?.UserName;
     
+        try {
+            const res = await fetch("/api/OTPSend", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    token: sessionToken,
+                    kuid,
+                    customerId: customerId,
+                })
+            });
+    
+            const data = await res.json();
+    
+            if (data.opstatus === 0 && data.OTP?.[0]?.statusCode === "200") {
+                setOtpServiceKey(data.OTP[0].serviceKey);
+                setLoading(false); 
+            
+          
+            setTimeout(() => {
+                setIsOtpOpen(true);
+                console.log("Setting isOtpOpen to true"); // Console mein check karein
+            }, 100);
+                
+                
+                // Yahan aap OTP verify wali screen ya popup open kar sakti hain
+                // setOtpSent(true); 
+            } else {
+                toast({ 
+                    variant: "destructive", 
+                    title: "OTP Failed", 
+                    description: data.OTP?.[0]?.message || "Could not send OTP" 
+                });
+            }
+        } catch (err) {
+            toast({ variant: "destructive", title: "Network Error", description: "Failed to connect to OTP service" });
+        } finally {
+            setLoading(false);
+        }
+    };
+    const handleFinalAddPayee = async () => {
+        setLoading(true);
+        const sessionToken = sessionStorage.getItem("claimsToken");
+        const userProfile = JSON.parse(sessionStorage.getItem('userProfile') || '{}');
+        const kuid = userProfile?.user_attributes?.UserName;
+    
+        try {
+          
+            const res = await fetch("/api/payment-bill-CreateBillPayee", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                      token: sessionToken,
+                      kuid: kuid,
+                  }),
+            });
+    
+            const data = await res.json();
+    
+            // if (data.opstatus === 0) {
+            //     // Success case: Popup dikhao
+            //     setPopupData({
+            //         isOpen: true,
+            //         type: 'success',
+            //         title: 'Success',
+            //         message: data.CustomPayeeAction?.[0]?.responseMessage || "Action completed successfully.",
+            //         referenceNo: data.CustomPayeeAction?.[0]?.referenceNo || ""
+            //     });
+            // } else {
+            //     toast({ 
+            //         variant: "destructive", 
+            //         title: "Service Error", 
+            //         description: data.errmsg || "Request could not be processed." 
+            //     });
+            // }
+        } catch (err) {
+            toast({ variant: "destructive", title: "Network Error", description: "Failed to reach server." });
+        } finally {
+            setLoading(false);
+        }
+    };
+    const handleOtpConfirm = async (otpValue: string) => {
+        setLoading(true);
+        const sessionToken = sessionStorage.getItem("claimsToken");
+    
+        try {
+            const res = await fetch("/api/verify-OTP", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    otp: otpValue,
+                    securityKey: otpServiceKey, 
+                    token: sessionToken
+                })
+            });
+    
+            const data = await res.json();
+    
+            
+            if (data.opstatus === 0 && data.OTP?.[0]?.isOtpVerified === "true") {
+                setIsOtpOpen(false); 
+                toast({ title: "Verified", description: "OTP verified successfully!" });
+    
+                // OTP verify hone ke baad Payee create karne ki final service hit karein
+                handleFinalAddPayee(); 
+            } else {
+                toast({ 
+                    variant: "destructive", 
+                    title: "Invalid OTP", 
+                    description: "The OTP you entered is incorrect or expired." 
+                });
+            }
+        } catch (err) {
+            toast({ variant: "destructive", title: "Error", description: "Something went wrong during verification." });
+        } finally {
+            setLoading(false);
+        }
+    };
+    if (showReview) {
+        return (
+            <ReviewScreen 
+                data={reviewData}
+                onBack={() => setShowReview(false)} 
+                onCancel={() => router.push('/bill-payment')}
+                onContinue={handleSendOTP} 
+                isOtpOpen={isOtpOpen} 
+                setIsOtpOpen={setIsOtpOpen} 
+                onOtpConfirm={handleOtpConfirm}
+            />
+        );
+    }
+  
+    
+  
 
     return (
         <main className="flex-1 p-4 sm:px-6 sm:py-4 flex flex-col gap-6">
@@ -248,12 +474,17 @@ function AddUtilityBillContent() {
                 <CardContent className="p-6">
                     <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            
+                            {/* Biller Type */}
                             <div className="space-y-2">
                                 <Label>Biller Type *</Label>
                                 {isEdit ? (
-                                    <Input value={getBillerTypeName()} disabled className="bg-muted" />
+                                    <Input value={queryBillerType} disabled className="bg-muted" />
                                 ) : (
-                                    <Select onValueChange={(val) => fetchCompanies(val)}>
+                                    <Select onValueChange={(val) => {
+                                        setSelectedBillerType(val); // State update
+                                        fetchCompanies(val);    
+                                    }}>
                                         <SelectTrigger><SelectValue placeholder="Select Biller Type" /></SelectTrigger>
                                         <SelectContent>
                                             {billerTypes.map((b: any) => (
@@ -263,12 +494,14 @@ function AddUtilityBillContent() {
                                     </Select>
                                 )}
                             </div>
+
+                            {/* Biller Institution - Yahan logic update hua hai */}
                             <div className="space-y-2">
                                 <Label>Biller Institution *</Label>
                                 {isEdit ? (
-                                    <Input value={getCompanyName()} disabled className="bg-muted" />
+                                    <Input value={queryCompany} disabled className="bg-muted" />
                                 ) : (
-                                    <Select>
+                                    <Select onValueChange={(val) => setSelectedCompanyCode(val)}>
                                         <SelectTrigger><SelectValue placeholder="Select Institution" /></SelectTrigger>
                                         <SelectContent>
                                             {billerCompanies.map((c: any) => (
@@ -278,34 +511,51 @@ function AddUtilityBillContent() {
                                     </Select>
                                 )}
                             </div>
+
+                            {/* Consumer Number */}
                             <div className="space-y-2">
                                 <Label>Consumer / Account # *</Label>
-                                <Input disabled value={searchParams.get('id') || ""} className="bg-muted" />
+                                <Input 
+                                    value={isEdit ? (searchParams.get('id') || "") : manualConsumerNo} 
+                                    disabled={isEdit} 
+                                    className={isEdit ? "bg-muted" : ""} 
+                                    onChange={(e) => setManualConsumerNo(e.target.value)}
+                                    placeholder="Enter Account Number"
+                                />
                             </div>
+
+                            {/* Nick Name */}
                             <div className="space-y-2">
                                 <Label>Nick Name *</Label>
                                 <Input value={nickName} onChange={(e) => setNickName(e.target.value)} placeholder="Enter Nick Name" />
                             </div>
+
+                            {/* Category */}
                             <div className="space-y-2">
                                 <Label>Category *</Label>
                                 {isEdit ? (
-                                    <Input value={getCategoryName()} disabled className="bg-muted" />
+                                    <Input value={queryCategory} disabled className="bg-muted" />
                                 ) : (
-                                    <Select>
-                                        <SelectTrigger><SelectValue placeholder="Select Category" /></SelectTrigger>
-                                        <SelectContent>
-                                            {categories.map((cat: any) => (
-                                                <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <Select onValueChange={(val) => setSelectedCategory(val)}>
+                                    <SelectTrigger><SelectValue placeholder="Select Category" /></SelectTrigger>
+                                    <SelectContent>
+                                        {categories.map((cat: any) => (
+                                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                                 )}
                             </div>
                         </div>
+
                         <div className="flex justify-end gap-4 pt-4">
                             <Button variant="outline" asChild><Link href="/bill-payment">Cancel</Link></Button>
-                            <Button type="button" disabled={loading} onClick={isEdit ? handleUpdatePayee : undefined}>
-                                {loading ? "Processing..." : isEdit ? "Update" : "Continue"}
+                            <Button 
+                                type="button" 
+                                disabled={loading} 
+                                onClick={isEdit ? handleUpdatePayee : handleBillInquiry}
+                            >
+                                {isEdit ? "Update" : "Continue"}
                             </Button>
                         </div>
                     </form>
