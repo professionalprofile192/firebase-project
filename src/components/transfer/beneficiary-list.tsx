@@ -49,10 +49,19 @@ function BeneficiaryRow({
             {beneficiary.accountNumber}
           </a>
         </div>
-        <div className="flex-1 w-1/3 text-sm">{beneficiary.bankName}</div>
+        <div className="flex-1 w-1/3 text-sm">{beneficiary.bank}</div>
         <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
+            <Button  variant="ghost" 
+            className={cn(
+              "bg-[#F1F8FD] text-[#00529B] font-semibold hover:bg-[#E1F0FB] px-4 py-1.5 h-auto rounded-md flex items-center gap-2 border border-transparent transition-colors",
+              "text-sm"
+            )}>
                 Transfer Now
+                <div className="flex flex-col -gap-1">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#49A8E5" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>
+              </svg>
+            </div>
             </Button>
             <Button variant="outline" size="icon" className="h-9 w-9" onClick={onToggle}>
                 {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}

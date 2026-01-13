@@ -1,262 +1,225 @@
-
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { Suspense, useState, useCallback, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Loader2, Download } from 'lucide-react'; 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BeneficiaryList, type Beneficiary } from '@/components/transfer/beneficiary-list';
 import { TransferActivityTable, type TransferActivity } from '@/components/transfer/transfer-activity-table';
 import { BulkTransfer } from '@/components/transfer/bulk-transfer';
-
-
-// Dummy data based on the provided image for Beneficiaries
-const beneficiaries: Beneficiary[] = [
-    {
-        name: 'BURQUE ENTERPRISES PVT LTD',
-        secondaryName: 'BURQUE ENTERPRISES PVT LTD',
-        accountNumber: 'PK79HABB0000307901346105',
-        bankName: 'Habib Bank Limited',
-    },
-    {
-        name: 'ELEGANZ LUXURY',
-        secondaryName: 'ELEGANZ LUXURY PVT LTD',
-        accountNumber: 'PK21HABB0000307901346105',
-        bankName: 'Habib Bank',
-    },
-    {
-        name: 'NAVEED BROTHERS',
-        secondaryName: 'NAVEED BROTHERS',
-        accountNumber: 'PK24MPBL9736774000000',
-        bankName: 'Habib Metropolitan Bank Limited',
-    },
-    {
-        name: 'VISCOUNT PHARMA DISTRIBUTOR',
-        secondaryName: 'VISCOUNT PHARMA DISTRIBUTORS',
-        accountNumber: 'PK20ASCM0000309080002302',
-        bankName: 'Askari Commercial Bank Limited',
-    },
-    {
-        name: 'HAIDRI BEVERAGES PVT LTD',
-        secondaryName: 'HAIDRI BEVERAGES PVT LTD DRINK',
-        accountNumber: 'PK08UNIL01120280115246',
-        bankName: 'UBL',
-    },
-    {
-        name: 'AL-GANI TRADING',
-        secondaryName: 'AL-GANI TRADING',
-        accountNumber: 'PK75SONE0002620002866977',
-        bankName: 'Soneri Bank Limited',
-    },
-    {
-        name: 'RAWAL MARKETING SERVICES',
-        secondaryName: 'RAWAL MARKETING SERVICES',
-        accountNumber: 'PK27APBL0010023092050028',
-        bankName: 'Allied Bank Limited',
-    },
-    {
-        name: 'DETHEALTH PHARM',
-        secondaryName: 'S&T HEALTH PHARMA',
-        accountNumber: 'PK79HABB0000307902984603',
-        bankName: 'Habib Bank',
-    },
-    {
-        name: 'BE HAPPY PETS (PRIVATE) LIMITE',
-        secondaryName: 'BE HAPPY PETS PVT LTD',
-        accountNumber: 'PK32MEZN0002010106245444',
-        bankName: 'Meezan Bank Limited',
-    },
-    {
-        name: 'MQ LOGISTICS (MEGA DISTRIBUTIO',
-        secondaryName: 'MQ LOGISTICS',
-        accountNumber: 'PK25ASCM0001140900003670',
-        bankName: 'Askari Commercial Bank Limited',
-    },
-];
-
-const transferActivities: TransferActivity[] = [
-    {
-        postDate: '10/12/2025 12:41 PM',
-        transactionDate: '10/12/2025 12:41 PM',
-        transactionNumber: '1917729409508887',
-        transactionType: 'FT',
-        status: 'Failed',
-        fromAccountName: 'BUYIRABHPTIJBGGVBLAVMBLQINKV',
-        fromAccount: '253237095',
-        toAccountName: 'SHAISTA SIDDIQUI',
-        beneficiaryTitle: 'SHAISTA SIDDIQUI',
-        accountNumber: '2000258949',
-        amount: '16.00'
-    },
-    {
-        postDate: '10/11/2025 10:20 AM',
-        transactionDate: '10/11/2025 10:20 AM',
-        transactionNumber: '1917729409508888',
-        transactionType: 'FT',
-        status: 'Completed',
-        fromAccountName: 'BUYIRABHPTIJBGGVBLAVMBLQINKV',
-        fromAccount: '253237095',
-        toAccountName: 'JOHN DOE',
-        beneficiaryTitle: 'JOHN DOE',
-        accountNumber: '1234567890',
-        amount: '500.00'
-    },
-    {
-        postDate: '10/10/2025 03:15 PM',
-        transactionDate: '10/10/2025 03:15 PM',
-        transactionNumber: '1917729409508889',
-        transactionType: 'FT',
-        status: 'In Progress',
-        fromAccountName: 'BUYIRABHPTIJBGGVBLAVMBLQINKV',
-        fromAccount: '253237095',
-        toAccountName: 'JANE SMITH',
-        beneficiaryTitle: 'JANE SMITH',
-        accountNumber: '0987654321',
-        amount: '1200.50'
-    }
-];
-
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 function InitiateTransferContent() {
     const searchParams = useSearchParams();
-    const tabFromUrl = searchParams.get('tab');
-    const [activeTab, setActiveTab] = useState(tabFromUrl || 'transfer');
+    const tabFromUrl = searchParams.get('tab') || 'transfer';
+    const [activeTab, setActiveTab] = useState(tabFromUrl);
+    const [categories, setCategories] = useState<any[]>([]);
+    const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
+    const [activities, setActivities] = useState<TransferActivity[]>([]); // Dynamic Activity State
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
+    const pathname = usePathname();
     
+
+
+    const handleTabChange = (value: string) => {
+        setActiveTab(value);
+        const params = new URLSearchParams(searchParams);
+        params.set('tab', value);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+
+    const fetchTransferData = useCallback(async () => {
+        const sessionToken = sessionStorage.getItem("claimsToken");
+        const userProfile = JSON.parse(sessionStorage.getItem('userProfile') || '{}');
+        const userName = userProfile?.user_attributes?.UserName;
+        
+        const approvalsRaw = sessionStorage.getItem("approvals");
+        const approvalsData = approvalsRaw ? JSON.parse(approvalsRaw) : null;
+        const payeeIdFromSession = approvalsData?.ApprovalMatrix?.[0]?.sentBy;
+
+        if (!sessionToken) return;
+
+        try {
+            setLoading(true);
+            const [catRes, payeeRes] = await Promise.all([
+                fetch("/api/get-all-categories", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        token: sessionToken, 
+                        kuid: userName, 
+                        payload: { categorytype: "transfer" } 
+                    })
+                }),
+                payeeIdFromSession ? fetch("/api/transfer-getExternal-Payees", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token: sessionToken, payeeId: payeeIdFromSession }),
+                }) : Promise.resolve(null)
+            ]);
+
+            const categoryData = await catRes.json();
+            if (categoryData.opstatus === 0) {
+                setCategories(categoryData.PaymentService || []);
+            }
+
+            if (payeeRes) {
+                const payeeData = await payeeRes.json();
+                if (payeeData.PaymentService) {
+                    const mappedData: Beneficiary[] = payeeData.PaymentService.map((item: any) => ({
+                        id: item.id,
+                        name: item.beneficiaryName,
+                        bank: item.bankName,
+                        accountNumber: item.accountNumber,
+                        nickName: item.nickName,
+                        accountType: item.accountType,
+                    }));
+                    setBeneficiaries(mappedData);
+                }
+            }
+        } catch (err) {
+            console.error("Data Load Error:", err);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
-        if (tabFromUrl && tabFromUrl !== activeTab) {
+        if (activeTab === 'transfer') {
+            fetchTransferData();
+        }
+    }, [activeTab, fetchTransferData]);
+
+    useEffect(() => {
+        if (tabFromUrl !== activeTab) {
             setActiveTab(tabFromUrl);
         }
-    }, [tabFromUrl, activeTab]);
-    
+    }, [tabFromUrl]);
+
     const getPageTitle = () => {
         switch (activeTab) {
-            case 'activity':
-                return 'Transfer History';
-            case 'bulk':
-                return 'Bulk Transfer';
-            case 'transfer':
-            default:
-                return 'Initiate Transfer';
+            case 'activity': return 'Transfer Activity';
+            case 'bulk': return 'Bulk Transfer';
+            default: return 'Initiate Transfer';
         }
     }
-    
+
+    // --- Tab Specific Headers ---
+
     const TransferTabHeader = () => (
-        <>
+        <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <h1 className="text-2xl font-semibold">{getPageTitle()}</h1>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline">Multiple Transfers</Button>
-                    <Button>Add Beneficiary +</Button>
+                    <Button variant="outline" className="border-slate-200">Multiple Transfers</Button>
+                    <Button className="bg-[#0070BA] hover:bg-[#005a96]">Add Beneficiary +</Button>
                 </div>
             </div>
-
             <div className="flex flex-col sm:flex-row items-center gap-4">
-                <div className="relative w-full sm:w-auto sm:min-w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                        placeholder="Search"
-                        className="pl-10 bg-muted border-none"
-                    />
+                <div className="relative w-full sm:w-80">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input placeholder="Search" className="pl-10 bg-slate-100 border-none h-11" />
                 </div>
                 <Select>
-                    <SelectTrigger className="w-full sm:w-[180px]">
-                        <SelectValue placeholder="Please select" />
+                    <SelectTrigger className="w-full sm:w-[200px] h-11 border-slate-200">
+                        <SelectValue placeholder="Select Category" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="cat1">Category 1</SelectItem>
-                        <SelectItem value="cat2">Category 2</SelectItem>
+                        {categories.map((cat: any) => (
+                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                        ))}
                     </SelectContent>
                 </Select>
             </div>
-        </>
+        </div>
     );
 
     const ActivityTabHeader = () => (
-         <>
+         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <h1 className="text-2xl font-semibold">{getPageTitle()}</h1>
-                 <Button>Download</Button>
+                 <Button variant="outline" className="flex items-center gap-2 border-slate-200">
+                    <Download className="h-4 w-4" /> Download
+                 </Button>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-4">
-                <div className="relative w-full sm:w-auto sm:min-w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                        placeholder="Search"
-                        className="pl-10 bg-background"
-                    />
+                <div className="relative w-full sm:w-80">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input placeholder="Search" className="pl-10 bg-white border-slate-200 h-11" />
                 </div>
                 <Select>
-                    <SelectTrigger className="w-full sm:w-[180px]">
-                        <SelectValue placeholder="Please select" />
+                    <SelectTrigger className="w-full sm:w-[220px] h-11 border-slate-200">
+                        <SelectValue placeholder="Select Account" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="acc1">Account 1</SelectItem>
-                        <SelectItem value="acc2">Account 2</SelectItem>
+                        <SelectItem value="all">All Accounts</SelectItem>
+                        <SelectItem value="acc1">PKR 1234...567</SelectItem>
                     </SelectContent>
                 </Select>
                  <Select>
-                    <SelectTrigger className="w-full sm:w-[180px]">
-                        <SelectValue placeholder="Please select" />
+                    <SelectTrigger className="w-full sm:w-[180px] h-11 border-slate-200">
+                        <SelectValue placeholder="View: All" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="all">View: All</SelectItem>
                         <SelectItem value="last7">Last 7 Days</SelectItem>
+                        <SelectItem value="last30">Last 30 Days</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
-        </>
-    );
-
-    const BulkTransferHeader = () => (
-        <h1 className="text-2xl font-semibold">{getPageTitle()}</h1>
+        </div>
     );
 
     const renderHeader = () => {
-        switch (activeTab) {
-            case 'activity':
-                return <ActivityTabHeader />;
-            case 'bulk':
-                return <BulkTransferHeader />;
-            case 'transfer':
-            default:
-                return <TransferTabHeader />;
-        }
+        if (activeTab === 'activity') return <ActivityTabHeader />;
+        if (activeTab === 'bulk') return <h1 className="text-2xl font-semibold">{getPageTitle()}</h1>;
+        return <TransferTabHeader />;
     }
-
 
     return (
         <DashboardLayout>
-            <main className="flex-1 p-4 sm:px-6 sm:py-4 flex flex-col gap-6">
+            <main className="flex-1 p-4 sm:px-8 sm:py-6 flex flex-col gap-8 bg-slate-50/50">
                 
                 {renderHeader()}
 
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <TabsList className="grid w-full max-w-lg grid-cols-3">
-                        <TabsTrigger value="transfer">Transfers</TabsTrigger>
-                        <TabsTrigger value="activity">Transfer History</TabsTrigger>
-                        <TabsTrigger value="bulk">Bulk Transfer</TabsTrigger>
+                <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+                    <TabsList className="grid w-full max-w-md grid-cols-3 bg-slate-100 p-1">
+                        <TabsTrigger value="transfer" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">Transfers</TabsTrigger>
+                        <TabsTrigger value="activity" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">Transfer Activity</TabsTrigger>
+                        <TabsTrigger value="bulk" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">Bulk Transfer</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="transfer">
-                        <BeneficiaryList beneficiaries={beneficiaries} />
-                    </TabsContent>
-                    <TabsContent value="activity">
-                        <TransferActivityTable activities={transferActivities} />
-                    </TabsContent>
-                    <TabsContent value="bulk">
-                        <BulkTransfer />
-                    </TabsContent>
-                </Tabs>
 
+                    <div className="mt-6">
+                        <TabsContent value="transfer" className="m-0 focus-visible:outline-none">
+                            {loading ? (
+                                <div className="flex justify-center p-20"><Loader2 className="h-8 w-8 animate-spin text-blue-600" /></div>
+                            ) : (
+                                <BeneficiaryList beneficiaries={beneficiaries} />
+                            )}
+                        </TabsContent>
+
+                            <TabsContent value="activity" className="m-0 focus-visible:outline-none">
+                            {loading ? (
+                                <div className="flex justify-center p-20"><Loader2 className="h-8 w-8 animate-spin text-blue-600" /></div>
+                            ) : (
+                            <TransferActivityTable activities={activities} />
+                        )}
+                        </TabsContent>
+
+                        <TabsContent value="bulk" className="m-0 focus-visible:outline-none">
+                            <BulkTransfer />
+                        </TabsContent>
+                    </div>
+                </Tabs>
             </main>
         </DashboardLayout>
     )
 }
-
 
 export default function InitiateTransferPage() {
     return (

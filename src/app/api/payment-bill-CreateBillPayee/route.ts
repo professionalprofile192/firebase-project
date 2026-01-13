@@ -1,32 +1,26 @@
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request) {
-       
+export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { token, kuid } = body;
+        const { token, ...dataForUBL } = body;
 
-        const externalApiUrl =  "https://prodpk.ubldigital.com/services/metadata/v1/CustomBillPay/CustomPayeeAction";
-        
-        const response = await fetch(externalApiUrl, {
-            method: "GET",
+        const params = new URLSearchParams();
+        params.append('jsondata', JSON.stringify(dataForUBL));
+
+        const response = await fetch("https://prodpk.ubldigital.com/services/data/v1/CustomBillPay/operations/CustomPayeeAction/CreateBillPayeeDCP", {
+            method: "POST",
             headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'x-kony-authorization': token,
-        'x-kony-reportingparams': JSON.stringify({ kuid: kuid }), // Reporting params mein kuid bhej rahe hain
-        'x-kony-api-version': '1.0',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/143.0.0.0 Safari/537.36',
-            }
+                "Content-Type": "application/json",
+                "X-Kony-Authorization": token,
+                "X-Kony-API-Version": "1.0"
+            },
+            body: params.toString(),
         });
-        const data = await response.json();
 
-        if (!response.ok) {
-          return NextResponse.json({ error: 'Failed to fetch bill data' }, { status: response.status });
-        }
-    
+        const data = await response.json();
         return NextResponse.json(data);
-      } catch (error) {
-        console.error('API Error:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-      }
+    } catch (error) {
+        return NextResponse.json({ error: "Creation Failed" }, { status: 500 });
     }
+}

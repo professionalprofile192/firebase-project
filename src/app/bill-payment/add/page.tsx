@@ -282,27 +282,31 @@ function AddUtilityBillContent() {
             const result = await res.json();
             if (result.opstatus === 0) {
                 const customAction = result.CustomPayeeAction?.[0];
-               
-                if (customAction && customAction.errmsg) {
-                    // Error Popup Case
+                
+                // 1. Check karein agar errmsg maujood hai (Error Case)
+                if (customAction && (customAction.errmsg || customAction.dbpErrMsg)) {
                     setPopupData({
                         isOpen: true,
                         type: 'error',
                         title: 'Action Restricted',
-                        message: customAction.responseMessage || customAction.errmsg,
+                        message: customAction.responseMessage || customAction.errmsg || "Failed to update payee",
                         referenceNo: ''
                     });
-                } else if (customAction && customAction.referenceNo) {
-                    // Success Popup Case with Ref No
+                } 
+                // 2. Success Case: Agar errmsg nahi hai aur opstatus 0 hai
+                else if (customAction) {
                     setPopupData({
                         isOpen: true,
                         type: 'success',
-                        title: 'Update Requested',
-                        message: customAction.responseMessage || "Record has been sent for approval.",
-                        referenceNo: customAction.referenceNo
+                        title: 'Update Successful',
+                        // Aapka naya response message yahan se pick hoga
+                        message: customAction.responseMessage || "Payee has been updated successfully",
+                        // Agar referenceNo "" hai toh empty string chala jayega
+                        referenceNo: customAction.referenceNo || ""
                     });
                 }
             }
+            
            
         }catch (err) {
             toast({ variant: "destructive", title: "Network Error", description: "Something went wrong" });
@@ -311,14 +315,20 @@ function AddUtilityBillContent() {
         }
     };
     const handlePopupClose = async () => {
-        if (popupData.type === 'success' && popupData.referenceNo) { 
-            await createNewApprovalRequest(popupData.referenceNo);//create a new request call
+ 
+        if (!isEdit) {
+          
+            setPopupData(prev => ({ ...prev, isOpen: false }));
+            router.push('/bill-payment');
+            return; // Function yahan khatam ho jaye
         }
     
-        // 2. Popup close
-        setPopupData(prev => ({ ...prev, isOpen: false }));
+        if (popupData.type === 'success' && popupData.referenceNo) { 
+            await createNewApprovalRequest(popupData.referenceNo);
+        }
     
-        // 3. Cleanup aur Navigation
+   
+        setPopupData(prev => ({ ...prev, isOpen: false }));
         sessionStorage.removeItem('editPayeeData');
         router.push('/bill-payment');
     };
@@ -374,39 +384,100 @@ function AddUtilityBillContent() {
         setLoading(true);
         const sessionToken = sessionStorage.getItem("claimsToken");
         const userProfile = JSON.parse(sessionStorage.getItem('userProfile') || '{}');
-        const kuid = userProfile?.user_attributes?.UserName;
-    
+        const uAttr = userProfile?.user_attributes;
+        const kuid = uAttr?.UserName;
+        const b: any = billInfo || {};
+        const cleanDate = b.dueDate.split(' ')[0];
+        const storedCoreId = sessionStorage.getItem("decodedCoreId");
+        const storedContractId = sessionStorage.getItem("decodedContractId");
         try {
-          
-            const res = await fetch("/api/payment-bill-CreateBillPayee", {
+            // --- Service 1: Integration Call (GET) ---
+           
+            const resIntegration = await fetch(`/api/payment-bill-custompayeeaction-integration?kuid=${kuid}`, {
                 method: "GET",
-                headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                      token: sessionToken,
-                      kuid: kuid,
-                  }),
+                headers: { 
+                    "x-kony-authorization": sessionToken || "" 
+                }
             });
     
-            const data = await res.json();
+            const dataIntegration = await resIntegration.json();
     
-            // if (data.opstatus === 0) {
-            //     // Success case: Popup dikhao
-            //     setPopupData({
-            //         isOpen: true,
-            //         type: 'success',
-            //         title: 'Success',
-            //         message: data.CustomPayeeAction?.[0]?.responseMessage || "Action completed successfully.",
-            //         referenceNo: data.CustomPayeeAction?.[0]?.referenceNo || ""
-            //     });
-            // } else {
-            //     toast({ 
-            //         variant: "destructive", 
-            //         title: "Service Error", 
-            //         description: data.errmsg || "Request could not be processed." 
-            //     });
-            // }
+          
+            if (dataIntegration.Metadata?.opstatus === 0) {
+                
+                
+                const finalPayload = {
+                    accountNumber: reviewData.consumerNumber,
+                    street: "UBL LTD",
+                    addressLine2: "Pakistan",
+                    cityName: "",
+                    payeeNickName: reviewData.payeeNickname,
+                    payeeName: b.consumerName || reviewData.consumerName,
+                    zipCode: "432156",
+                    companyName: reviewData.billerInstitution,
+                    nameOnBill: reviewData.billerType,
+                    billerId: "",
+                    phone: "",
+                    state: "",
+                    country: "Pakistan",
+                    notes: JSON.stringify({
+                        typeKey: selectedBillerType,
+                        instKey: selectedCompanyCode,
+                        typeVal: reviewData.billerType,
+                        instVal: reviewData.billerInstitution,//companyCode
+                        billerAccountNo: b.companyCollectionAccount,
+                        billerBrCode: b.collectionBranchCode,
+                        billerBankIMD: "588974",
+                        billerBranchName: "UBL CBS",
+                        billerBankName: "UBL",
+                        billerCurrency: "PKR",
+                        categoryKey: selectedCategory,
+                        categoryVal: reviewData.category,
+                        enquiryID: b.inquiryId ,
+                        dueDate: cleanDate,
+                        lateSurcharge: b.lateSurcharge,
+                        actualAmount: b.actualAmount,
+                        partialPaymentAllowed: b.partialPaymentAllowed,
+                        consumerNo: reviewData.consumerNumber,
+                        contractId: storedContractId,
+                        coreCustomerId: storedCoreId,
+                        billAmount: b.payableAmount,
+                        billStatus: b.billStatus,
+                    }),
+                    UserID: uAttr?.user_id,
+                    serviceKey: otpServiceKey 
+                };
+    
+                // --- Service 2: Main Creation Call (POST) ---
+                const resCreate = await fetch("/api/payment-bill-CreateBillPayee", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        ...finalPayload,
+                        token: sessionToken
+                    })
+                });
+    
+                const dataCreate = await resCreate.json();
+    
+                if (dataCreate.opstatus === 0) {
+                    const action = dataCreate.CustomPayeeAction?.[0];
+                    setPopupData({
+                        isOpen: true,
+                        type: 'success',
+                        title: 'Payee Added',
+                        message: action?.responseMessage,
+                        referenceNo: action?.referenceNo
+                    });
+                } else {
+                    toast({ variant: "destructive", title: "Creation Failed", description: dataCreate.errmsg || "Main creation service failed." });
+                }
+            } else {
+                toast({ variant: "destructive", title: "Integration Failed", description: "Step 1 verification failed." });
+            }
         } catch (err) {
-            toast({ variant: "destructive", title: "Network Error", description: "Failed to reach server." });
+            console.error("Error in final process:", err);
+            toast({ variant: "destructive", title: "Network Error", description: "Something went wrong. Please try again." });
         } finally {
             setLoading(false);
         }
@@ -450,6 +521,7 @@ function AddUtilityBillContent() {
     };
     if (showReview) {
         return (
+            <>
             <ReviewScreen 
                 data={reviewData}
                 onBack={() => setShowReview(false)} 
@@ -459,6 +531,15 @@ function AddUtilityBillContent() {
                 setIsOtpOpen={setIsOtpOpen} 
                 onOtpConfirm={handleOtpConfirm}
             />
+            <CustomPopup 
+                isOpen={popupData.isOpen}
+                onClose={handlePopupClose}
+                type={popupData.type}
+                title={popupData.title}
+                message={popupData.message}
+                referenceNo={popupData.referenceNo}
+            />
+            </>
         );
     }
   

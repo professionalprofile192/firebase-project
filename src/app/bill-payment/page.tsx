@@ -188,184 +188,144 @@ const fetchBulkData = useCallback(async () => {
     }
 }, [tabFromParams]); // Jab bhi tab change ho, ye dobara check kare
    
-  const fetchData = useCallback(async () => {
-    setLoadingPayees(true);
-    setPayeeSearchTerm('');
-    setHistorySearchTerm('');
-    setSelectedCategory('all');
+const fetchData = useCallback(async () => {
+  setLoadingPayees(true);
+  setPayeeSearchTerm('');
+  setHistorySearchTerm('');
+  setSelectedCategory('all');
 
-    const sessionToken = sessionStorage.getItem("claimsToken");
-    const userProfileString = sessionStorage.getItem('userProfile');
+  const sessionToken = sessionStorage.getItem("claimsToken");
+  const userProfileString = sessionStorage.getItem('userProfile');
 
-    if (!sessionToken || !userProfileString) {
-      toast({ variant: "destructive", title: "Error", description: "Session not found. Please log in again." });
-      setLoadingPayees(false);
-      router.push('/');
-      return;
+  if (!sessionToken || !userProfileString) {
+    toast({ variant: "destructive", title: "Error", description: "Session not found. Please log in again." });
+    setLoadingPayees(false);
+    router.push('/');
+    return;
+  }
+  
+  try {
+    const userProfile = JSON.parse(userProfileString);
+    const userName = userProfile?.user_attributes?.UserName;
+
+    // 1. FETCH PAYEE LIST
+    const payeeData = await fetch("/api/get-payee-list", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            token: sessionToken,
+            kuid: userName,
+            payload: {
+              offset: 0, limit: 10, sortBy: "createdOn", order: "desc",
+              payeeId: userProfile?.userid, searchString: "",
+            },
+        }),
+    });
+    const payeeRes = await payeeData.json();
+
+    // 2. FETCH ALL CATEGORIES
+    const categoryData = await fetch("/api/get-all-categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            token: sessionToken,
+            kuid: userName,
+            payload: { categorytype: "bill" }
+        })
+    });
+    const categoryRes = await categoryData.json();
+    if (categoryRes && categoryRes.opstatus === 0 && categoryRes.PaymentService) {
+      setCategories(categoryRes.PaymentService);
     }
-    
-    try {
-      const userProfile = JSON.parse(userProfileString);
-          // Fetch Payees
-          const payeeData = await fetch("/api/get-payee-list", {
+
+    // Check if payees exist for Integration and Inquiry
+    if (payeeRes && payeeRes.opstatus === 0 && payeeRes.payee && payeeRes.payee.length > 0) {
+      
+      // 3. HIT BILL INTEGRATION
+      try {
+          await fetch("/api/payment-bill-integration", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                  token: sessionToken,
-                  kuid: userProfile?.user_attributes?.UserName,
-                  payload: {
-                    offset: 0,
-                    limit: 10,
-                    sortBy: "createdOn",
-                    order: "desc",
-                    payeeId: userProfile?.userid,
-                    searchString: "",
-                  },
-              }),
+              body: JSON.stringify({ token: sessionToken, kuid: userName }),
           });
-          const payeeRes = await payeeData.json();
+      } catch (billError) {
+          console.error("Integration failed:", billError);
+      }
 
-          // Fetch Categories
-          const categoryData = await fetch("/api/get-all-categories", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                  token: sessionToken,
-                  kuid: userProfile?.user_attributes?.UserName,
-                  payload: { categorytype: "bill" }
-              })
-              
-          })
-          const categoryRes = await categoryData.json();
-
-          // --- Payee Response Handling ---
-        if (payeeRes && payeeRes.opstatus === 0 && payeeRes.payee && payeeRes.payee.length > 0) {
-        
-            const mappedPayees = payeeRes.payee.map((p: any) => {
-              let parsedNotes: any = {};
-              try {
-                parsedNotes = typeof p.notes === 'string' ? JSON.parse(p.notes) : (p.notes || {});
-              } catch (e) {
-                console.error("Failed to parse notes for payee:", p.payeeId, e);
+      // 4. PREPARE & HIT BILL INQUIRY
+      const bulkRequests = payeeRes.payee.map((p: any) => {
+          let parsedNotes: any = {};
+          try { parsedNotes = JSON.parse(p.notes || '{}'); } catch (e) {}
+          return {
+              billInquiryRequest: {
+                  billDetails: {
+                      companyCode: parsedNotes.instKey || "", 
+                      consumerNumber: p.accountNumber || "",
+                      expiryDays: "2"
+                  }
               }
-              return {
-                payeeId: p.payeeId || p.id,
-                consumerName: p.payeeName || 'N/A',
-                payeeNickName: p.payeeNickName || p.nickName || 'N/A',
-                billerType: p.nameOnBill || 'N/A',
-                companyName: p.companyName || 'N/A',
-                consumerNumber: p.accountNumber || '',
-                status: parsedNotes.billStatus || 'Not Available',
-                amountDue: parsedNotes.billAmount || '0',
-                dueDate: parsedNotes.dueDate ? format(new Date(parsedNotes.dueDate), 'dd/MM/yyyy') : 'N/A',
-                amountAfterDueDate: parsedNotes.lateSurcharge || '0',
-                category: parsedNotes.categoryVal || 'Uncategorized',
-                
-                // Ye key poora parsed object hold karegi taake Edit page par kaam aaye
-                rawNotes: parsedNotes 
-              };
-            });
+          };
+      });
 
-          setAllPayees(mappedPayees);
-          setFilteredPayees(mappedPayees);
+      const bulkInquiryPayload = {
+          bulkBillInquiryRequest: JSON.stringify({ bulkBillInquiryRequest: bulkRequests })
+      };
 
-          // Sirf tab chalega jab Payee list ka data aaye ---
-          try {
-              console.log("Payee list found, fetching bill details...");
-              const billData = await fetch("/api/payment-bill-integration", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                      token: sessionToken,
-                      kuid: userProfile?.user_attributes?.UserName,
-                  }),
-              });
-              const billRes = await billData.json();
-              console.log("Integration Bill Response:", billRes);
+      const inquiryData = await fetch("/api/payment-bill-inquiry", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+              token: sessionToken,
+              kuid: userName,
+              payload: bulkInquiryPayload
+          }),
+      });
+      const inquiryRes = await inquiryData.json();
 
+      // 5. PARSE INQUIRY DATA FOR TABLE (Mapping logic)
+      if (inquiryRes?.Bill?.[0]?.Response) {
+        const innerResponse = JSON.parse(inquiryRes.Bill[0].Response);
+        const inquiryResults = innerResponse.bulkInquiryResponseList || [];
 
-
-          } catch (billError) {
-              console.error("Bill Service failed but continuing with payees:", billError);
-          }
-            //bill inquiry service
-
-            if (payeeRes && payeeRes.payee && payeeRes.payee.length > 0) {
-                
-              // 1. Payload Taiyar Karna (Payee List se data map karna)
-              const bulkRequests = payeeRes.payee.map((p) => {
-                  let parsedNotes = {};
-                  try {
-                      parsedNotes = JSON.parse(p.notes || '{}');
-                  } catch (e) { console.error("Notes parse error", e); }
-
-                  return {
-                      billInquiryRequest: {
-                          billDetails: {
-                              // instKey ko companyCode banaya aur accountNumber ko consumerNumber
-                              companyCode: parsedNotes.instKey || "", 
-                              consumerNumber: p.accountNumber || "",
-                              expiryDays: "2" // Jaisa aapke network payload mein tha
-                          }
-                      }
-                  };
-              });
-
-              // Final Object Structure (Jaisa aapne bataya)
-              const bulkInquiryPayload = {
-                  bulkBillInquiryRequest: JSON.stringify({
-                      bulkBillInquiryRequest: bulkRequests
-                  })
-              };
-
-              // 2. Service Call (Just after get-bill)
-              try {
-                  console.log("Fetching Bulk Bill Inquiry...");
-                  const bulkInquiryData = await fetch("/api/payment-bill-inquiry", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                          token: sessionToken,
-                          kuid:  userProfile?.user_attributes?.UserName,
-                          payload: bulkInquiryPayload // Dynamic payload pass ho raha hai
-                      }),
-                  });
-                  const bulkRes = await bulkInquiryData.json();
-                  console.log("Bulk Inquiry Response:", bulkRes);
-              } catch (err) {
-                  console.error("Bulk Inquiry Service Failed:", err);
-              }
-            }
-
-        } else {
+        const finalTableData = inquiryResults.map((item: any) => {
+          const bill = item.billInquiryResponse.billInfo;
+          // Payee list se matching record nikalna for nickname and original notes
+          const originalPayee = payeeRes.payee.find((p: any) => p.accountNumber === bill.consumerNo);
           
-          setFilteredPayees([]);
-          if (payeeRes?.opstatus !== -1) { 
-              toast({ 
-                  variant: "destructive", 
-                  title: "Failed to fetch payees", 
-                  description: payeeRes?.errmsg || 'Could not load payee data.' 
-              });
-          }
-        }
+          let originalNotes: any = {};
+          try { originalNotes = JSON.parse(originalPayee?.notes || '{}'); } catch (e) {}
 
-        // --- Category Response Handling ---
-        if (categoryRes && categoryRes.opstatus === 0 && categoryRes.PaymentService) {
-          setCategories(categoryRes.PaymentService);
-        } else {
-          setCategories([]);
+          return {
+            payeeId: originalPayee?.payeeId || originalPayee?.id,
+            consumerName: bill.consumerName || originalPayee?.payeeName || 'N/A',
+            payeeNickName: originalPayee?.payeeNickName || originalPayee?.nickName || 'N/A',
+            billerType: bill.companyName || originalPayee?.companyName || 'N/A',
+            companyName: bill.companyName,
+            consumerNumber: bill.consumerNo,
+            status: bill.billStatus,
+            amountDue: bill.payableAmount?.toString(),
+            dueDate: bill.dueDate ? format(new Date(bill.dueDate), 'dd/MM/yyyy') : 'N/A',
+            amountAfterDueDate: (bill.payableAmount + (bill.lateSurcharge || 0)).toString(),
+            category: originalNotes.categoryVal,
+            rawNotes: originalNotes
+          };
+        });
 
-               if (categoryRes?.opstatus !== -1) {
-                toast({ variant: "destructive", title: "Failed to fetch categories", description: categoryRes?.errmsg || 'Could not load category data.' });
-               }
-          }
-
-    } catch (error) {
-       toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred while fetching data." });
-    } finally {
-      setLoadingPayees(false);
+        setAllPayees(finalTableData);
+        setFilteredPayees(finalTableData);
+      }
+    } else {
+      setAllPayees([]);
+      setFilteredPayees([]);
     }
-  }, [toast, router]);
+
+  } catch (error) {
+     console.error("Fetch Data Error:", error);
+     toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred." });
+  } finally {
+    setLoadingPayees(false);
+  }
+}, [toast, router]);
 
   useEffect(() => {
     fetchData();
@@ -385,7 +345,8 @@ const fetchBulkData = useCallback(async () => {
         newFilteredPayees = newFilteredPayees.filter(payee => 
             payee.consumerName.toLowerCase().includes(payeeSearchTerm.toLowerCase()) ||
             payee.consumerNumber.toLowerCase().includes(payeeSearchTerm.toLowerCase()) ||
-            payee.billerType.toLowerCase().includes(payeeSearchTerm.toLowerCase())
+            payee.billerType.toLowerCase().includes(payeeSearchTerm.toLowerCase()) ||
+            payee.payeeNickName.toLowerCase().includes(payeeSearchTerm.toLowerCase())
         );
     }
     
@@ -417,7 +378,8 @@ const fetchBulkData = useCallback(async () => {
   const filteredHistory = billPaymentHistory.filter(item => 
     (item.consumerName?.toLowerCase() || '').includes(historySearchTerm.toLowerCase()) ||
     (item.consumerNumber?.toLowerCase() || '').includes(historySearchTerm.toLowerCase()) ||
-    (item.transactionId?.toLowerCase() || '').includes(historySearchTerm.toLowerCase())
+    (item.transactionId?.toLowerCase() || '').includes(historySearchTerm.toLowerCase()) ||
+    (item.payeeNickName?.toLowerCase() || item.nickName?.toLowerCase() || '').includes(historySearchTerm.toLowerCase())
   );
 
   return (

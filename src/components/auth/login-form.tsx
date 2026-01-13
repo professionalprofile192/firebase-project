@@ -470,7 +470,6 @@ export function LoginForm() {
     setRecoveryDetails(null);
     setView('signIn'); // Go back to the sign in form
   }
-
   async function onSubmit(values: z.infer<typeof loginFormSchema>) {
     setIsSubmitting(true);
   
@@ -482,63 +481,47 @@ export function LoginForm() {
         },
         body: JSON.stringify(values),
       });
-      const data = await res.json().catch(() => ({}));
-      
+  
+      // Check karein agar response okay nahi hai
+      if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.message || "Invalid credentials");
+      }
+  
+      const data = await res.json();
       console.log("LOGIN API RESPONSE:", data);
- 
-      console.log("🧑‍💼 Logged in user:", data.profile);
-      console.log("📦 Attributes:", data.profile?.user_attributes);
-
   
-
+      // Validation: Profile aur Token dono lazmi honay chahiye
       if (!data?.profile || !data?.claims_token) {
-          console.error("❌ Login failed, missing profile or claims_token:", data);
-          toast({ 
-              variant: 'destructive',
-              title: 'Login Failed',
-              description: data?.message || "Invalid login response",
-          });
-          return;
-      }
-      
-      // Save user profile
-      sessionStorage.setItem("userProfile", JSON.stringify(data.profile));
-      sessionStorage.setItem("claimsToken", data.claims_token.value);
-      sessionStorage.setItem("providerToken", data.provider_token?.value || "");
-
-// ✅ redirect
-router.push("/dashboard");
-       
-
-  //     const legacyToken =
-  // data?.provider_token?.params?.security_attributes?.session_token;
-  //     // ⭐ NOW call Last Login API (after saving)
-  //     const lastLoginRes = await fetch("/api/last-login", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         "x-kony-authorization": legacyToken,   // <-- direct use
-  //       },
-  //       body: JSON.stringify({ userID: data?.profile?.userid }),
-  //     });
-
-  //     const lastLogin = await lastLoginRes.json();
-  //     console.log("🔥 LAST LOGIN TIME:", lastLogin);
-
         toast({
-          title: "Login Successful",
-          description: "Redirecting to dashboard...",
+          variant: 'destructive',
+          title: 'Login Failed',
+          description: data?.message || "Invalid server response. Please try again.",
         });
-  
-        router.push("/dashboard");
+        return;
       }
   
-    
-     catch(error){
+      // Save Data - safely check if claims_token is object or string
+      const cToken = typeof data.claims_token === 'object' ? data.claims_token.value : data.claims_token;
+      
+      sessionStorage.setItem("userProfile", JSON.stringify(data.profile));
+      sessionStorage.setItem("claimsToken", cToken);
+      sessionStorage.setItem("providerToken", data.provider_token?.value || data.provider_token || "");
+  
+      toast({
+        title: "Login Successful",
+        description: "Redirecting to dashboard...",
+      });
+  
+      // Final Redirect
+      router.push("/dashboard");
+  
+    } catch (error: any) {
+      console.error("Login Error:", error);
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Something went wrong. Please try again.',
+        description: error.message || 'Something went wrong. Please try again.',
       });
     } finally {
       setIsSubmitting(false);
@@ -547,45 +530,47 @@ router.push("/dashboard");
   // ⭐ FINAL LAYOUT (RIGHT SIDE ONLY — MATCHES YOUR NEED)
   return (
     <>
-      <div className="w-full h-full flex md:pt-0">
-
+      <div className="w-full h-full flex items-center justify-center p-4">
         <div
           className={cn(
-            'w-full max-w-sm flip-card',
+            'w-full max-w-[480px] flip-card mx-auto',
             { flipped: view !== 'signIn' }
           )}
         >
           <div className="flip-card-inner">
 
-            {/* FRONT */}
+            {/* FRONT - LOGIN CARD */}
             <div className="flip-card-front">
-              <Card className="w-full border-none bg-white md:bg-white/80 shadow-none md:shadow-xl relative md:rounded-lg" >
-                <CardHeader>
-                  <CardTitle className="text-3xl font-bold tracking-tight">
+            <Card className="w-full border-none bg-white/40 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-[2.5rem] overflow-hidden">
+                <CardHeader className="space-y-1 pb-4">
+                  <CardTitle className="text-3xl font-bold tracking-tight text-[#00529B]">
                     Sign In
                   </CardTitle>
-                  <CardDescription>
-                    Enter your credentials to sign in to UBL Digital.
+                  <CardDescription className="text-gray-600">
+                    Enter your credentials to access UBL Digital.
                   </CardDescription>
                 </CardHeader>
 
                 <CardContent>
                   <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
 
                       {/* USERNAME */}
                       <FormField
                         control={form.control}
                         name="username"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Username:</FormLabel>
+                          <FormItem className="space-y-1">
+                            <FormLabel className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Username</FormLabel>
                             <FormControl>
-                              <Input
-                                className="h-12 text-base bg-gray-100 md:bg-white/50"
-                                placeholder="Enter Username"
-                                {...field}
-                              />
+                              <div className="relative group">
+                                <User className="absolute left-3 top-3.5 h-5 w-5 text-gray-400 group-focus-within:text-[#00529B] transition-colors" />
+                                <Input
+                                  className="h-12 pl-10 text-base bg-white/50 border-white/30 focus:bg-white/80 focus:ring-[#00529B]/20 transition-all rounded-xl shadow-sm"
+                                  placeholder="Enter Username"
+                                  {...field}
+                                />
+                              </div>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -597,93 +582,83 @@ router.push("/dashboard");
                         control={form.control}
                         name="password"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Password:</FormLabel>
-
-                            <div className="relative">
+                          <FormItem className="space-y-1">
+                            <FormLabel className="text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1">Password</FormLabel>
+                            <div className="relative group">
+                              <Lock className="absolute left-3 top-3.5 h-5 w-5 text-gray-400 group-focus-within:text-[#00529B] transition-colors" />
                               <FormControl>
                                 <Input
                                   type={showPassword ? 'text' : 'password'}
-                                  className="h-12 pr-10 text-base bg-gray-100 md:bg-white/50"
+                                  className="h-12 pl-10 pr-10 text-base bg-white/50 border-white/30 focus:bg-white/80 focus:ring-[#00529B]/20 transition-all rounded-xl shadow-sm"
                                   placeholder="Enter Password"
                                   {...field}
                                 />
                               </FormControl>
-
                               <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-0 flex items-center pr-3"
+                                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
                               >
-                                {showPassword ? (
-                                  <Eye className="h-5 w-5" />
-                                ) : (
-                                  <EyeOff className="h-5 w-5" />
-                                )}
+                                {showPassword ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
                               </button>
                             </div>
-
                             <FormMessage />
                           </FormItem>
                         )}
                       />
 
-                      {/* SUBMIT */}
+                      {/* SUBMIT BUTTON */}
                       <Button
                         type="submit"
-                        className="w-full py-6 text-base font-semibold"
+                        className="w-full py-6 text-base font-semibold bg-[#00529B] hover:bg-[#003d75] text-white rounded-xl shadow-lg shadow-[#00529B]/20 transition-all duration-300 transform hover:-translate-y-0.5"
                         disabled={isSubmitting}
                       >
-                        {isSubmitting ? 'Signing In...' : 'Sign In'}
+                        {isSubmitting ? (
+                          <span className="flex items-center gap-2">
+                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                            Signing In...
+                          </span>
+                        ) : 'Sign In'}
                       </Button>
 
                     </form>
                   </Form>
                 </CardContent>
 
-                <CardFooter className="flex-col items-start gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleSetView('forgotOptions')}
-                    className="text-sm font-medium text-primary hover:underline"
-                  >
-                    Forgot your credentials?
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSetView('corporateEnroll')}
-                    className="text-sm font-medium text-gray-700 hover:underline"
-                  >
-                    Corporate Enroll
-                  </button>
+                <CardFooter className="flex flex-col gap-3 pb-8">
+                  <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent my-2" />
+                  <div className="flex w-full justify-between px-1">
+                    <button
+                      type="button"
+                      onClick={() => handleSetView('forgotOptions')}
+                      className="text-xs font-semibold text-[#00529B] hover:underline"
+                    >
+                      Forgot Credentials?
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSetView('corporateEnroll')}
+                      className="text-xs font-semibold text-gray-600 hover:underline underline-offset-4"
+                    >
+                      Corporate Enroll
+                    </button>
+                  </div>
                 </CardFooter>
               </Card>
             </div>
 
-            {/* BACK */}
+            {/* BACK - OPTIONS CARD (Same Glass Look) */}
             <div className="flip-card-back">
-              <Card
-                className="w-full border-none bg-white  bg-white/80 shadow-lg md:shadow-xl  md:rounded-lg"
-              >
-                {view === 'forgotOptions' && (
-                  <ForgotCredentialsOptions setView={handleSetView} />
-                )}
-                {view === 'recoverUsername' && (
-                  <RecoverUsernameForm setView={handleSetView} onOtpRequest={handleOtpRequest} />
-                )}
-                {view === 'recoverPassword' && (
-                  <RecoverPasswordForm setView={handleSetView} onValidateUser={handleValidateUser}/>
-                )}
-                {view === 'corporateEnroll' && (
-                  <CorporateEnrollForm setView={handleSetView} />
-                )}
+            <Card className="w-full border-none bg-white/50 backdrop-blur-xl shadow-2xl rounded-[2.5rem]">
+                {view === 'forgotOptions' && <ForgotCredentialsOptions setView={handleSetView} />}
+                {view === 'recoverUsername' && <RecoverUsernameForm setView={handleSetView} onOtpRequest={handleOtpRequest} />}
+                {view === 'recoverPassword' && <RecoverPasswordForm setView={handleSetView} onValidateUser={handleValidateUser}/>}
+                {view === 'corporateEnroll' && <CorporateEnrollForm setView={handleSetView} />}
               </Card>
             </div>
 
           </div>
         </div>
-
       </div>
 
       <OtpDialog 

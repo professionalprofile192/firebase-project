@@ -119,16 +119,20 @@ export default function Dashboard() {
 
     const userRecord = usersData?.records?.[0];
     const decodedUserId = decodeValue(userRecord?.userId); 
-    const decodedCoreId = decodeValue(userRecord?.CoreCustomers?.[0]?.coreCustomerID);
+    const CoreId = decodeValue(userRecord?.CoreCustomers?.[0]?.coreCustomerID);
+    const ContractId = decodeValue(userRecord?.CoreCustomers?.[0]?.contractId);
+
+    sessionStorage.setItem("decodedCoreId", CoreId);
+    sessionStorage.setItem("decodedContractId", ContractId);
 
         /* ================= FETCH ACCOUNTS (Dynamic CIF) ================= */
       
-        if (decodedCoreId) {
+        if (CoreId) {
           const accRes = await fetch("/api/fetch-account", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
-              CIF: decodedCoreId, 
+              CIF: CoreId, 
               Customer_id: decodedUserId, 
               token, 
               kuid 

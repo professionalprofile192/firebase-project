@@ -15,16 +15,18 @@ interface OtpDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: (otp: string) => void;
+  onResend?: () => void;
 }
 
-export function OtpDialog({ open, onOpenChange, onConfirm }: OtpDialogProps) {
+export function OtpDialog({ open, onOpenChange, onConfirm, onResend }: OtpDialogProps) {
   const [otp, setOtp] = useState('');
-  const [timer, setTimer] = useState(60);
+  const INITIAL_TIME = 900;
+  const [timer, setTimer] = useState(INITIAL_TIME);
   const [showResend, setShowResend] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setTimer(60);
+      setTimer(INITIAL_TIME);
       setShowResend(false);
       setOtp('');
     }
@@ -46,8 +48,9 @@ export function OtpDialog({ open, onOpenChange, onConfirm }: OtpDialogProps) {
   };
 
   const handleResend = () => {
-    setTimer(60);
+    setTimer(INITIAL_TIME);
     setShowResend(false);
+    if (onResend) onResend();
     // Add logic to resend OTP here
   };
 

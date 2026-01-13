@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
     const payload = {
       userId: userId,
-      isCreated: false,
+      isCreated: true,
       sortBy: sortBy,
       sortOrder: sortOrder,
       limit: limit,

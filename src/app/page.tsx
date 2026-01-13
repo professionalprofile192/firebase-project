@@ -31,7 +31,7 @@ export default function LoginPage() {
       )}
     >
         {/* LEFT SIDE – visible on tablet + desktop */}
-        <div className="hidden sm:flex flex-col items-start justify-between p-12">
+        <div className="hidden sm:flex flex-col items-start justify-between py-16 pl-24 pr-12">
           <Image
             src={ublLogo}
             alt="UBL Digital Logo"
@@ -39,10 +39,7 @@ export default function LoginPage() {
             height={100}
             priority
             className="
-              rounded-lg shadow-md
-              sm:w-16 sm:h-16
-              md:w-20 md:h-20
-              lg:w-24 lg:h-24
+              rounded-2xl shadow-lg sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24
             "
           />
 
@@ -55,15 +52,14 @@ export default function LoginPage() {
           >
             <h1
               className="
-                font-bold mb-4
-                text-3xl
-                sm:text-4xl
-                md:text-5xl
-                lg:text-6xl
+               font-bold mb-6 text-black tracking-tight leading-[1.1] 
+              sm:text-4xl md:text-5xl lg:text-7xl
               "
             >
-              Welcome to UBL Digital Business Banking
+              Welcome to <br /><span className="text-[#00529B]">UBL Digital</span> <br />
+              Business Banking
             </h1>
+           
 
             <p
               className="
@@ -71,6 +67,7 @@ export default function LoginPage() {
                 text-base
                 sm:text-lg
                 md:text-xl
+                text-gray-700 font-medium leading-relaxed opacity-90
               "
             >
               UBL Digital Business Banking offers a comprehensive suite of
