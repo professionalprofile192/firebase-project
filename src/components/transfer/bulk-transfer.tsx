@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -218,13 +218,70 @@ export function BulkTransfer() {
     const [rowsPerPage, setRowsPerPage] = useState('50');
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
+    const [bulkFiles, setBulkFiles] = useState<{fileId: string, fileName: string}[]>([]);
+    const [loadingFiles, setLoadingFiles] = useState(false);
 
     const rows = parseInt(rowsPerPage);
     const totalPages = Math.ceil(bulkProcessingDetails.length / rows);
     const startIndex = (currentPage - 1) * rows;
     const endIndex = Math.min(startIndex + rows, bulkProcessingDetails.length);
     const currentData = bulkProcessingDetails.slice(startIndex, endIndex);
+    const hasFetched = useRef(false);
+            //api calling
 
+            const fetchBulkReferences = async () => {
+                if (hasFetched.current) return;
+                try {
+                    setLoadingFiles(true);
+                    
+                    // Retrieving necessary credentials from session
+                    const token = sessionStorage.getItem("claimsToken");
+                    const approvalsRaw = sessionStorage.getItem("approvals");
+                    
+                    if (!token || !approvalsRaw) {
+                        console.warn("Missing token or approvals in session");
+                        return;
+                    }
+                
+                    const approvalsData = JSON.parse(approvalsRaw);
+                    const userId = approvalsData?.ApprovalMatrix?.[0]?.sentBy;
+                
+                    if (!userId) {
+                        console.warn("User ID not found in approvals data");
+                        return;
+                    }
+                
+                    // Pure API call (No state mapping/updates)
+                    const response = await fetch("/api/transfer-Bulk-getReferenceBulk", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            token: token,
+                            payload: {
+                                fromAccountNumber: "", 
+                                userId: userId,
+                                remitterType: "FT" 
+                            }
+                        }),
+                    });
+                
+                    const result = await response.json();
+                    console.log("API Call successful, status:", result.opstatus);
+                    
+                    // Note: Data is received in 'result', but not being saved to state as requested.
+        
+                } catch (err) {
+                    console.error("Fetch Error:", err);
+                    hasFetched.current = false;
+                } finally {
+                    setLoadingFiles(false);
+                }
+            };
+        
+            // This triggers the call once when the component mounts
+            useEffect(() => {
+                fetchBulkReferences();
+            }, []);
     useEffect(() => {
         setSelectedRows([]);
     }, [currentPage, rowsPerPage, selectedBulkFile]);
