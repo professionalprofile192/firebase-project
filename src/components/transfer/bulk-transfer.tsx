@@ -20,8 +20,15 @@ import {
     CommandEmpty, 
     CommandGroup, 
     CommandItem 
-  } from "@/components/ui/command"
+  } from "@/components/ui/command";
 
+  import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+  } from "@/components/ui/dialog";
 const transferTypes = [
     { title: "Funds Transfer", description: "Own & Internal" },
     { title: "Inter Bank Funds Transfer", description: "Other Banks" },
@@ -29,42 +36,6 @@ const transferTypes = [
     { title: "Omni Payment", description: "All Omni Accounts" },
 ];
 
-type BulkDetail = {
-    fileReferenceNumber: string;
-    beneficiaryName: string;
-    accountTitle: string;
-    localAmount: string;
-    beneficiaryAccountNo: string;
-    customerUniqueId: string;
-    beneficiaryEmail: string;
-    beneficiaryPhone: string;
-    beneficiaryBankCode: string;
-    beneficiaryBankName: string;
-    status: 'Processed' | 'Failed' | 'Pending';
-    titleFetch: 'Success' | 'Failed';
-    reasonOfFailure: string;
-};
-
-
-const generateBulkDetails = (count: number): BulkDetail[] => {
-    return Array.from({ length: count }, (_, i) => ({
-        fileReferenceNumber: '0016249076386172',
-        beneficiaryName: ['ali akber', 'shahzain', 'Jatoi', 'Ahmed', 'Fatima', 'Bilal'][i % 6],
-        accountTitle: 'PGEBSTYCCCESXVGIDQBMKWU',
-        localAmount: `${(120000 + i * 1000).toLocaleString()}.00`,
-        beneficiaryAccountNo: `PK42UNIL01090002300175${88 + i}`,
-        customerUniqueId: `UB_amt_${10 + i}`,
-        beneficiaryEmail: `beneficiary${i}@example.com`,
-        beneficiaryPhone: `0300-123456${i}`,
-        beneficiaryBankCode: `00${i % 9 + 1}`,
-        beneficiaryBankName: ['UBL', 'HBL', 'Meezan', 'Alfalah', 'Askari'][i % 5],
-        status: i % 3 === 0 ? 'Processed' : i % 3 === 1 ? 'Failed' : 'Pending',
-        titleFetch: i % 2 === 0 ? 'Success' : 'Failed',
-        reasonOfFailure: i % 3 === 1 ? 'Insufficient funds' : '',
-    }));
-};
-
-const bulkProcessingDetails = generateBulkDetails(100);
 
 const DetailRow = ({ label, value }: { label: string, value: React.ReactNode }) => (
     <div>
@@ -95,9 +66,11 @@ const BulkDetailRow = ({ detail, onSelect, isSelected }: { detail: any; onSelect
                 </TableCell>
                 <TableCell>
                     <span className={cn('px-2 py-1 text-[10px] font-bold uppercase rounded-full', 
-                        detail.status === '1' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                        detail.status === 'Success' ? 'bg-green-100 text-green-800' : 
+                        detail.status === 'Failure' ? 'bg-red-100 text-red-800' : 
+                        'bg-yellow-100 text-yellow-800'
                     )}>
-                        {detail.status === '1' ? 'Processed' : 'Pending'}
+                        {detail.status}
                     </span>
                 </TableCell>
                 <TableCell className="text-right">
@@ -123,6 +96,7 @@ const BulkDetailRow = ({ detail, onSelect, isSelected }: { detail: any; onSelect
                             <DetailRow label="Bank Code" value={detail.beneficiaryBankName || "N/A"} />
                             <DetailRow label="Email" value={detail.beneficiaryEmail || "N/A"} />
                             <DetailRow label="File Title" value={detail.title || "N/A"} />
+                            <DetailRow label="Comment" value={detail.errmsg || "N/A"} />
                         </div>
                     </TableCell>
                 </TableRow> 
@@ -163,6 +137,13 @@ const ReviewSummary = ({
                         <div>
                             <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Selected Payment</p>
                             <p className="text-lg font-bold text-primary">{formatCurrency(totalPayment)}</p>
+                        </div>
+                        <div className="h-8 w-px bg-border"></div>
+                        <div>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider">Available Balance</p>
+                            <p className={cn("text-lg font-bold", availableBalance < 0 ? "text-red-600" : "text-black-600")}>
+                                {formatCurrency(availableBalance)}
+                            </p>
                         </div>
                         <div className="h-8 w-px bg-border"></div>
                         <div>
@@ -226,12 +207,13 @@ export function BulkTransfer() {
     const [loadingAccount, setLoadingAccount] = useState(false);
     const [paymentRecords, setPaymentRecords] = useState([]);
     const [bulkStats, setBulkStats] = useState({ grandTotal: "0", noOfTransaactions: "0" });
-
+  
+    
     const rows = parseInt(rowsPerPage);
-    const totalPages = Math.ceil(bulkProcessingDetails.length / rows);
+    // const totalPages = Math.ceil(bulkProcessingDetails.length / rows);
     const startIndex = (currentPage - 1) * rows;
-    const endIndex = Math.min(startIndex + rows, bulkProcessingDetails.length);
-    const currentData = bulkProcessingDetails.slice(startIndex, endIndex);
+    // const endIndex = Math.min(startIndex + rows, bulkProcessingDetails.length);
+    // const currentData = bulkProcessingDetails.slice(startIndex, endIndex);
     const hasFetched = useRef(false);
             //api calling
 
@@ -463,13 +445,18 @@ export function BulkTransfer() {
                         const mergedData = rawPayments.map((record: any, index: number) => {
                             // Match by index (kyunki sequence usually same rehta hai)
                             const fetchedInfo = titleData.Payments[index];
-                            
+                            const opStatusValue = Number(fetchedInfo?.opstatus);
+
                             return {
                                 ...record,
                                 // Agar service title laayi hai to wo dikhao, warna purana wala
                                 fetchedAccountTitle: fetchedInfo?.accountTitle || record.accountTitle || "N/A",
                                 branchCode: fetchedInfo?.branchCode || "",
                                 title:fetchedInfo?.type,
+                                errorDescription: opStatusValue < 0 ? (fetchedInfo?.errorMessage): "",
+                                status: (opStatusValue === 0 || opStatusValue === 1) ? 'Success' : 
+                                (opStatusValue < 0) ? 'Failure' : 'Pending',
+                                opstatus: opStatusValue
                             };
                         });
         
@@ -517,40 +504,65 @@ export function BulkTransfer() {
         );
     };
 
+    const currentData = paymentRecords; 
+
     const isAllSelected = selectedRows.length === currentData.length && currentData.length > 0;
     
     const summaryData = useMemo(() => {
-        // Agar records nahi hain to summary mat dikhao
-        if (paymentRecords.length === 0) return null;
+        // Pehla Check: Agar koi row select NAHI hui, to summary mat dikhao
+        if (selectedRows.length === 0 || paymentRecords.length === 0) {
+            return null;
+        }
     
         // 1. Jo transactions user ne checkbox se select ki hain
         const selectedTransactions = paymentRecords.filter((d: any) => 
             selectedRows.includes(d.customerUniqueId)
         );
     
-        // 2. Selected transactions ka total amount calculation
+        // 2. Selected transactions ka total amount
         const totalPayment = selectedTransactions.reduce(
             (sum, d: any) => sum + Number(d.remittanceAmount || 0), 0
         );
     
-        // 3. API se aaya hua Grand Total (bulkStats state se)
-        // Agar API data nahi hai to fallback 0
+        // 3. API wala Grand Total (bulkStats state se)
         const grandTotalCount = parseInt(bulkStats.noOfTransaactions || "0");
         const grandTotalAmount = parseFloat(bulkStats.grandTotal || "0");
     
+        // 4. Hold Calculation (Total - Selected)
+        const transactionsToHoldCount = grandTotalCount - selectedTransactions.length;
+        const transactionsToHoldAmount = grandTotalAmount - totalPayment;
+    
         return {
-            totalPayment, // Selected amount
+            totalPayment,
             availableBalance: selectedAccount?.balance ?? 0,
-            grandTotalCount, // API wala total count
-            grandTotalAmount, // API wala total amount
+            grandTotalCount,
+            grandTotalAmount,
             selectedCount: selectedTransactions.length,
-            // Hold logic: Jo select nahi hue (Total - Selected)
-            transactionsToHoldCount: Math.max(0, grandTotalCount - selectedTransactions.length),
-            transactionsToHoldAmount: Math.max(0, grandTotalAmount - totalPayment),
+            transactionsToHoldCount: Math.max(0, transactionsToHoldCount),
+            transactionsToHoldAmount: Math.max(0, transactionsToHoldAmount),
         };
     }, [selectedRows, selectedAccount, paymentRecords, bulkStats]);
 
+const [isStatusPopupOpen, setIsStatusPopupOpen] = useState(false);
 
+const handleStatusSelection = (type: 'All' | 'Success' | 'Failure') => {
+    let filteredIds: string[] = [];
+    
+    if (type === 'All') {
+        filteredIds = paymentRecords.map((d: any) => d.customerUniqueId);
+    } else if (type === 'Success') {
+        filteredIds = paymentRecords
+            .filter((d: any) => d.status === 'Success')
+            .map((d: any) => d.customerUniqueId);
+    } else if (type === 'Failure') {
+        filteredIds = paymentRecords
+            .filter((d: any) => d.status === 'Failure')
+            .map((d: any) => d.customerUniqueId);
+    }
+    
+    setSelectedRows(filteredIds);
+    setIsStatusPopupOpen(false);
+};
     return (
         <div className="mt-4 space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -653,12 +665,50 @@ export function BulkTransfer() {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-[#ECECEC8C]">
-                                        <TableHead className="w-[50px]">
+                                    <TableHead className="w-[50px]">
+                                <Dialog open={isStatusPopupOpen} onOpenChange={setIsStatusPopupOpen}>
+                                    <DialogTrigger asChild>
+                                        <div className="flex items-center cursor-pointer">
                                             <Checkbox
                                                 checked={isAllSelected}
-                                                onCheckedChange={handleSelectAll}
+                                                className="data-[state=checked]:bg-primary"
                                             />
-                                        </TableHead>
+                                        </div>
+                                    </DialogTrigger>
+                                    
+                                    {/* Iska background automatically fade/overlay hota hai */}
+                                    <DialogContent className="sm:max-w-[400px] p-0 border-none bg-white overflow-hidden">
+                                        <div className="p-8">
+                                            <DialogHeader className="mb-6">
+                                                <DialogTitle className="text-center text-2xl font-bold">Transactions</DialogTitle>
+                                                <p className="text-center text-sm text-muted-foreground">Select type of status</p>
+                                            </DialogHeader>
+                                            
+                                            <div className="flex justify-center items-center gap-3">
+                                                <Button 
+                                                    variant="outline" 
+                                                    className="flex-1 bg-slate-100 hover:bg-slate-200 border-none text-slate-700 font-semibold h-12"
+                                                    onClick={() => handleStatusSelection('All')}
+                                                >
+                                                    All
+                                                </Button>
+                                                <Button 
+                                                    className="flex-1 bg-[#007dbd] hover:bg-[#006ca3] text-white font-semibold h-12"
+                                                    onClick={() => handleStatusSelection('Success')}
+                                                >
+                                                    Success
+                                                </Button>
+                                                <Button 
+                                                    className="flex-1 bg-[#ff5b4d] hover:bg-[#e04b3d] text-white font-semibold h-12"
+                                                    onClick={() => handleStatusSelection('Failure')}
+                                                >
+                                                    Failure
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
+                            </TableHead>
                                         <TableHead>File Reference Number</TableHead>
                                         <TableHead>Account Title</TableHead>
                                         <TableHead>Customer Unique ID</TableHead>
@@ -706,7 +756,9 @@ export function BulkTransfer() {
                 </TabsContent>
             </Tabs>
             
-            {summaryData && <ReviewSummary {...summaryData} />}
+            {selectedRows.length > 0 && summaryData && (
+    <ReviewSummary {...summaryData} />
+)}
 
         </div>
     )
