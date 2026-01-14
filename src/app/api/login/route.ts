@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       "x-kony-sdk-type": "js",
       "x-kony-sdk-version": "9.6.19",
       "x-kony-reportingparams": "YOUR REPORTING PARAMS",
-      "x-kony-requestid": "1768281725713-e4b6-0fe2-a7f3",//"1768210761189-f7ad-96c7-0239"//
+      "x-kony-requestid": requestId,//"1768210761189-f7ad-96c7-0239"//
     };
 
     const apiRes = await fetch(
