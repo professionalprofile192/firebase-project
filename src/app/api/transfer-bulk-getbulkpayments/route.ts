@@ -2,13 +2,13 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { token, fromAccount, userId, fileReference } = body;
+  const { token, fromAccount, userId,remitterType, fileReference } = body;
 
   const payload = new URLSearchParams();
   payload.append('jsondata', JSON.stringify({
     fromAccountNumber: fromAccount,
     userId: userId,
-    remitterType: "FT",
+    remitterType: remitterType,
     searchString: fileReference, // Aapka select kiya hua file reference
     sortBy: "createdAt",
     sortOrder: "desc",
