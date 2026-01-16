@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { token, fromAccount, userId,remitterType, fileReference } = body;
+  const { token, fromAccount, userId,remitterType, fileReference,sortBy, limit, status } = body;
 
   const payload = new URLSearchParams();
   payload.append('jsondata', JSON.stringify({
@@ -10,11 +10,11 @@ export async function POST(req: Request) {
     userId: userId,
     remitterType: remitterType,
     searchString: fileReference, // Aapka select kiya hua file reference
-    sortBy: "createdAt",
+    sortBy:  sortBy,
     sortOrder: "desc",
-    limit: 100,
+    limit: limit,
     offset: 0,
-    status: 1
+    status: status
   }));
 
   try {

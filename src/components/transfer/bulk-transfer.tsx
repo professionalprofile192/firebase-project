@@ -223,6 +223,9 @@ export function BulkTransfer() {
     const [isOtpOpen, setIsOtpOpen] = useState(false);
     const [otpServiceKey, setOtpServiceKey] = useState('');
     const { toast } = useToast();
+    const [historyRecords, setHistoryRecords] = useState<any[]>([]);
+const [activeTab, setActiveTab] = useState("details"); // Tab track karne ke liye
+
     
     const getRemitterType = (title: string) => {
         switch (title) {
@@ -422,7 +425,7 @@ export function BulkTransfer() {
             }
         };
     
-        const handleFileSelect = async (fileReference: string) => {
+        const handleFileSelect = async (fileReference: string, isHistory: boolean = false) => {
             setSelectedBulkFile(fileReference);
             setOpenFileDropdown(false);
         
@@ -433,13 +436,13 @@ export function BulkTransfer() {
             const token = claimsToken;
             const currentRemitterType = getRemitterType(selectedTransferType);
             const currentAccountNo = selectedAccount?.acctNo;
-        
             if (!currentAccountNo || !userId) {
                 console.error("Account number or User ID missing");
                 return;
             }
         
             try {
+                
                 const response = await fetch('/api/transfer-bulk-getbulkpayments', {
                     method: 'POST',
                     headers: { "Content-Type": "application/json" },
@@ -448,7 +451,10 @@ export function BulkTransfer() {
                         fromAccount: currentAccountNo,
                         userId: userId,
                         remitterType: currentRemitterType,
-                        fileReference: fileReference,
+                        fileReference:  isHistory ?"": fileReference,
+                        sortBy: isHistory ? "transactionDate" : "createdAt",
+                        limit: isHistory ? 20 : 100,
+                        status: isHistory ? "2,3" : "1"
                     }),
                 });
         
@@ -456,11 +462,12 @@ export function BulkTransfer() {
         
                 if (result && result.NDC_BulkPayments) {
                     const rawPayments = result.NDC_BulkPayments;
-        
+                    if(!isHistory){
                     // 1. Condition for FT and IBFT
                     if (currentRemitterType === "FT" || currentRemitterType === "IBFT" || currentRemitterType === "OMNI") {
                         const isFT = currentRemitterType === "FT";
                         const isOMNI = currentRemitterType === "OMNI";
+                        
                         const accountsPayload = rawPayments.map((p: any) => {
                             return {
                                 appChannel: "DCPCRP",
@@ -521,10 +528,85 @@ export function BulkTransfer() {
                         // OMNI API call logic here
                     }
                 }
-            } catch (error) {
+                else{
+                    await fetchBulkStatusHistory(rawPayments);
+                }
+            
+            }} catch (error) {
                 console.error("Error in selection flow:", error);
             }
             
+        };
+        //history service
+        const fetchBulkStatusHistory = async (rawPayments: any[]) => {
+            try {
+                console.log(rawPayments);
+                const claimsToken = sessionStorage.getItem("claimsToken");
+                const currentRemitterType = getRemitterType(selectedTransferType);
+        
+                // Logic for transactionType
+                let txType = currentRemitterType;
+                if (currentRemitterType === "FT" || currentRemitterType === "OMNI") {
+                    txType = "FT";
+                }
+        
+              // 2. ChildReferenceId se referenceId extract karna
+                    const subTransactions = rawPayments
+                    .filter(p => p.childReferenceId) // Sirf wo records jinme childReferenceId ho
+                    .map(p => {
+                        try {
+                            // Stringified JSON ko parse kar rahe hain
+                            const parsedChild = JSON.parse(p.childReferenceId);
+                            return {
+                                referenceId: parsedChild.referenceId // Internal referenceId nikal li
+                            };
+                        } catch (e) {
+                            console.error("Error parsing childReferenceId for record:", p.id);
+                            return null;
+                        }
+                    })
+                    .filter(item => item !== null); // Jo parse nahi ho sakay unhein nikal dein
+
+        
+                const response = await fetch('/api/transfer-Bulk-fundtransferstatus', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: claimsToken,
+                        payload: {
+                            subTransactions: subTransactions,
+                            transactionType: txType
+                        }
+                    })
+                });
+        
+                const result = await response.json();
+        
+                if (result.opstatus === 0 && result.Payments?.[0]) {
+                   
+                    // Raw payments ko updated status ke saath merge karna
+                    const mergedHistory = rawPayments.map(record => {
+                        let finalStatus = record.status;
+
+                    // Condition: Agar status 2 hai to extra5, agar 3 hai to SUCCESS
+                        if (record.status === "2") {
+                            finalStatus = record.extra5;
+                        } else if (record.status === "3") {
+                            finalStatus = "SUCCESS";
+                        }
+                        return {
+                            ...record,
+                            status: finalStatus,
+                            fetchedAccountTitle: record.beneficiaryName || "N/A",
+                            amount:record.remmitanceAmount  
+                        };
+                    });
+        
+                    setPaymentRecords(mergedHistory);
+                }
+            } catch (error) {
+                console.error("Error fetching bulk status history:", error);
+            }
         };
         //raast API
         const fetchRaastInquiry = async (fileID: string, rawPayments: any[]) => {
@@ -807,6 +889,7 @@ export function BulkTransfer() {
                 setIsSubmitting(false);
             }
         };
+    
     const handleTypeSelect = (title: string) => {
         setSelectedType(title);
         setSelectedAccount(null);
@@ -1009,7 +1092,18 @@ const handleStatusSelection = (type: 'All' | 'Success' | 'Failure') => {
                 </CardContent>
             </Card>
 
-            <Tabs defaultValue="details">
+            <Tabs 
+              value={activeTab}
+              onValueChange={(value) => {
+                  setActiveTab(value);
+                  
+                  // Agar koi file pehle se selected hai, to tab switch hote hi API hit hogi
+                  if (selectedBulkFile) {
+                      const isHistory = (value === "history");
+                      handleFileSelect(selectedBulkFile, isHistory);
+                  }
+                }}
+            >
                 <TabsList>
                     <TabsTrigger value="details">Bulk Processing Details</TabsTrigger>
                     <TabsTrigger value="history">Bulk Processing History</TabsTrigger>
@@ -1108,12 +1202,61 @@ const handleStatusSelection = (type: 'All' | 'Success' | 'Failure') => {
                     </div>
                 )}
             </TabsContent>
-                <TabsContent value="history">
-                     <div className="p-6 text-center text-muted-foreground border rounded-lg">
-                        Bulk Processing History will be shown here.
-                    </div>
-                </TabsContent>
-            </Tabs>
+            {/* HISTORY TAB */}
+            <TabsContent value="history">
+        {selectedBulkFile ? (
+            <div className="rounded-lg border bg-card shadow-sm mt-4">
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="bg-[#ECECEC8C]">
+                                {/* History mein checkbox nahi dikhana */}
+                                <TableHead>File Reference Number</TableHead>
+                                <TableHead>Account Title</TableHead>
+                                <TableHead>Customer Unique ID</TableHead>
+                                <TableHead>Beneficiary Account No.</TableHead>
+                                <TableHead >Local Amount</TableHead>
+                                <TableHead>File Status</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {paymentRecords.length > 0 ? (
+                                paymentRecords.map((detail: any) => (
+                                    <TableRow key={detail.id}>
+                                        <TableCell>{detail.fileId || selectedBulkFile}</TableCell>
+                                        <TableCell>{detail.fetchedAccountTitle}</TableCell>
+                                        <TableCell>{detail.customerUniqueId}</TableCell>
+                                        <TableCell>{detail.beneficiaryAccountNumber}</TableCell>
+                                        <TableCell >{detail.remittanceAmount}. 00</TableCell>
+                                        <TableCell>
+                                            <span className={cn(
+                                                "px-2 py-1 rounded-full text-xs font-semibold",
+                                                detail.status === "Ready to Process" ? "bg-blue-100 text-blue-700" : 
+                                                detail.status === "Success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                                            )}>
+                                                {detail.status}
+                                            </span>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                                        No Records Found in History
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+        ) : (
+            <div className="h-48 flex items-center justify-center border rounded-lg mt-4 text-muted-foreground">
+                Please select a Bulk File to view history
+            </div>
+        )}
+    </TabsContent>
+</Tabs>
                         
                         {selectedRows.length > 0 && summaryData && (
                 <ReviewSummary {...summaryData} onReject={handleReject} onContinue={handleContinue} 
